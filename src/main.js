@@ -3,6 +3,7 @@ import { createVuetify } from 'vuetify'
 import router from './router/routes.js';
 import 'vuetify/styles'
 import './style.css'
+import VScrollLock from 'v-scroll-lock'
 import App from './App.vue'
 
 
@@ -15,6 +16,7 @@ const vuetify = createVuetify({
   directives,
 })
 
+app.use(VScrollLock)
 app.use(vuetify)
 app.use(router)
 

@@ -107,16 +107,7 @@ export default {
         const token = fulltoken.split(' ')[1]
 
         localStorage.setItem('token', token)
-
-        const payload = JSON.parse(atob(token.split('.')[1]))
-        console.log(payload)
-        const role = payload.role
-
-        if(role === 'ADMIN') {
-          this.$router.push('/admin')
-        } else {
-          this.$router.push('/user')
-        }
+        this.$router.push('/home')
       } catch (error) {
         console.log("Erro no login", error)
       }

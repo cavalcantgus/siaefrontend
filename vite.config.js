@@ -4,6 +4,9 @@ import { fileURLToPath, URL } from 'node:url';
 import vuetify from 'vite-plugin-vuetify';
 
 export default defineConfig({
+  server :{
+    host: true
+  },
   plugins: [
     vue(),
     vuetify({ autoImport: true }),
