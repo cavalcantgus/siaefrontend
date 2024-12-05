@@ -9,7 +9,7 @@
             <h3 class="logo-name">SIAE</h3>
            </div>
         </div>
-        <p>O sistema  que garante alimentação<br>
+        <p class="slogan">O sistema  que garante alimentação<br>
           de qualidade para os nossos alunos
         </p>
       </v-card>
@@ -23,13 +23,15 @@
           </div>
           </v-col>
         </v-row>
-        <v-form class="form-container">
+        <v-form class="form-container" v-on:submit.prevent="login">
           <v-card-text>
             <v-row dense>
               <v-col dense>
-                <p class="enter-text">
-                  Entre com seu Usuário e Senha
-                </p>
+                <div class="options-bar">
+                  <a class="arch-left"><p>Cadastrar</p></a>
+                  <a class="rectangle"><p>Login</p></a>
+                  <a class="arch-right"><p>Esqueci a senha</p></a>
+                </div>
                 <v-text-field
                   v-model="username"
                   rounded
@@ -47,6 +49,9 @@
                   rounded
                   variant="outlined"
                   placeholder="Senha"
+                  :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                  :type="showPassword ? 'text' : 'password'"
+                  @click:append-inner="showPassword = !showPassword"
                   dense
                   hide-details
                   class="custom-text-field"
@@ -57,13 +62,18 @@
           <v-card-actions>
             <v-container>
               <v-btn
+                type="submit"
                 class="btn-login"
-                @click="login"
               >
                 Entrar
               </v-btn>
             </v-container>
           </v-card-actions>
+          <v-row dense justify="end">
+            <v-col class="text-end forgot-password-container">
+              <router-link class="forgot_password" to="/esqueci-minha-senha">Esqueci minha senha</router-link>
+            </v-col>
+          </v-row>
         </v-form>
       </v-card>
     </div>
@@ -79,6 +89,7 @@ export default {
   data: () => ({
     username: null,
     password: null,
+    showPassword: false
 
   }),
   methods: {
@@ -102,9 +113,9 @@ export default {
         const role = payload.role
 
         if(role === 'ADMIN') {
-          console.log("Usuário Admin")
+          this.$router.push('/admin')
         } else {
-          console.log("Outro usuário")
+          this.$router.push('/user')
         }
       } catch (error) {
         console.log("Erro no login", error)
@@ -128,7 +139,7 @@ export default {
   border-radius: 20px;
   z-index: 1;
   width: 550px;
-  height: 500px;
+  height: 550px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
   transform: translate(-180px);
 }
@@ -138,13 +149,13 @@ export default {
   border-radius: 20px;
   z-index: 2;
   width: 430px;
-  height: 500px;
+  height: 550px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
   transform: translate(220px);
 }
 
 .form-container {
-  margin-top: 40px;
+  margin-top: 70px;
 }
 
 .enter-text {
@@ -195,7 +206,7 @@ export default {
   margin: 0; /* Remove qualquer margem padrão */
 }
 
-p {
+.slogan {
   font-size: 1.1rem;
   margin-top: 100px;
   margin-right: 90px;
@@ -230,5 +241,67 @@ p {
   object-fit: cover;
   margin: 0;
 }
+
+.forgot_password {
+  color:#57a340;
+  font-weight: 400;
+  text-decoration: underline;
+  font-size: 0.9rem;
+  
+}
+
+.forgot-password-container {
+  margin-top: -100px;
+  margin-right: 25px;
+}
+
+.options-bar {
+  display:flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+}
+
+.arch-left, .arch-right{
+  color: #ffffff;
+  font-weight: 400;
+  width: 90px;
+  padding-top: 10px;
+  background-color: #80c25c;
+  height: 40px;
+  border-radius: 100px 0 0 100px;
+  margin-top: -80px;
+  margin-left: 1px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  cursor:pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease
+
+}
+
+.rectangle {
+  color: #ffffff;
+  font-weight: 400;
+  width: 100px; 
+  height: 40px;
+  padding-top: 10px;
+  background-color: #62a84d;
+  margin-top: -80px;
+  margin-left: 1px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  cursor:pointer;
+
+}
+
+.arch-right {
+  border-radius: 0 100px 100px 0;
+  cursor:pointer;
+  width: 120px; 
+}
+
+.arch-left:hover, .arch-right:hover {
+  background-color: #57a340;
+  transform: scale(0.9)
+}
+
 
 </style>
