@@ -24,7 +24,7 @@
             </div>
           </v-col>
         </v-row>
-        <v-form class="form-container" v-on:submit.prevent="login">
+        <v-form class="form-container" v-on:submit.prevent="register">
           <v-card-text>
             <v-row dense>
               <v-col dense>
@@ -52,6 +52,18 @@
             <v-row dense>
               <v-col>
                 <v-text-field
+                  v-model="email"
+                  rounded
+                  variant="outlined"
+                  placeholder="Email"
+                  dense
+                  hide-details
+                />
+              </v-col>
+            </v-row>
+            <v-row dense>
+              <v-col>
+                <v-text-field
                   v-model="password"
                   rounded
                   variant="outlined"
@@ -68,7 +80,7 @@
           </v-card-text>
           <v-card-actions>
             <v-container>
-              <v-btn type="submit" class="btn-login"> Entrar </v-btn>
+              <v-btn type="submit" class="btn-login"> Cadastrar </v-btn>
             </v-container>
           </v-card-actions>
           <v-row dense justify="end">
@@ -92,19 +104,21 @@ export default {
 
   data: () => ({
     username: null,
+    email: null,
     password: null,
     showPassword: false,
   }),
   methods: {
-    async login() {
+    async register() {
       const fields = {
         username: this.username,
+        email: this.email,
         password: this.password,
       };
 
       try {
         console.log("Teste de requisição");
-        const response = await axios.post("/login/auth", fields);
+        const response = await axios.post("/public/users/register", fields);
         console.log(response);
         const fulltoken = response.data.token;
         const token = fulltoken.split(" ")[1];
@@ -149,7 +163,7 @@ export default {
 }
 
 .form-container {
-  margin-top: 70px;
+  margin-top: 50px;
 }
 
 .enter-text {
@@ -261,7 +275,7 @@ export default {
   font-weight: 400;
   width: 90px;
   padding-top: 10px;
-  background-color: #80c25c;
+  background-color: #62a84d;
   height: 40px;
   border-radius: 100px 0 0 100px;
   margin-top: -80px;
@@ -277,21 +291,23 @@ export default {
   width: 100px;
   height: 40px;
   padding-top: 10px;
-  background-color: #62a84d;
+  background-color: #80c25c;
   margin-top: -80px;
   margin-left: 1px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
 }
 
 .arch-right {
+  background-color: #80c25c;
   border-radius: 0 100px 100px 0;
   cursor: pointer;
   width: 120px;
 }
 
-.arch-left:hover,
-.arch-right:hover {
+.arch-right:hover,
+.rectangle:hover {
   background-color: #57a340;
   transform: scale(0.9);
 }
