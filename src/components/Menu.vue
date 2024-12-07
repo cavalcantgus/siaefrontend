@@ -1,14 +1,6 @@
 <template>
   <div class="main">
-    <v-row dense class="navbar">
-      <v-col cols="1">
-        <v-img class="logo-img" src=".\img\logo (1).svg"></v-img>
-      </v-col>
-      <v-col cols="2">
-        <h2 class="logo-name">SIAE</h2>
-      </v-col>
-    </v-row>
-    <hr class="line">
+    <NavBar class="navbar"></NavBar>
     <div class="container">
       <v-card class="card-first" color="#57a340">
         <v-card-text>
@@ -25,7 +17,7 @@
             <v-card-actions>
             <v-container>
               <v-btn
-                class="access-paa"
+                class="access-paa" to="/menu-paa"
               >
                 Acessar
               </v-btn>
@@ -50,7 +42,7 @@
               <v-card-actions>
                 <v-container>
                   <v-btn
-                    class="access-pnae"
+                    class="access-pnae" to="/menu-pnae"
                   >
                     Acessar
                   </v-btn>
@@ -64,28 +56,37 @@
   </div>
 </template>
 
-<script></script>
+<script>
+import NavBar from "./NavBar.vue";
+
+export default {
+  name: 'Menu.vue',
+  components: {
+    NavBar
+  },
+  data: () => ({
+    pendingUsers: 3,
+    items: [],    
+  }),
+  methods: {
+    
+  },
+}
+</script>
 
 <style scoped>
 .navbar {
-  margin-left: 10px;
   align-items: center;
+  margin: 0;
   justify-content: flex-start;
-  margin-top: 5px;
 }
-hr {
-  margin: 10px 0 30px;
-}
-.line {
-  border: 0;
-  border-top: 3px solid rgba(87, 163, 64, 0.7);
-}
+
 .container {
   display: flex;
+  margin-top: 30px;
   flex-direction: row;
   width: 100vw;
   height: 100vh;
-  margin: 0;
   padding-left: 2rem;
   justify-content: flex-start;
   align-items: flex-start;
@@ -131,14 +132,4 @@ hr {
   transform: scale(1.1);
 } 
 
-.logo-img {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-}
-
-.logo-name {
-  color: #37622a;
-  justify-self: flex-start;
-}
 </style>
