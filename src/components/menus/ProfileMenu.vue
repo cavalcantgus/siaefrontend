@@ -70,4 +70,16 @@ export default {
 .custom-item:hover {
   background-color: #80c25c;
 }
+
+.v-btn:focus,
+.v-btn:active
+ {
+  outline: none !important;
+  background-color: #57a340 !important; 
+  box-shadow: none !important;      
+}
+
+.v-btn:focus-visible {
+  outline: none !important; 
+}
 </style>

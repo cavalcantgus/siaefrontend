@@ -113,7 +113,8 @@ export default {
     background-color: #62a84d;
 }
 
-.v-btn:focus
+.v-btn:focus,
+.v-btn:active
  {
   outline: none !important;
   background-color: #57a340 !important; 
