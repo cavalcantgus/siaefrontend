@@ -1,5 +1,4 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -73,3 +72,11 @@ button:hover {
   }
 }
 
+:deep(.v-btn) {
+  background-color: transparent !important;
+}
+
+:deep(.v-btn:hover) {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
