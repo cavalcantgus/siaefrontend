@@ -3,7 +3,7 @@
   <h1 style="color: #57a340; margin-top: 10px; padding: 30px; font-size: 3rem">Cadastro de Produtores</h1>
   <v-row justify="center">
     <v-col cols="12">
-      <v-data-table :items="filteredProductors" :headers="headers" :search="search" show-expand expanded.sync="expanded" class="fixed-header-table" fixer-header height="700px" items-per-page="-1">
+      <v-data-table-virtual :items="filteredProductors" :headers="headers" :search="search" show-expand single-expand v-model:expanded="expanded" :fixed-header="true" height="700px">
         <template v-slot:top>
           <v-row class="mt-2 mb-8 mx-3">
             <v-col cols="5">
@@ -18,7 +18,7 @@
               </v-badge>
             </v-col>
             <v-col class="text-end">
-              <v-btn color="success" class="mx-4 elevation-0" @click="dialog = true">
+              <v-btn color="success" class="mx-4 elevation-0" @click="dialog.create = true">
                 <v-icon left>mdi-plus</v-icon>
                 Novo
               </v-btn>
@@ -26,22 +26,46 @@
           </v-row>
         </template>
         <template v-slot:[`item.edit`]="{ item }">
-            {{ item.edit }}
-            <v-btn icon class="elevation-0">
+          <v-tooltip location="top">
+            <template #activator="{ props }">
+              <v-btn icon v-bind="props" @click="onSelectRow(item, 'update')" class="elevation-0">
                 <v-icon color="green">mdi-pencil</v-icon>
-            </v-btn>
+              </v-btn>
+            </template>
+            <span>Clique para editar um Produtor</span>
+          </v-tooltip>
         </template>
-      </v-data-table>
-      <v-dialog v-model="dialog">
+        <template v-slot:expanded-row="{ item }">
+          <tr>
+            <td :colspan="9">
+              {{ console.log(item) }}
+              <ProdutorExpand :produtorData="item"></ProdutorExpand>
+            </td>
+          </tr>
+        </template>
+      </v-data-table-virtual>
+      <v-dialog v-model="dialog.create">
         <v-card class="card-form">
           <v-card-title class="sticky-title title-border">
             Cadastro de Produtor
             <v-spacer></v-spacer>
-            <v-btn icon class="btn-close elevation-0" @click="dialog = !dialog">
+            <v-btn icon class="btn-close elevation-0" @click="dialog.create = !dialog.create">
               <v-icon prepend> mdi-close </v-icon>
             </v-btn>
           </v-card-title>
           <NovoProdutor :currentItem="newItem" :onSubmit="createProductor" :files="files"></NovoProdutor>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="dialog.update">
+        <v-card class="card-form">
+          <v-card-title class="sticky-title title-border">
+            Editar Produtor: {{ selectedRow.id }}
+            <v-spacer></v-spacer>
+            <v-btn icon class="btn-close elevation-0" @click="dialog.update = !dialog.update">
+              <v-icon prepend> mdi-close </v-icon>
+            </v-btn>
+          </v-card-title>
+          <EditProdutor :currentItem="selectedRow" :onSubmit="updateProductor" :files="files"></EditProdutor>
         </v-card>
       </v-dialog>
     </v-col>
@@ -52,6 +76,8 @@
 import axios from "@/services/axios.js";
 import NavBar from "../../NavBar.vue";
 import NovoProdutor from "./NovoProdutor.vue";
+import EditProdutor from "./EditProdutor.vue";
+import ProdutorExpand from "./ProdutorExpand.vue";
 import { useToast } from "vue-toastification";
 
 export default {
@@ -59,10 +85,16 @@ export default {
   components: {
     NavBar,
     NovoProdutor,
+    ProdutorExpand,
+    EditProdutor,
   },
   data: () => ({
-    dialog: false,
+    dialog: {
+      create: false,
+      update: false,
+    },
     search: "",
+    singleExpand: false,
     showFilters: false,
     productors: [],
     headers: [
@@ -78,6 +110,8 @@ export default {
       sexo: "Masculino",
     },
     files: [],
+    selectedRow: {},
+    expanded: [],
   }),
   computed: {
     filteredProductors() {
@@ -129,6 +163,43 @@ export default {
         this.dialog = false;
       }
     },
+
+    async updateProductor(fields) {
+      const toast = useToast();
+      const { currentItem, files } = fields;
+
+      try {
+        const formData = new FormData();
+        files.forEach((file) => {
+          console.log("Arquivo enviado: ", file)
+          formData.append("file", file);
+        });
+        formData.append("produtor", JSON.stringify(currentItem));
+
+        const response = await axios.put(`/public/produtores/atualizar/${currentItem.id}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        console.log(response.data);
+
+        if (response.status !== 200) {
+          throw new Error(`Erro: ${response.status}`);
+        }
+        toast.success("Produtor atualizado com sucesso!");
+        this.dialog.update = false;
+      } catch (error) {
+        console.error("Erro: ", error);
+        toast.error("Erro ao atualizar produtor: ", error);
+        this.dialog.update = false;
+      }
+    },
+
+    onSelectRow(row, dialog) {
+      this.selectedRow = { ...row };
+      this.dialog[dialog] = true;
+    },
   },
   mounted() {
     this.getProductors();
@@ -161,5 +232,10 @@ export default {
 
 .card-form::-webkit-scrollbar-button {
   display: none;
+}
+
+td {
+  padding: 16px;
+  background-color: #f9f9f9;
 }
 </style>

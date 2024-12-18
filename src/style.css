@@ -72,3 +72,11 @@ button:hover {
   }
 }
 
+:deep(.v-btn) {
+  background-color: transparent !important;
+}
+
+:deep(.v-btn:hover) {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}

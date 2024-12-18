@@ -226,17 +226,15 @@ export default {
       try {
         this.currentItem.estado = this.currentItem.estado.nome;
         this.currentItem.municipio = this.currentItem.municipio.nome;
-
-        const fields = {
-          ...this.currentItem,
-          files: [...this.files],
-        };
-        console.log(fields);
-        this.onSubmit(fields);
+        this.onSubmit({
+          currentItem: {...this.currentItem},
+          files: [...this.files]
+      })
       } catch (error) {
         console.log("Erro: ", error);
       }
     },
+
     async getUF() {
       try {
         const response = await axios.get("https://servicodados.ibge.gov.br/api/v1/localidades/estados");
