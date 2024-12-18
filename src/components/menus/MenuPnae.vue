@@ -4,15 +4,15 @@
     <div class="container">
       <v-row dense class="justify-center" align="center" wrap>
         <v-col
-          v-for="(title, index) in cardTitles"
+          v-for="(card, index) in cardTitles"
           :key="index"
           cols="12" sm="6" md="3" lg="3" xl="3"
         >
           <CardsTemplate
           :key="index"
           :main-title="'Sistema Integrado de Alimentação Escolar'"
-          :title="title"
-          route="/menu-paa"
+          :title="card.title"
+          :route="card.route"
           width="250px"
           height="250px"
           :customClass="{
@@ -41,7 +41,14 @@ export default {
     pendingUsers: 3,
     items: [],  
     cardTitles: [
-        'PRODUTORES', 'PRODUTOS', 'PESQUISA DE PREÇO', 'PAUTA DA CHAMADA', 'PROJETO DE VENDA', 'CRONOGRAMA DE ENTREGA', 'COMPROVANTE DE RECEBIMENTO', 'CONTRATOS'
+        {title: 'PRODUTORES', route: "/cadastro-produtor"}, 
+        {title: 'PRODUTOS', route: "/cadastro-produtor"}, 
+        {title: 'PESQUISA DE PREÇO', route: "/cadastro-produtor"}, 
+        {title: 'PAUTA DA CHAMADA', route: "/cadastro-produtor"}, 
+       {title: 'PROJETO DE VENDA', route: "/cadastro-produtor"}, 
+        {title: 'CRONOGRAMA DE ENTREGA', route: "/cadastro-produtor"}, 
+        {title: 'COMPROVANTE DE RECEBIMENTO', route: "/cadastro-produtor"}, 
+        {title: 'CONTRATOS', route: "/cadastro-produtor"}
     ],
   }),
   methods: {
