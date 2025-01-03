@@ -7,6 +7,7 @@ const routes = [
     { path: '/register', name: 'Register', component: () => import("@/components/cadastros/Register.vue")},
     { path: '/menu-pnae', name: 'Pnae', component: () => import("@/components/menus/MenuPnae.vue")},
     { path: '/cadastro-produtor', name: 'Produtor', component: () => import("@/components/cadastros/produtor/Produtor.vue")},
+    { path: '/cadastro-produto', name: 'Produto', component: () => import("@/components/cadastros/produto/Produto.vue")},
     { path: '/', redirect: '/login'},
 
 ]

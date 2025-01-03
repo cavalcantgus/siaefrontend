@@ -132,7 +132,7 @@ import axios from "@/services/axios.js";
 import ConfirmButton from "../../template/ConfirmButton.vue";
 
 export default {
-  name: "NovoProdutor",
+  name: "EditProdutor",
   components: {
     ConfirmButton,
   },
