@@ -42,7 +42,7 @@ export default {
     items: [],  
     cardTitles: [
         {title: 'PRODUTORES', route: "/cadastro-produtor"}, 
-        {title: 'PRODUTOS', route: "/cadastro-produtor"}, 
+        {title: 'PRODUTOS', route: "/cadastro-produto"}, 
         {title: 'PESQUISA DE PREÇO', route: "/cadastro-produtor"}, 
         {title: 'PAUTA DA CHAMADA', route: "/cadastro-produtor"}, 
        {title: 'PROJETO DE VENDA', route: "/cadastro-produtor"}, 
