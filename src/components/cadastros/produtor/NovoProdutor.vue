@@ -142,6 +142,10 @@ export default {
       type: Object,
     },
     files: Array,
+    dialogAtivo: {
+      type: Boolean,
+      required: true,
+    },
   },
   data: () => ({
     isSubmitting: false,
@@ -176,8 +180,15 @@ export default {
     estado: [],
     municipio: [],
     requiredField: [(e) => (e !== null && e !== undefined && e !== "") || "Obrigatório"],
-    emailRules: [(v) => !!v || "E-mail é obrigatório", (v) => !v || /.+@.+\..+/.test(v) || "E-mail deve ser válido"],
+    emailRules: [(v) => !v || /.+@.+\..+/.test(v) || "E-mail deve ser válido"],
   }),
+  watch: {
+    dialogAtivo(newValue) {
+      if (!newValue) {
+        this.resetState();
+      }
+    },
+  },
   computed: {
     isFormValid() {
       return !!(
@@ -220,6 +231,11 @@ export default {
     },
   },
   methods: {
+    resetState() {
+      Object.keys(this.currentItem).forEach((key) => {
+        this.currentItem[key] = null
+      })
+    },
     async localOnSubmit() {
       this.format();
       this.currentItem.nome = this.currentItem.nome.toUpperCase()
