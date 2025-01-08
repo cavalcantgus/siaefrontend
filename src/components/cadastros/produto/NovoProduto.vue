@@ -2,13 +2,13 @@
   <div class="pa-4 pr-12 pl-12">
     <v-form @submit.prevent="localOnSubmit" ref="formRef">
       <div class="grid-container">
-        <v-text-field class="flex-item-nome" density="compact" name="nome" v-model="currentItem.descricao" variant="outlined">
+        <v-text-field class="flex-item-nome" density="compact" name="nome" v-model="currentItem.descricao" variant="outlined" :rules="requiredField" >
           <template v-slot:label>
             <span>Descrição <span style="color: red">*</span></span>
           </template>
         </v-text-field>
 
-        <v-select density="compact" name="unidade" :items="unidade" item-title="type" item-value="value" v-model="currentItem.unidade" variant="outlined">
+        <v-select density="compact" name="unidade" :items="unidade" item-title="type" item-value="value" v-model="currentItem.unidade" variant="outlined" :rules="requiredField" clearable>
           <template v-slot:label>
             <span>Unidade <span style="color: red">*</span></span>
           </template>

@@ -3,7 +3,7 @@
   <h1 style="color: #57a340; margin-top: 10px; padding: 30px; font-size: 3rem">Cadastro de Produtos</h1>
   <v-row justify="center" class="pr-2">
     <v-col cols="12">
-      <v-data-table-virtual :items="filteredProductors" :headers="headers" :search="search" show-expand single-expand v-model:expanded="expanded" :fixed-header="true" height="700px">
+      <v-data-table-virtual :items="filteredProductors" :headers="headers" :search="search" single-expand v-model:expanded="expanded" :fixed-header="true" height="700px">
         <template v-slot:top>
           <v-row class="mt-2 mb-8 mx-3">
             <v-col cols="5">
@@ -42,7 +42,7 @@
           </v-tooltip>
         </template>
         <template v-slot:[`item.precoMedio`]="{ item }">
-          <span v-if="item.precoMedio !== null">{{ item.precoMedio }}</span>
+          <span v-if="item.precoMedio !== null">{{ formatPrice(item.precoMedio) }}</span>
           <span v-else>-</span>
         </template>
           <!-- <template v-slot:expanded-row="{ item }">
@@ -89,6 +89,7 @@ import NovoProduto from "./NovoProduto.vue";
 import EditProdutor from "./EditProduto.vue";
 import ProdutorExpand from "./ProdutorExpand.vue";
 import { useToast } from "vue-toastification";
+import UtilsService from '../../../services/utilsService';
 
 export default {
   name: "CadastroProdutor",
@@ -123,6 +124,11 @@ export default {
     },
   },
   methods: {
+    formatPrice(val) {
+      val = UtilsService.formatReal(val);
+      return val;
+    },
+
     async getProducts() {
       try {
         const response = await axios.get("/public/produtos");
