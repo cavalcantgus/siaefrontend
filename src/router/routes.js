@@ -8,6 +8,7 @@ const routes = [
     { path: '/menu-pnae', name: 'Pnae', component: () => import("@/components/menus/MenuPnae.vue")},
     { path: '/cadastro-produtor', name: 'Produtor', component: () => import("@/components/cadastros/produtor/Produtor.vue")},
     { path: '/cadastro-produto', name: 'Produto', component: () => import("@/components/cadastros/produto/Produto.vue")},
+    { path: '/pesquisa-de-preco', name: 'PesquisaDePreco', component: () => import("@/components/cadastros/pesquisaDePreco/PesquisaDePreco.vue")},
     { path: '/', redirect: '/login'},
 
 ]

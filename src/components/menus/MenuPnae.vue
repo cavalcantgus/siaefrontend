@@ -43,7 +43,7 @@ export default {
     cardTitles: [
         {title: 'PRODUTORES', route: "/cadastro-produtor"}, 
         {title: 'PRODUTOS', route: "/cadastro-produto"}, 
-        {title: 'PESQUISA DE PREÇO', route: "/cadastro-produtor"}, 
+        {title: 'PESQUISA DE PREÇO', route: "/pesquisa-de-preco"}, 
         {title: 'PAUTA DA CHAMADA', route: "/cadastro-produtor"}, 
        {title: 'PROJETO DE VENDA', route: "/cadastro-produtor"}, 
         {title: 'CRONOGRAMA DE ENTREGA', route: "/cadastro-produtor"}, 
