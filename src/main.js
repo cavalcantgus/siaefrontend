@@ -7,10 +7,9 @@ import '@mdi/font/css/materialdesignicons.css'  // Certifique-se de importar o C
 import VueToastificationPlugin, { POSITION } from 'vue-toastification';
 import 'vue-toastification/dist/index.css'
 import VScrollLock from 'v-scroll-lock'
+import VuetifyMoney from 'vuetify-money-3'
 import App from './App.vue'
 import VueTheMask from 'vue-the-mask'
-
-
 
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
@@ -25,7 +24,7 @@ const vuetify = createVuetify({
 })
 
 app.use(VueTheMask)
-
+app.use(VuetifyMoney);
 app.use(VueToastificationPlugin, {
   position: POSITION.BOTTOM_RIGHT, 
   timeout: 3000,  
@@ -34,5 +33,6 @@ app.use(VueToastificationPlugin, {
 app.use(VScrollLock)
 app.use(vuetify)
 app.use(router)
+
 
 app.mount('#app')

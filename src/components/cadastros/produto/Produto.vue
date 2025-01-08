@@ -45,14 +45,14 @@
           <span v-if="item.precoMedio !== null">{{ item.precoMedio }}</span>
           <span v-else>-</span>
         </template>
-        <!-- <template v-slot:expanded-row="{ item }">
-          <tr>
-            <td :colspan="9">
-              {{ console.log(item) }}
-              <ProdutorExpand :produtorData="item"></ProdutorExpand>
-            </td>
-          </tr>
-        </template> -->
+          <!-- <template v-slot:expanded-row="{ item }">
+            <tr>
+              <td :colspan="9">
+                {{ console.log(item) }}
+                <ProdutorExpand :produtorData="item"></ProdutorExpand>
+              </td>
+            </tr>
+          </template> -->
       </v-data-table-virtual>
       <v-dialog v-model="dialog.create">
         <v-card class="card-form align-self-center" width="60%">
