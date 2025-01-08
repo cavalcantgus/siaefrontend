@@ -24,10 +24,10 @@
                 <template #activator="{ props }">
                   <v-btn color="success" class="elevation-3 compact-btn ml-3" min-width="25%" @click="dialog.create = true" v-bind="props">
                     <v-icon small class="compact-icon" left>mdi-plus</v-icon>
-                    <div class="d-flex flex-column compact-btn-text" style="font-size: 0.6rem"><span>Novo</span> <span>Produto</span></div>
+                    <div class="d-flex flex-column compact-btn-text" style="font-size: 0.6rem"><span>Nova</span> <span>Pesquisa</span></div>
                   </v-btn>
                 </template>
-                <span>Clique para adicionar um produto</span>
+                <span>Clique para adicionar uma pesquisa</span>
               </v-tooltip>
             </v-col>
             <v-col cols="12">

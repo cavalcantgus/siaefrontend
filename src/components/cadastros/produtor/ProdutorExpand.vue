@@ -11,7 +11,11 @@
     </v-col>
     <v-col cols="1" align="start" class="h-50">
       <h4>Idade:</h4>
-      <p>{{ produtorData.dataNascimento }}</p>
+      <p>{{ getAge(produtorData.dataNascimento)}}</p>
+    </v-col>
+    <v-col cols="1" align="start" class="h-50">
+      <h4>Sexo:</h4>
+      <p>{{ produtorData.sexo }}</p>
     </v-col>
     <v-col cols="3" align="start" class="h-50">
       <h4>Email:</h4>
@@ -52,8 +56,8 @@
       <p>{{ produtorData.cep }}</p>
     </v-col>
   </v-row>
-  <v-row dense style="height: 50vh; width: 452px; margin-top: 34px; border-top: 2px solid #CCCCCC;" class=" float-end">
-    <v-data-table-virtual :items="produtorData.documentos" :headers="headers"  class="h-75 " align="start" :items-per-page="3" :fixed-header="true">
+  <v-row dense style="height: 50vh; width: 452px; margin-top: 34px; margin-bottom: -50px; border-radius: 10px;" class=" float-end">
+    <v-data-table-virtual :items="produtorData.documentos" :headers="headers"  class="h-75 " align="start" :hover="true" style="background-color: #f4f1e4;">
       <template v-slot:top>
         <h4 align="center" class="pa-2">
           Documentos do produtor
@@ -62,7 +66,7 @@
         <template v-slot:[`item.download`]="{ item }">
           <v-tooltip location="top">
             <template #activator="{ props }">
-              <v-btn icon v-bind="props" @click="downloadFile(item)" class="elevation-0">
+              <v-btn icon v-bind="props" @click="downloadFile(item)" class="elevation-0" color="#f4f1e4">
                 <v-icon color="primary">mdi-download-box</v-icon>
               </v-btn>
             </template>
@@ -72,7 +76,7 @@
         <template v-slot:[`item.remove`]="{ item }">
           <v-tooltip location="top">
             <template #activator="{ props }">
-              <v-btn icon v-bind="props" @click="deleteFile(item)" class="elevation-0">
+              <v-btn icon v-bind="props" @click="deleteFile(item)" class="elevation-0" color="#f4f1e4">
                 <v-icon color="red">mdi-delete</v-icon>
               </v-btn>
             </template>
@@ -138,17 +142,17 @@ export default {
     ],
   }),
   methods: {
-    getAge() {
-      const date = new Date();
-      const bornDate = new Date(this.produtorData?.dataNascimento);
-
-      let age = date.getFullYear() - bornDate.getFullYear();
-      const m = date.getMonth() - bornDate.getMonth();
-
-      if (m < 0 || (m === 0 && date.getDate() < bornDate.getDate())) {
+    getAge(item) {
+      const today = new Date();
+    const birthDate = new Date(item);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
         age--;
-      }
-      this.produtorData.dataNascimento = age
+    }
+    
+    return age;
     },
 
     downloadFile(item) {
@@ -169,6 +173,11 @@ export default {
         if(response.status !== 204) {
           throw new Error("Erro: ", response.status)
         }
+
+        const index = this.produtorData.documentos.findIndex(doc => doc.id === item.id)
+        if(index !== -1) {
+          this.produtorData.documentos.splice(index, 1)
+        }
         toast.success("Arquivo removido com sucesso!")
       } catch (error) {
         toast.error("Erro ao remover arquivo: ", error)
@@ -178,7 +187,6 @@ export default {
     async getProductors() {
       try {
         const response = await axios.get("/public/produtores");
-        console.log(response.data);
 
         if (Array.isArray(response.data)) {
           this.productors = response.data;
@@ -186,6 +194,7 @@ export default {
           console.log("A resposta da API não é um Array");
           this.productors = [];
         }
+
       } catch (error) {
         console.log("Error: ", error);
         this.productors = [];
@@ -193,7 +202,7 @@ export default {
     },
   },
   mounted() {
-    this.getAge(),
+    this.getProductors(),
     console.log(this.produtorData?.documentos)
   },
 };
