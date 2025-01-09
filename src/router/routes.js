@@ -10,12 +10,12 @@ const routes = [
     { path: '/cadastro-produto', name: 'Produto', component: () => import("@/components/cadastros/produto/Produto.vue")},
     { path: '/pesquisa-de-preco', name: 'PesquisaDePreco', component: () => import("@/components/cadastros/pesquisaDePreco/PesquisaDePreco.vue")},
     { path: '/', redirect: '/login'},
+];
 
-]
-
-const router = createRouter ({
-    history: createWebHistory(),
+const router = createRouter({
+    // Use o base correto para o GitHub Pages
+    history: createWebHistory('/siaefrontend/'),  // Aqui você coloca o caminho base
     routes,
-})
+});
 
-export default router
+export default router;
