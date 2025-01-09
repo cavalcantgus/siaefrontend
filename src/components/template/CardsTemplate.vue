@@ -19,7 +19,13 @@
       <!-- Conteúdo principal -->
       <div class="content-container">
         <slot name="content">
-          <h2 v-if="title" class="program" :class="customClass.program">{{title}}</h2>
+          <h2 v-if="sysTitle" class="program" :class="customClass.program">{{sysTitle}}</h2>
+        </slot>
+      </div>
+
+      <div class="program-container">
+        <slot name="program-content">
+          <h6 v-if="title" class="program-name" :class="customClass.programName">{{title}}</h6>
         </slot>
       </div>
 
@@ -48,10 +54,15 @@ export default {
         sysName: "",
         program: "",
         accessProgram: "",
-        actionsContainer: ""
+        actionsContainer: "",
+        programName: ""
       }),
     },
     route: {
+      type: String,
+      default: null,
+    },
+    sysTitle: {
       type: String,
       default: null,
     },
@@ -82,3 +93,32 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+
+.sys-name {
+  font-size: 0.9rem ;
+  font-weight: 400;
+}
+
+.program {
+  margin-left: 20px;
+  margin-top: 120px;
+  margin-bottom: 20px;
+  justify-self: flex-start;
+}
+
+.access-program {
+  height: 30px;
+  display: flex;
+  width: auto; 
+  justify-self: flex-end;
+  margin: auto;
+  background-color: #ffffff;
+  color: #57a340;
+  font-weight: bold;
+  padding: 5px 10px; 
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+</style>

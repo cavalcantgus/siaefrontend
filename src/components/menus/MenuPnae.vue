@@ -9,17 +9,17 @@
           cols="12" sm="6" md="3" lg="3" xl="3"
         >
           <CardsTemplate
+          class="txt_program"
           :key="index"
-          :main-title="'Sistema Integrado de Alimentação Escolar'"
           :title="card.title"
           :route="card.route"
           width="250px"
-          height="250px"
+          height="150px"
           :customClass="{
             card: 'card',
             sysName: 'sys-name',
-            program: 'program',
-            accessProgram: 'access-program',
+            programName: 'program-name',
+            accessCard: 'access-card',
           }"
         ></CardsTemplate>
         </v-col>
@@ -42,8 +42,8 @@ export default {
     items: [],  
     cardTitles: [
         {title: 'PRODUTORES', route: "/cadastro-produtor"}, 
-        {title: 'PRODUTOS', route: "/cadastro-produtor"}, 
-        {title: 'PESQUISA DE PREÇO', route: "/cadastro-produtor"}, 
+        {title: 'PRODUTOS', route: "/cadastro-produto"}, 
+        {title: 'PESQUISA DE PREÇO', route: "/pesquisa-de-preco"}, 
         {title: 'PAUTA DA CHAMADA', route: "/cadastro-produtor"}, 
        {title: 'PROJETO DE VENDA', route: "/cadastro-produtor"}, 
         {title: 'CRONOGRAMA DE ENTREGA', route: "/cadastro-produtor"}, 
@@ -57,14 +57,14 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .navbar {
   align-items: center;
   margin: 0;
   justify-content: flex-start;
 }
 
-.container {
+:deep(.container ){
   display: flex;
   flex-direction: row;
   margin-top: 0;
@@ -90,11 +90,11 @@ export default {
 }
 
 .sys-name {
-  font-size: 0.9rem;
+  font-size: 0.6rem;
   font-weight: 600;
 }
 
-.program {
+.programName {
   margin-top: 100px;
   margin-left: 0;
   height: 20px;

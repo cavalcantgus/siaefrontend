@@ -80,3 +80,11 @@ button:hover {
   background-color: transparent !important;
   box-shadow: none !important;
 }
+
+h6 {
+  margin-bottom: 70px;
+  font-size: 0.9rem;
+  height: 5px;
+  justify-self: center;
+}
+
