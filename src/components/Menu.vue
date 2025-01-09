@@ -4,7 +4,7 @@
     <div class="container">
       <CardsTemplate
         main-title="Sistema Integrado de Alimentação Escolar"
-        title="PAA"
+        sysTitle="PAA"
         route="/menu-paa"
         width="350px"
         height="250px"
@@ -18,7 +18,7 @@
       </CardsTemplate>
       <CardsTemplate
         main-title="Sistema Integrado de Alimentação Escolar"
-        title="PNAE"
+        sysTitle="PNAE"
         route="/menu-pnae"
         width="350px"
         height="250px"
@@ -37,6 +37,8 @@
 <script>
 import NavBar from "./NavBar.vue";
 import CardsTemplate from "./template/CardsTemplate.vue";
+import services from '@/services/utilsFunc.js'
+import { useToast } from "vue-toastification";
 
 export default {
   name: "MenuPnae.vue",
@@ -48,13 +50,24 @@ export default {
     pendingUsers: 3,
     items: [],
     title1: "PAA",
-    title2: "PNAE",    
+    title2: "PNAE", 
+    role: services.getRoleFromToken()   
   }),
-  methods: {},
+  methods: {
+    route() {
+      const toast = useToast()
+      console.log(this.role)
+      if(this.role.toLowerCase() === "admin") {
+        this.$router.push("/menu-pnae");
+      } else {
+        toast.error("Você não tem permissões para acessar esta página.")
+      }
+    }
+  },
 };
 </script>
 
-<style>
+<style scoped>
 .navbar {
   align-items: center;
   margin: 0;
@@ -80,7 +93,7 @@ export default {
 }
 
 .sys-name {
-  font-size: 0.9rem;
+  font-size: 0.6rem ;
   font-weight: 400;
 }
 

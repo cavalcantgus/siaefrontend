@@ -68,7 +68,14 @@
           </v-card-text>
           <v-card-actions>
             <v-container>
-              <v-btn type="submit" class="btn-login"> Entrar </v-btn>
+              <v-btn :loading="loading" type="submit" class="btn-login">
+                <template v-slot:default>
+                  Entrar
+                </template>
+                <template v-slot:loader>
+                  <v-progress-circular indeterminate color="white" ></v-progress-circular>
+                </template>
+              </v-btn>
             </v-container>
           </v-card-actions>
           <v-row dense justify="end">
@@ -86,6 +93,7 @@
 
 <script>
 import axios from "@/services/axios.js";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "TwoCardsExample",
@@ -94,9 +102,12 @@ export default {
     username: null,
     password: null,
     showPassword: false,
+    loading: false,
   }),
   methods: {
     async login() {
+      this.loading = true
+      const toast = useToast()
       const fields = {
         username: this.username,
         password: this.password,
@@ -105,14 +116,21 @@ export default {
       try {
         console.log("Teste de requisição");
         const response = await axios.post("/login/auth", fields);
-        console.log(response);
+        console.log(response.status);
         const fulltoken = response.data.token;
         const token = fulltoken.split(" ")[1];
 
         localStorage.setItem("token", token);
         this.$router.push("/menu");
       } catch (error) {
-        console.log("Erro no login", error);
+        if(error.response) {
+          toast.error("Erro ao fazer o login. " + error.response.data.message)
+          console.log(error.response.data.message)
+        } else {
+          console.error("Erro de conexão: ", error)
+        }
+      } finally {
+        this.loading = false; 
       }
     },
   },
