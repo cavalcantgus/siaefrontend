@@ -31,10 +31,6 @@
       <h4>ID:</h4>
       <p>{{ pesquisaData.id }}</p>
     </v-col>
-    <v-col cols="auto" align="start" class="h-75">
-      <h4>Quantidade:</h4>
-      <p>{{ pesquisaData.quantidade }}</p>
-    </v-col>
     <v-col cols="auto" align="start" class="h-75" v-for="(preco, index) in pesquisaData.precos" :key="index" >
       <h4>Preço {{ index + 1 }}:</h4>
       <p>{{ preco.valor}}</p>
@@ -42,10 +38,6 @@
     <v-col cols="auto" align="start" class="h-75">
       <h4>Data da Pesquisa:</h4>
       <p>{{ formatDateBr(pesquisaData.dataPesquisa) }}</p>
-    </v-col>
-    <v-col cols="auto" align="start" class="h-75">
-      <h4>Total</h4>
-      <p>{{ formatPrice(pesquisaData.total) }}</p>
     </v-col>
   </v-row>
 </template>

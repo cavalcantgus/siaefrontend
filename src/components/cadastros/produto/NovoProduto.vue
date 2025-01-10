@@ -8,6 +8,8 @@
           </template>
         </v-text-field>
 
+        <v-text-field density="compact" name="nome" label="Especificação" v-model="currentItem.especificacao" variant="outlined"></v-text-field>
+
         <v-select density="compact" name="unidade" :items="unidade" item-title="type" item-value="value" v-model="currentItem.unidade" variant="outlined" :rules="requiredField" clearable>
           <template v-slot:label>
             <span>Unidade <span style="color: red">*</span></span>
@@ -52,11 +54,11 @@ export default {
     isSubmitting: false,
     unidade: [
       { type: "G", value: "G" }, // Gramas
-      { type: "Kg", value: "Kg" }, // Kilogramas
+      { type: "KG", value: "KG" }, // Kilogramas
       { type: "T", value: "T" }, // Toneladas
       { type: "L", value: "L" }, // Litros
-      { type: "Ml", value: "Ml" }, // Mililitros
-      { type: "UND", value: "Und" }, // Unidades
+      { type: "ML", value: "ML" }, // Mililitros
+      { type: "UND", value: "UND" }, // Unidades
       { type: "Maço", value: "Maço" }, // Caixas
       { type: "Caixas", value: "Caixas" }, // Caixas
       { type: "Pacotes", value: "Pacotes" }, // Pacotes

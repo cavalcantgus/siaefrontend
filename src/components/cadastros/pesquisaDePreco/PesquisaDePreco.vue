@@ -157,7 +157,6 @@ export default {
       { text: "Editar", align: "center", value: "edit" },
       { title: "Produto", align: "center", sortable: true, value: "produto.descricao" },
       { title: "Unidade", align: "center", sortable: true, value: "produto.unidade" },
-      { title: "Quantidade", align: "center", sortable: true, value: "quantidade" },
     ],
     newItem: {
       precos: [null, null, null],

@@ -111,6 +111,7 @@ export default {
     headers: [
       { text: "Editar", align: "center", value: "edit" },
       { title: "Descrição do Produto", align: "center", sortable: true, value: "descricao" },
+      { title: "Especificação do Produto", align: "center", sortable: true, value: "especificacao" },
       { title: "Unidade", align: "center", sortable: true, value: "unidade" },
       { title: "Preço Médio", align: "center", sortable: true, value: "precoMedio" },
     ],
