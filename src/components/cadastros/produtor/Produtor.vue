@@ -1,5 +1,6 @@
 <template>
   <NavBar></NavBar>
+  <BtnComeBack></BtnComeBack>
   <h1 style="color: #57a340; margin-top: 10px; padding: 30px; font-size: 3rem">Cadastro de Produtores</h1>
   <v-row justify="center">
     <v-col cols="12">
@@ -111,6 +112,7 @@ import NovoProdutor from "./NovoProdutor.vue";
 import EditProdutor from "./EditProdutor.vue";
 import ProdutorExpand from "./ProdutorExpand.vue";
 import { useToast } from "vue-toastification";
+import BtnComeBack from "../../template/BtnComeBack.vue";
 
 export default {
   name: "CadastroProdutor",
@@ -119,6 +121,7 @@ export default {
     NovoProdutor,
     ProdutorExpand,
     EditProdutor,
+    BtnComeBack,
   },
   data: () => ({
     dialog: {

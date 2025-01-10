@@ -1,5 +1,6 @@
 <template>
   <NavBar></NavBar>
+  <BtnComeBack></BtnComeBack>
   <h1 style="color: #57a340; margin-top: 10px; padding: 30px; font-size: 3rem">Pesquisa De Preço</h1>
   <v-row justify="center" class="pr-2">
     <v-col cols="12">
@@ -119,6 +120,7 @@ import EditPesquisa from "./EditPesquisa.vue";
 import ProdutorExpand from "./PesquisaExpand.vue";
 import { useToast } from "vue-toastification";
 import UtilsService from "../../../services/utilsService";
+import BtnComeBack from '../../template/BtnComeBack.vue';
 
 export default {
   name: "PesquisaDePreco",
@@ -127,6 +129,7 @@ export default {
     NovaPesquisa,
     ProdutorExpand,
     EditPesquisa,
+    BtnComeBack,
   },
   data: () => ({
     dialog: {

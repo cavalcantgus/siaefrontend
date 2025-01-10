@@ -16,6 +16,27 @@ import * as directives from 'vuetify/directives'
 
 const app = createApp(App)
 const vuetify = createVuetify({
+  theme: {
+    defaultTheme: 'light',
+    themes: {
+      light: {
+        colors: {
+          primary: '#1976D2', // Azul padrão
+          secondary: '#424242', // Cinza escuro
+          tooltipBackground: '#FFCC00', // Cor personalizada para tooltip
+          tooltipText: '#000000', // Cor do texto do tooltip
+        },
+      },
+      dark: {
+        colors: {
+          primary: '#BB86FC',
+          secondary: '#03DAC6',
+          tooltipBackground: '#333333', // Cor personalizada para tooltip
+          tooltipText: '#1976D2', // Cor do texto do tooltip
+        },
+      },
+    },
+  },
   icons: {
     icons: 'mdi'
   },
