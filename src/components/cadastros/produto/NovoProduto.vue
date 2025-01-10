@@ -43,6 +43,10 @@ export default {
     currentItem: {
       type: Object,
     },
+    dialogAtivo: {
+      type: Boolean,
+      required: true,
+    },
   },
   data: () => ({
     isSubmitting: false,
