@@ -78,7 +78,7 @@
         <template v-slot:[`item.precos`]="{ item }">
           {{ console.log(item.precos) }}
           <template v-for="(preco, index) in item.precos" :key="index">
-            <span> {{ preco.valor }} Texto adicional </span>
+            <span> {{ preco.valor }}</span>
             <span>-</span>
           </template>
         </template>
@@ -211,7 +211,6 @@ export default {
         // });
         const numberOfPrices = this.research[0].precos.length;
         for (let i = 0; i < numberOfPrices; i++) {
-          console.log(this.research[i].precos[i]);
           headers.push({ title: `Preço ${i + 1}`, align: "center", value: `precos[${i}].valor` });
         }
       }
