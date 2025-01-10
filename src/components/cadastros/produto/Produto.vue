@@ -160,7 +160,7 @@ export default {
         console.error("Erro: ", error);
         toast.error("Erro ao cadastrar produto: ", error);
       } finally {
-        this.dialog = false;
+        this.dialog.create = false;
         this.getProducts();
       }
     },
