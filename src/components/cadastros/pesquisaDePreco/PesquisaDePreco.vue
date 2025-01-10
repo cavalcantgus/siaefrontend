@@ -92,7 +92,7 @@
               <v-icon prepend> mdi-close </v-icon>
             </v-btn>
           </v-card-title>
-          <NovaPesquisa :currentItem="newItem" :onSubmit="createProduct"></NovaPesquisa>
+          <NovaPesquisa :currentItem="newItem" :onSubmit="createProduct" :dialogAtivo="dialog.create"></NovaPesquisa>
         </v-card>
       </v-dialog>
       <v-dialog v-model="dialog.update">

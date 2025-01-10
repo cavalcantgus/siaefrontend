@@ -63,7 +63,7 @@
               <v-icon prepend> mdi-close </v-icon>
             </v-btn>
           </v-card-title>
-          <NovoProduto :currentItem="newItem" :onSubmit="createProduct" :files="files"></NovoProduto>
+          <NovoProduto :currentItem="newItem" :onSubmit="createProduct" :dialogAtivo="dialog.create"></NovoProduto>
         </v-card>
       </v-dialog>
       <v-dialog v-model="dialog.update">

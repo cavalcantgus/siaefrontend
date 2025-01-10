@@ -2,7 +2,7 @@
   <div class="pa-4 pr-12 pl-12">
     <v-form @submit.prevent="localOnSubmit" ref="formRef">
       <div class="grid-container">
-        <v-text-field class="flex-item-nome" density="compact" name="nome" v-model="currentItem.descricao" variant="outlined" :rules="requiredField" >
+        <v-text-field class="flex-item-nome" density="compact" name="nome" v-model="currentItem.descricao" variant="outlined" :rules="requiredField">
           <template v-slot:label>
             <span>Descrição <span style="color: red">*</span></span>
           </template>
@@ -62,15 +62,24 @@ export default {
 
     requiredField: [(e) => (e !== null && e !== undefined && e !== "") || "Obrigatório"],
   }),
+  watch: {
+    dialogAtivo(newValue) {
+      if (!newValue) {
+        this.resetState();
+      }
+    },
+  },
   computed: {
     isFormValid() {
-      return !!(
-        this.currentItem.descricao &&
-        this.currentItem.unidade 
-      );
+      return !!(this.currentItem.descricao && this.currentItem.unidade);
     },
   },
   methods: {
+    resetState() {
+      Object.keys(this.currentItem).forEach((key) => {
+        this.currentItem[key] = null;
+      });
+    },
     async localOnSubmit() {
       this.currentItem.descricao = this.currentItem.descricao.toUpperCase();
       try {
@@ -84,8 +93,7 @@ export default {
       }
     },
   },
-  mounted() {
-  },
+  mounted() {},
 };
 </script>
 
