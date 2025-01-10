@@ -63,7 +63,7 @@
               <v-icon prepend> mdi-close </v-icon>
             </v-btn>
           </v-card-title>
-          <NovoProduto :currentItem="newItem" :onSubmit="createProduct" :files="files"></NovoProduto>
+          <NovoProduto :currentItem="newItem" :onSubmit="createProduct" :dialogAtivo="dialog.create"></NovoProduto>
         </v-card>
       </v-dialog>
       <v-dialog v-model="dialog.update">
@@ -160,7 +160,7 @@ export default {
         console.error("Erro: ", error);
         toast.error("Erro ao cadastrar produto: ", error);
       } finally {
-        this.dialog = false;
+        this.dialog.create = false;
         this.getProducts();
       }
     },

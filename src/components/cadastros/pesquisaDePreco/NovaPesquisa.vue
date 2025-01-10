@@ -55,12 +55,24 @@ export default {
     products: [],
     requiredField: [(e) => (e !== null && e !== undefined && e !== "") || "Obrigatório"],
   }),
+  watch: {
+    dialogAtivo(newValue) {
+      if (!newValue) {
+        this.resetState();
+      }
+    },
+  },
   computed: {
     isFormValid() {
       return !!(this.currentItem.produtoId && this.currentItem.quantidade);
     },
   },
   methods: {
+    resetState() {
+      Object.keys(this.currentItem).forEach((key) => {
+        this.currentItem[key] = null;
+      });
+    },
     async getProducts() {
       try {
         const response = await axios.get("/public/produtos");

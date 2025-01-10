@@ -4,7 +4,7 @@ import { fileURLToPath, URL } from 'node:url';
 import vuetify from 'vite-plugin-vuetify';
 
 export default defineConfig({
-  server :{
+  server: {
     host: true
   },
   plugins: [
@@ -16,4 +16,5 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)), // Define @ como src/
     },
   },
+  base: '/siaefrontend/',  // Caminho base para o GitHub Pages
 });
