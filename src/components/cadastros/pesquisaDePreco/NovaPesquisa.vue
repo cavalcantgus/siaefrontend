@@ -11,11 +11,6 @@
           <MoneyInput v-model="currentItem.precos[index]" style="width: 120px" type="number" :label="`Preço ${index + 1}`" density="compact" variant="outlined" :placeholder="`Preço ${index + 1}`"></MoneyInput>
         </div>
 
-        <v-text-field v-model="currentItem.quantidade" type="number" :rules="requiredField" variant="outlined" density="compact">
-          <template v-slot:label>
-            <span>Quantidade <span style="color: red">*</span></span>
-          </template>
-        </v-text-field>
       </div>
     </v-form>
     <v-row class="justify-end dense pt-6">
@@ -49,6 +44,10 @@ export default {
     currentItem: {
       type: Object,
     },
+    dialogAtivo: {
+      type: Boolean,
+      required: true,
+    },
   },
   data: () => ({
     isSubmitting: false,
@@ -64,7 +63,7 @@ export default {
   },
   computed: {
     isFormValid() {
-      return !!(this.currentItem.produtoId && this.currentItem.quantidade);
+      return !!(this.currentItem.produtoId);
     },
   },
   methods: {
