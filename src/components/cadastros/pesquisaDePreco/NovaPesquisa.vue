@@ -10,7 +10,6 @@
         <div v-for="(preco, index) in currentItem.precos" :key="index">
           <MoneyInput v-model="currentItem.precos[index]" style="width: 120px" type="number" :label="`Preço ${index + 1}`" density="compact" variant="outlined" :placeholder="`Preço ${index + 1}`"></MoneyInput>
         </div>
-
       </div>
     </v-form>
     <v-row class="justify-end dense pt-6">
@@ -63,15 +62,22 @@ export default {
   },
   computed: {
     isFormValid() {
-      return !!(this.currentItem.produtoId);
+      return !!this.currentItem.produtoId;
     },
   },
   methods: {
     resetState() {
+      // Resetando os campos, mantendo o array 'precos' e definindo os valores como 'null'
       Object.keys(this.currentItem).forEach((key) => {
-        this.currentItem[key] = null;
+        if (key === "precos") {
+          // Resetando o array 'precos', colocando cada item como null
+          this.currentItem[key] = this.currentItem[key].map(() => null);
+        } else {
+          this.currentItem[key] = null;
+        }
       });
     },
+
     async getProducts() {
       try {
         const response = await axios.get("/public/produtos");

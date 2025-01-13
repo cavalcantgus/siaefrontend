@@ -1,6 +1,7 @@
 <template>
   <div class="main">
     <NavBar class="navbar"></NavBar>
+    <BtnComeBack ></BtnComeBack>
     <div class="container">
       <v-row dense class="justify-center" align="center" wrap>
         <v-col
@@ -31,11 +32,11 @@
 <script>
 import NavBar from '../NavBar.vue';
 import CardsTemplate from '../template/CardsTemplate.vue';
-
+import BtnComeBack from '../template/BtnComeBack.vue';
 export default {
   name: 'MenuPnae.vue',
   components: {
-    NavBar, CardsTemplate
+    NavBar, CardsTemplate, BtnComeBack
   },
   data: () => ({
     pendingUsers: 3,
@@ -67,7 +68,7 @@ export default {
 :deep(.container ){
   display: flex;
   flex-direction: row;
-  margin-top: 0;
+  margin-top: 10;
   width: 100vw;
   height: 100vh;
   padding-left: 2rem;

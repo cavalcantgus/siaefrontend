@@ -232,6 +232,9 @@ export default {
   },
   methods: {
     resetState() {
+      for(let i = 0; i < this.files.length; i++) {
+        this.files.pop(i)
+      }
       Object.keys(this.currentItem).forEach((key) => {
         this.currentItem[key] = null
       })

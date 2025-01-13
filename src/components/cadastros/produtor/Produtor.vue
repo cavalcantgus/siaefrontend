@@ -57,6 +57,18 @@
               </v-expand-transition>
             </v-col>
           </v-row>
+          <v-row class="mb-5 pl-1 ml-4">
+            <v-col cols="auto" class="pa-0 mr-4" v-if="cafProxVenci > 0 || cafVencida > 0">
+              <span class="status-text">CAF</span>
+              <div class="d-flex align-center">
+                <v-icon small color="error" left>mdi-alert</v-icon>
+                <div class="d-flex flex-column ml-3 status-text align-start">
+                  <span v-if="cafVencida > 0" class="text-error text-xs font-weight-medium"> {{ cafVencida }} {{ cafVencida === 1 ? "CAF" : "CAFS" }} vencida(s) </span>
+                  <span v-if="cafProxVenci > 0" class="text-warning text-xs font-weight-medium"> {{ cafProxVenci }} {{ cafProxVenci === 1 ? "CAF" : "CAFS" }} próxima(s) do vencimento </span>
+                </div>
+              </div>
+            </v-col>
+          </v-row>
         </template>
         <template v-slot:[`item.edit`]="{ item }">
           <v-tooltip location="top">
@@ -66,6 +78,32 @@
               </v-btn>
             </template>
             <span>Clique para editar um Produtor</span>
+          </v-tooltip>
+        </template>
+        <template v-slot:[`item.validadeCaf`]="{ item }">
+          <v-tooltip location="top">
+            <template #activator="{ props }">
+              <v-chip color="white" v-if="uniqueValidateCaf(item.validadeCaf) === 1" v-bind="props">
+                <span style="background-color: #f09900; height: 35px; width: 90px; padding-top: 6px; font-weight: bold">{{ formatData(item.validadeCaf) }}</span>
+              </v-chip>
+            </template>
+            <span>A CAF está próxima de vencer</span>
+          </v-tooltip>
+          <v-tooltip location="top">
+            <template #activator="{ props }">
+              <v-chip color="white" v-if="uniqueValidateCaf(item.validadeCaf) === 2" v-bind="props">
+                <span style="background-color: #57a340; height: 35px; width: 90px; padding-top: 6px; font-weight: bold">{{ formatData(item.validadeCaf) }}</span>
+              </v-chip>
+            </template>
+            <span>A CAF está longe de vencer</span>
+          </v-tooltip>
+          <v-tooltip location="top">
+            <template #activator="{ props }">
+              <v-chip color="white" v-if="uniqueValidateCaf(item.validadeCaf) === 3" v-bind="props">
+                <span style="background-color: #e60200; height: 35px; width: 90px; padding-top: 6px; font-weight: bold">{{ formatData(item.validadeCaf) }}</span>
+              </v-chip>
+            </template>
+            <span>CAF vencida</span>
           </v-tooltip>
         </template>
         <template v-slot:expanded-row="{ item }">
@@ -113,6 +151,7 @@ import EditProdutor from "./EditProdutor.vue";
 import ProdutorExpand from "./ProdutorExpand.vue";
 import { useToast } from "vue-toastification";
 import BtnComeBack from "../../template/BtnComeBack.vue";
+import UtilsService from "../../../services/utilsService";
 
 export default {
   name: "CadastroProdutor",
@@ -124,6 +163,8 @@ export default {
     BtnComeBack,
   },
   data: () => ({
+    cafVencida: null,
+    cafProxVenci: null,
     dialog: {
       create: false,
       update: false,
@@ -136,6 +177,7 @@ export default {
       { text: "Editar", align: "center", value: "edit" },
       { title: "Nome do Produtor", align: "center", sortable: true, value: "nome" },
       { title: "Endereço", align: "center", sortable: true, value: "endereco" },
+      { title: "CAF", align: "center", sortable: true, value: "validadeCaf" },
       { title: "CPF", align: "center", sortable: true, value: "cpf" },
       { title: "CEP", align: "center", sortable: true, value: "cep" },
       { title: "Estado", align: "center", sortable: true, value: "estado" },
@@ -159,10 +201,16 @@ export default {
     uf: [],
     municipios: [],
     sexoOptions: [
-      { label: "Masculino", value: 'Masculino'},
-      { label: "Feminino", value: 'Feminino'}
-    ]
+      { label: "Masculino", value: "Masculino" },
+      { label: "Feminino", value: "Feminino" },
+    ],
   }),
+  watch: {
+    filteredProductors: function () {
+      this.validateCafs();
+    },
+    deep: true,
+  },
   computed: {
     filteredProductors() {
       return this.productors
@@ -178,8 +226,68 @@ export default {
     },
   },
   methods: {
+    formatData(item) {
+      return UtilsService.formatData(item);
+    },
+    validateCafs() {
+      this.cafVencida = 0;
+      this.cafProxVenci = 0;
+      const alertThreshold = 30;
+      const today = new Date();
+      const normalizedToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+      if (!this.filteredProductors || this.filteredProductors.length === 0) {
+        console.warn("Nenhum produtor encontrado.");
+        return;
+      }
+      this.productors.forEach((productor) => {
+        const dateCaf = productor?.validadeCaf;
+
+        if (!dateCaf) {
+          console.warn("Data inválida: ", dateCaf);
+        }
+        const newCafValidity = new Date(dateCaf + "T00:00:00Z");
+        const normalizedCafValidity = new Date(newCafValidity.getUTCFullYear(), newCafValidity.getUTCMonth(), newCafValidity.getUTCDate());
+        console.log("Data da caf: ", normalizedCafValidity);
+
+        const timeDiff = normalizedCafValidity.getTime() - normalizedToday.getTime();
+        const diffInDays = timeDiff / (1000 * 60 * 60 * 24);
+
+        if (diffInDays >= 0 && diffInDays <= alertThreshold) {
+          this.cafProxVenci++;
+        } else if (diffInDays < 0) {
+          this.cafVencida++;
+        }
+
+        console.log(this.cafProxVenci);
+        console.log(this.cafVencida);
+      });
+    },
+
+    uniqueValidateCaf(item) {
+      const alertThreshold = 30;
+      const today = new Date();
+      const normalizedToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+      const newCafValidity = new Date(item + "T00:00:00Z");
+      const normalizedCafValidity = new Date(newCafValidity.getUTCFullYear(), newCafValidity.getUTCMonth(), newCafValidity.getUTCDate());
+
+      const timeDiff = normalizedCafValidity.getTime() - normalizedToday.getTime();
+      const diffInDays = timeDiff / (1000 * 60 * 60 * 24);
+
+      if (diffInDays >= 0 && diffInDays <= alertThreshold) {
+        return 1; // Amarelo
+      }
+      if (diffInDays > alertThreshold) {
+        return 2; // Verde
+      } else {
+        return 3;
+      }
+    },
     onExpand(newExpanded) {
-      this.expanded = newExpanded.length > 0 ? [newExpanded[newExpanded.length - 1]] : [];
+      if (this.expanded !== newExpanded) {
+        this.expanded = newExpanded;
+      }
     },
 
     clearFilters() {
@@ -189,18 +297,13 @@ export default {
       this.filterActive = false;
       this.filtered = [];
     },
-    
+
     async getProductors() {
       try {
         const response = await axios.get("/public/produtores");
         console.log(response.data);
 
-        if (Array.isArray(response.data)) {
-          this.productors = response.data;
-        } else {
-          console.log("A resposta da API não é um Array");
-          this.productors = [];
-        }
+        this.productors = response.data;
       } catch (error) {
         console.log("Error: ", error);
         this.productors = [];
@@ -231,8 +334,8 @@ export default {
         console.error("Erro: ", error);
         toast.error("Erro ao cadastrar produtor: ", error);
       } finally {
-        this.dialog.create = false
-        this.getProductors()
+        this.dialog.create = false;
+        this.getProductors();
       }
     },
 
@@ -243,7 +346,7 @@ export default {
       try {
         const formData = new FormData();
         files.forEach((file) => {
-          console.log("Arquivo enviado: ", file)
+          console.log("Arquivo enviado: ", file);
           formData.append("file", file);
         });
         formData.append("produtor", JSON.stringify(currentItem));
@@ -264,14 +367,13 @@ export default {
         console.error("Erro: ", error);
         toast.error("Erro ao atualizar produtor: ", error);
       } finally {
-        this.dialog.update = false
-        this.getProductors()
+        this.dialog.update = false;
+        this.getProductors();
       }
     },
 
     onSelectRow(row, dialog) {
-      
-      if(dialog === "update") {
+      if (dialog === "update") {
         this.selectedRow = JSON.parse(JSON.stringify({ ...row }));
         this.dialog.update = true;
       }

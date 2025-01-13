@@ -25,6 +25,7 @@ const vuetify = createVuetify({
           secondary: '#424242', // Cinza escuro
           tooltipBackground: '#FFCC00', // Cor personalizada para tooltip
           tooltipText: '#000000', // Cor do texto do tooltip
+          
         },
       },
       dark: {
