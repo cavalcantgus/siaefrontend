@@ -88,3 +88,8 @@ h6 {
   justify-self: center;
 }
 
+
+.text-justify {
+  text-align: justify-all !important;
+  word-break: break-all;
+}
