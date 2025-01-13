@@ -8,13 +8,12 @@
           </template>
         </v-text-field>
 
-        <v-text-field density="compact" name="nome" label="Especificação" v-model="currentItem.especificacao" variant="outlined"></v-text-field>
-
         <v-select density="compact" name="unidade" :items="unidade" item-title="type" item-value="value" v-model="currentItem.unidade" variant="outlined" :rules="requiredField" clearable>
           <template v-slot:label>
             <span>Unidade <span style="color: red">*</span></span>
           </template>
         </v-select>
+        <v-text-field class="flex-item-especificao" density="compact" name="nome" label="Especificação" v-model="currentItem.especificacao" variant="outlined"></v-text-field>
       </div>
     </v-form>
     <v-row class="justify-end dense pt-6">
@@ -120,64 +119,7 @@ export default {
   flex: 1 1 350px !important;
 }
 
-.flex-item-email {
-  flex: 1 1 300px !important;
-}
-
-:deep(.custom-date-field) {
-  max-width: 200px !important;
-}
-
-:deep(.custom-date-field input[type="date"]::-webkit-calendar-picker-indicator) {
-  position: absolute;
-  right: 10px;
-  z-index: 1;
-  cursor: pointer;
-}
-
-.upload-container {
-  text-align: center;
-  justify-content: center;
-  align-content: center;
-  border: 2px solid #1976d2;
-  border-radius: 4px;
-}
-
-.upload-btn {
-  margin-bottom: 1rem;
-}
-
-.hidden-input {
-  display: none;
-}
-
-.file-list {
-  margin-top: 1rem;
-}
-
-.file-item {
-  display: flex;
-  justify-content: center;
-}
-
-.file-card {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-}
-
-.file-icon {
-  margin-right: 10px;
-  font-size: 24px;
-  color: #1976d2;
-}
-
-.file-name {
-  display: flex;
-  margin-top: 10px;
-  font-size: 16px;
-  font-weight: bold;
-  color: #333;
-  word-break: break-all;
+.flex-item-especificao {
+  flex: 1 1 550px !important;
 }
 </style>
