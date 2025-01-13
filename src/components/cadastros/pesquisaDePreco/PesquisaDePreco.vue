@@ -68,6 +68,16 @@
             <span>Clique para editar um Produtor</span>
           </v-tooltip>
         </template>
+        <template v-slot:[`item.delete`]="{ item }">
+          <v-tooltip location="top">
+            <template #activator="{ props }">
+              <ConfirmButton icon v-bind="props" :onConfirm="() => onDeleteRow(item)" class="elevation-0">
+                <v-icon color="red">mdi-delete</v-icon>
+              </ConfirmButton>
+            </template>
+            <span>Clique para deletar um Produtor</span>
+          </v-tooltip>
+        </template>
         <template v-slot:expanded-row="{ item }">
           <tr>
             <td :colspan="9" style="background-color: #37622a" class="text-white">
@@ -82,6 +92,9 @@
             <span> {{ preco.valor }}</span>
             <span>-</span>
           </template>
+        </template>
+        <template v-slot:[`item.precoMedio`]="{ item }">
+          <span>{{ formatPrice(item.precoMedio) }}</span>
         </template>
       </v-data-table>
       <v-dialog v-model="dialog.create">
@@ -121,6 +134,8 @@ import ProdutorExpand from "./PesquisaExpand.vue";
 import { useToast } from "vue-toastification";
 import UtilsService from "../../../services/utilsService";
 import BtnComeBack from '../../template/BtnComeBack.vue';
+import ConfirmButton from "../../template/ConfirmButton.vue";
+
 
 export default {
   name: "PesquisaDePreco",
@@ -130,6 +145,7 @@ export default {
     ProdutorExpand,
     EditPesquisa,
     BtnComeBack,
+    ConfirmButton,
   },
   data: () => ({
     dialog: {
@@ -157,7 +173,8 @@ export default {
       { type: "Sacos", value: "Sacos" }, // Sacos
     ],
     headers: [
-      { text: "Editar", align: "center", value: "edit" },
+      { text: "Editar", align: "center", value: "edit", width: "50px" },
+      { text: "Remover", align: "center", value: "delete", width: "50px"},
       { title: "Produto", align: "center", sortable: true, value: "produto.descricao" },
       { title: "Unidade", align: "center", sortable: true, value: "produto.unidade" },
     ],
@@ -215,6 +232,7 @@ export default {
         for (let i = 0; i < numberOfPrices; i++) {
           headers.push({ title: `Preço ${i + 1}`, align: "center", value: `precos[${i}].valor` });
         }
+        headers.push({ title: "Preço Médio", align: "center", value: `precoMedio`})
       }
       return headers;
     },
@@ -332,12 +350,33 @@ export default {
       }
     },
 
+    async deletePesquisa(fields) {
+      const toast = useToast();
+      try {
+        const response = await axios.delete(`/public/pesquisas/pesquisa/${fields.id}`, fields);
+        if (response.status !== 204) {
+          throw new Error(`Erro: `, response.status);
+        }
+        toast.success("Pesquisa removida com sucesso!");
+      } catch (error) {
+        toast.error("Erro ao deletar pesquisa: ", error);
+        console.error("Erro: ", error);
+      } finally {
+        this.getProducts();
+      }
+    },
+
     onSelectRow(row, dialog) {
       console.log("Linha selecionada: ", this.selectedRow);
       if(dialog === "update") {
         this.selectedRow = JSON.parse(JSON.stringify({ ...row }));
         this.dialog.update = true;
       }
+    },
+
+    onDeleteRow(row) {
+      this.selectedRow = { ...row };
+      this.deletePesquisa(this.selectedRow);
     },
   },
   mounted() {
