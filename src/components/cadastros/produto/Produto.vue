@@ -42,11 +42,24 @@
             <span>Clique para editar um Produtor</span>
           </v-tooltip>
         </template>
+        <template v-slot:[`item.delete`]="{ item }">
+          <v-tooltip location="top">
+            <template #activator="{ props }">
+              <ConfirmButton icon v-bind="props" :onConfirm="() => onDeleteRow(item)" class="elevation-0">
+                <v-icon color="red">mdi-delete</v-icon>
+              </ConfirmButton>
+            </template>
+            <span>Clique para deletar um Produtor</span>
+          </v-tooltip>
+        </template>
         <template v-slot:[`item.precoMedio`]="{ item }">
           <span v-if="item.precoMedio !== null">{{ formatPrice(item.precoMedio) }}</span>
           <span v-else>-</span>
         </template>
-          <!-- <template v-slot:expanded-row="{ item }">
+        <template v-slot:[`item.especificacao`]="{ item }">
+          <span class="text-justify d-flex">{{ item.especificacao }}</span>
+        </template>
+        <!-- <template v-slot:expanded-row="{ item }">
             <tr>
               <td :colspan="9">
                 {{ console.log(item) }}
@@ -90,8 +103,9 @@ import NovoProduto from "./NovoProduto.vue";
 import EditProdutor from "./EditProduto.vue";
 import ProdutorExpand from "./ProdutorExpand.vue";
 import { useToast } from "vue-toastification";
-import UtilsService from '../../../services/utilsService';
-import BtnComeBack from '../../template/BtnComeBack.vue';
+import UtilsService from "../../../services/utilsService";
+import BtnComeBack from "../../template/BtnComeBack.vue";
+import ConfirmButton from "../../template/ConfirmButton.vue";
 
 export default {
   name: "CadastroProdutor",
@@ -101,6 +115,7 @@ export default {
     ProdutorExpand,
     EditProdutor,
     BtnComeBack,
+    ConfirmButton,
   },
   data: () => ({
     dialog: {
@@ -114,12 +129,14 @@ export default {
     headers: [
       { text: "Editar", align: "center", value: "edit" },
       { title: "Descrição do Produto", align: "center", sortable: true, value: "descricao" },
-      { title: "Especificação do Produto", align: "center", sortable: true, value: "especificacao" },
+      { title: "Especificação do Produto", align: "center", sortable: true, value: "especificacao", width: "300px" },
       { title: "Unidade", align: "center", sortable: true, value: "unidade" },
       { title: "Preço Médio", align: "center", sortable: true, value: "precoMedio" },
+      { text: "Remover", align: "center", value: "delete" },
     ],
     newItem: {},
     selectedRow: {},
+    deleteRow: {},
     expanded: [],
   }),
   computed: {
@@ -185,14 +202,36 @@ export default {
         console.error("Erro: ", error);
         toast.error("Erro ao atualizar produto: ", error);
       } finally {
-        this.dialog.update = false
-        this.getProducts()
+        this.dialog.update = false;
+        this.getProducts();
+      }
+    },
+
+    async deleteProduct(fields) {
+      const toast = useToast();
+      try {
+        const response = await axios.delete(`/public/produtos/produto/${fields.id}`, fields);
+        if (response.status !== 204) {
+          throw new Error(`Erro: `, response.status);
+        }
+        toast.success("Produto removido com sucesso!");
+      } catch (error) {
+        toast.error("Erro ao deletar produto: ", error);
+        console.error("Erro: ", error);
+      } finally {
+        this.getProducts();
       }
     },
 
     onSelectRow(row, dialog) {
       this.selectedRow = { ...row };
       this.dialog[dialog] = true;
+    },
+
+    onDeleteRow(row) {
+      console.log("Método chamado");
+      this.deleteRow = { ...row };
+      this.deleteProduct(this.deleteRow);
     },
   },
   mounted() {
@@ -268,4 +307,5 @@ td {
 .v-data-table__expand-icon {
   margin-left: 0; /* Remover qualquer margem esquerda */
 }
+
 </style>
