@@ -127,12 +127,12 @@ export default {
     showFilters: false,
     products: [],
     headers: [
-      { text: "Editar", align: "center", value: "edit" },
+      { text: "Editar", align: "center", value: "edit", width: "40px" },
+      { text: "Remover", align: "center", value: "delete", width: "40px" },
       { title: "Descrição do Produto", align: "center", sortable: true, value: "descricao" },
       { title: "Especificação do Produto", align: "center", sortable: true, value: "especificacao", width: "300px" },
       { title: "Unidade", align: "center", sortable: true, value: "unidade" },
       { title: "Preço Médio", align: "center", sortable: true, value: "precoMedio" },
-      { text: "Remover", align: "center", value: "delete" },
     ],
     newItem: {},
     selectedRow: {},
@@ -307,5 +307,4 @@ td {
 .v-data-table__expand-icon {
   margin-left: 0; /* Remover qualquer margem esquerda */
 }
-
 </style>
