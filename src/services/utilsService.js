@@ -21,4 +21,10 @@ export default class UtilsService {
       year: 'numeric',
     }).format(data);
   }
+
+  static formatData(val) {
+    if (!val) return "";
+    const [year, month, day] = val.split("-");
+    return new Date(year, month - 1, day).toLocaleDateString();
+  }
 }
