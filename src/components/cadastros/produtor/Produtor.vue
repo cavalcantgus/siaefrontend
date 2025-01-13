@@ -80,6 +80,17 @@
             <span>Clique para editar um Produtor</span>
           </v-tooltip>
         </template>
+
+        <template v-slot:[`item.delete`]="{ item }">
+          <v-tooltip location="top">
+            <template #activator="{ props }">
+              <ConfirmButton icon v-bind="props" :onConfirm="() => onDeleteRow(item)" class="elevation-0">
+                <v-icon color="red">mdi-delete</v-icon>
+              </ConfirmButton>
+            </template>
+            <span>Clique para deletar um Produtor</span>
+          </v-tooltip>
+        </template>
         <template v-slot:[`item.validadeCaf`]="{ item }">
           <v-tooltip location="top">
             <template #activator="{ props }">
@@ -151,6 +162,7 @@ import EditProdutor from "./EditProdutor.vue";
 import ProdutorExpand from "./ProdutorExpand.vue";
 import { useToast } from "vue-toastification";
 import BtnComeBack from "../../template/BtnComeBack.vue";
+import ConfirmButton from "../../template/ConfirmButton.vue";
 import UtilsService from "../../../services/utilsService";
 
 export default {
@@ -161,6 +173,7 @@ export default {
     ProdutorExpand,
     EditProdutor,
     BtnComeBack,
+    ConfirmButton,
   },
   data: () => ({
     cafVencida: null,
@@ -174,7 +187,8 @@ export default {
     showFilters: false,
     productors: [],
     headers: [
-      { text: "Editar", align: "center", value: "edit" },
+      { text: "Editar", align: "center", value: "edit", width: "50px" },
+      { text: "Remover", align: "center", value: "delete", width: "50px" },
       { title: "Nome do Produtor", align: "center", sortable: true, value: "nome" },
       { title: "Endereço", align: "center", sortable: true, value: "endereco" },
       { title: "CAF", align: "center", sortable: true, value: "validadeCaf" },
@@ -372,12 +386,33 @@ export default {
       }
     },
 
+    async deleteProductor(fields) {
+      const toast = useToast();
+      try {
+        const response = await axios.delete(`/public/produtores/produtor/${fields.id}`, fields);
+        if (response.status !== 204) {
+          throw new Error(`Erro: `, response.status);
+        }
+        toast.success("Produtor removido com sucesso!");
+      } catch (error) {
+        toast.error("Erro ao deletar pesquisa: ", error);
+        console.error("Erro: ", error);
+      } finally {
+        this.getProductors();
+      }
+    },
+
     onSelectRow(row, dialog) {
       if (dialog === "update") {
         this.selectedRow = JSON.parse(JSON.stringify({ ...row }));
         this.dialog.update = true;
       }
       console.log("Linha selecionada: ", this.selectedRow);
+    },
+
+    onDeleteRow(row) {
+      this.selectedRow = { ...row };
+      this.deleteProductor(this.selectedRow);
     },
 
     async getUF() {
