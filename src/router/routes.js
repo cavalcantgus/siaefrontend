@@ -9,6 +9,7 @@ const routes = [
     { path: '/cadastro-produtor', name: 'Produtor', component: () => import("@/components/cadastros/produtor/Produtor.vue")},
     { path: '/cadastro-produto', name: 'Produto', component: () => import("@/components/cadastros/produto/Produto.vue")},
     { path: '/pesquisa-de-preco', name: 'PesquisaDePreco', component: () => import("@/components/cadastros/pesquisaDePreco/PesquisaDePreco.vue")},
+    { path: '/pauta-da-chamada', name: 'PautaDaChamada', component: () => import("@/components/cadastros/pautaDaChamada/PautaDaChamada.vue")},
     { path: '/', redirect: '/login'},
 ];
 
