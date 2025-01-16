@@ -13,7 +13,7 @@
             <span>Unidade <span style="color: red">*</span></span>
           </template>
         </v-select>
-        <v-text-field class="flex-item-especificao" density="compact" name="nome" label="Especificação" v-model="currentItem.especificacao" variant="outlined"></v-text-field>
+        <v-text-field class="flex-item-especificao" density="compact" name="nome" label="Especificação" v-model="currentItem.especificacao" :counter="255" :counter-value="customCounter" maxlength="255" variant="outlined" :rules="requiredField" :counter-color="light"></v-text-field>
       </div>
     </v-form>
     <v-row class="justify-end dense pt-6">
@@ -33,6 +33,8 @@
 
 <script>
 import ConfirmButton from "../../template/ConfirmButton.vue";
+import axios from "@/services/axios.js";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "NovoProduto",
@@ -80,13 +82,36 @@ export default {
     },
   },
   methods: {
+    async validateProductName(value) {
+      try {
+        const response = await axios.get("/public/produtos");
+        return !response.data.some((item) => item.descricao.toUpperCase() === value.toUpperCase())
+      } catch(error) {
+        console.error("Ocorreu um erro: ", error)
+      }
+    },
+
+    customCounter(value) {
+      length = value?.length || 0
+      if(value?.length === 255) {
+        return `Limite de caracteres alcançado - ${value?.length}`
+      } else {
+        return `${length}`
+      }
+    },
     resetState() {
       Object.keys(this.currentItem).forEach((key) => {
         this.currentItem[key] = null;
       });
     },
     async localOnSubmit() {
+      const toast = useToast()
       this.currentItem.descricao = this.currentItem.descricao.toUpperCase();
+      const isValidName = await this.validateProductName(this.currentItem.descricao)
+      if(!isValidName) {
+        toast.warning("O nome do produto já está cadastrado")
+        return
+      }
       try {
         const fields = {
           ...this.currentItem,

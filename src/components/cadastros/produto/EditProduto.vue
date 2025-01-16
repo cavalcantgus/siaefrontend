@@ -7,14 +7,12 @@
             <span>Descrição <span style="color: red">*</span></span>
           </template>
         </v-text-field>
-
-        <v-text-field density="compact" name="nome" label="Especificação" v-model="currentItem.especificacao" variant="outlined"></v-text-field>
-
         <v-select density="compact" name="unidade" :items="unidade" item-title="type" item-value="value" v-model="currentItem.unidade" variant="outlined" :rules="requiredField" clearable>
           <template v-slot:label>
             <span>Unidade <span style="color: red">*</span></span>
           </template>
         </v-select>
+        <v-text-field class="flex-item-especificao" density="compact" name="nome" label="Especificação" v-model="currentItem.especificacao" variant="outlined"></v-text-field>
       </div>
     </v-form>
     <v-row class="justify-end dense pt-6">
@@ -163,5 +161,9 @@ export default {
   font-weight: bold;
   color: #333;
   word-break: break-all;
+}
+
+.flex-item-especificao {
+  flex: 1 1 550px !important;
 }
 </style>
