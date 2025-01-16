@@ -130,7 +130,7 @@ export default {
       { text: "Editar", align: "center", value: "edit", width: "40px" },
       { text: "Remover", align: "center", value: "delete", width: "40px" },
       { title: "Descrição do Produto", align: "center", sortable: true, value: "descricao" },
-      { title: "Especificação do Produto", align: "center", sortable: true, value: "especificacao", width: "300px" },
+      { title: "Especificação do Produto", align: "start", sortable: true, value: "especificacao", width: "300px" },
       { title: "Unidade", align: "center", sortable: true, value: "unidade" },
       { title: "Preço Médio", align: "center", sortable: true, value: "precoMedio" },
     ],
