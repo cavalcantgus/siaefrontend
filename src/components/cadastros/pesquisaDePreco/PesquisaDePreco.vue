@@ -362,7 +362,7 @@ export default {
         toast.error("Erro ao deletar pesquisa: ", error);
         console.error("Erro: ", error);
       } finally {
-        this.getProducts();
+        this.getResearch();
       }
     },
 
