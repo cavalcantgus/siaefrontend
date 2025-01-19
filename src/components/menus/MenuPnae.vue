@@ -46,7 +46,7 @@ export default {
         {title: 'PRODUTOS', route: "/cadastro-produto"}, 
         {title: 'PESQUISA DE PREÇO', route: "/pesquisa-de-preco"}, 
         {title: 'PAUTA DA CHAMADA', route: "/pauta-da-chamada"}, 
-       {title: 'PROJETO DE VENDA', route: "/cadastro-produtor"}, 
+       {title: 'PROJETO DE VENDA', route: "/projeto-de-venda"}, 
         {title: 'CRONOGRAMA DE ENTREGA', route: "/cadastro-produtor"}, 
         {title: 'COMPROVANTE DE RECEBIMENTO', route: "/cadastro-produtor"}, 
         {title: 'CONTRATOS', route: "/cadastro-produtor"}
