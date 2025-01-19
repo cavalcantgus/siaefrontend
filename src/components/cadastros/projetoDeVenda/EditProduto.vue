@@ -2,18 +2,18 @@
   <div class="pa-4 pr-12 pl-12">
     <v-form @submit.prevent="localOnSubmit" ref="formRef">
       <div class="grid-container">
-        <v-select density="compact" name="products" :items="products" item-title="descricao" item-value="id" v-model="currentItem.produtoId" :rules="requiredField" variant="outlined">
+        <v-text-field class="flex-item-nome" density="compact" name="nome" v-model="currentItem.descricao" variant="outlined" :rules="requiredField" clearable>
           <template v-slot:label>
-            <span>Produto <span style="color: red">*</span></span>
+            <span>Descrição <span style="color: red">*</span></span>
+          </template>
+        </v-text-field>
+        <v-select density="compact" name="unidade" :items="unidade" item-title="type" item-value="value" v-model="currentItem.unidade" variant="outlined" :rules="requiredField" clearable>
+          <template v-slot:label>
+            <span>Unidade <span style="color: red">*</span></span>
           </template>
         </v-select>
-        <div v-for="(preco, index) in currentItem.precos" :key="index">
-          <MoneyInput v-model="currentItem.precos[index]" style="width: 120px" type="number" :label="`Preço ${index + 1}`" density="compact" variant="outlined" :placeholder="`Preço ${index + 1}`"></MoneyInput>
-        </div>
+        <v-text-field class="flex-item-especificao" density="compact" name="nome" label="Especificação" v-model="currentItem.especificacao" variant="outlined"></v-text-field>
       </div>
-      <v-text-field density="compact" name="quantidade" type="number" label="Quantidade" v-model="currentItem.quantidade" :rules="requiredField" variant="outlined">
-
-      </v-text-field>
     </v-form>
     <v-row class="justify-end dense pt-6">
       <v-col class="text-end">
@@ -32,88 +32,56 @@
 
 <script>
 import ConfirmButton from "../../template/ConfirmButton.vue";
-import axios from "@/services/axios.js";
-import MoneyInput from "../../template/MoneyInput.vue";
 
 export default {
-  name: "NovaPesquisa",
+  name: "EditProduto",
   components: {
     ConfirmButton,
-    MoneyInput,
   },
   props: {
     onSubmit: Function,
     currentItem: {
       type: Object,
     },
-    dialogAtivo: {
-      type: Boolean,
-      required: true,
-    },
   },
   data: () => ({
     isSubmitting: false,
-    products: [],
+    unidade: [
+      { type: "G", value: "G" }, // Gramas
+      { type: "KG", value: "KG" }, // Kilogramas
+      { type: "T", value: "T" }, // Toneladas
+      { type: "L", value: "L" }, // Litros
+      { type: "ML", value: "ML" }, // Mililitros
+      { type: "UND", value: "UND" }, // Unidades
+      { type: "Maço", value: "Maço" }, // Caixas
+      { type: "Caixas", value: "Caixas" }, // Caixas
+      { type: "Pacotes", value: "Pacotes" }, // Pacotes
+      { type: "Fardos", value: "Fardos" }, // Fardos
+      { type: "Sacos", value: "Sacos" }, // Sacos
+    ],
     requiredField: [(e) => (e !== null && e !== undefined && e !== "") || "Obrigatório"],
   }),
-  watch: {
-    dialogAtivo(newValue) {
-      if (!newValue) {
-        this.resetState();
-      }
-    },
-  },
   computed: {
     isFormValid() {
-      return !!this.currentItem.produtoId;
+      return !!(
+        this.currentItem.descricao &&
+        this.currentItem.unidade 
+      );
     },
   },
   methods: {
-    resetState() {
-      // Resetando os campos, mantendo o array 'precos' e definindo os valores como 'null'
-      Object.keys(this.currentItem).forEach((key) => {
-        if (key === "precos") {
-          // Resetando o array 'precos', colocando cada item como null
-          this.currentItem[key] = this.currentItem[key].map(() => null);
-        } else {
-          this.currentItem[key] = null;
-        }
-      });
-    },
-
-    async getProducts() {
-      try {
-        const response = await axios.get("/public/produtos");
-        console.log(response.data);
-
-        if (Array.isArray(response.data)) {
-          this.products = response.data;
-        } else {
-          console.log("A resposta da API não é um Array");
-          this.products = [];
-        }
-      } catch (error) {
-        console.log("Error: ", error);
-        this.products = [];
-      }
-    },
-
     async localOnSubmit() {
+      this.currentItem.descricao = this.currentItem.descricao.toUpperCase()
       try {
-        this.currentItem.dataPesquisa = new Date();
         const fields = {
-          ...this.currentItem,
-        };
-        console.log(fields);
-        this.onSubmit(fields);
+          ...this.currentItem
+        }
+        this.onSubmit(fields)
       } catch (error) {
         console.log("Erro: ", error);
       }
     },
-  },
-  mounted() {
-    this.getProducts();
-  },
+  }
 };
 </script>
 
@@ -193,5 +161,9 @@ export default {
   font-weight: bold;
   color: #333;
   word-break: break-all;
+}
+
+.flex-item-especificao {
+  flex: 1 1 550px !important;
 }
 </style>
