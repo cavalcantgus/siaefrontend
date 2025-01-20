@@ -20,23 +20,25 @@
   </h4>
   <v-row dense style="height: 170px" class="border-md pa-2">
     <v-col v-for="(projeto, index) in projetoData.projetoProdutos" :key="index" cols="2" class="d-flex flex-wrap flex-column mr-16 h-50">
-      <div class="d-flex flex-wrap flex-column mr-16" style="height: 150px; border: 2px solid white; width: 240px;">
-        <div class="d-flex flex-column flex-wrap" align="start"  style="width: 100%; height: 100%;">
-        <p style="margin-right: -100px; padding-left: 5px;">Produto {{ index + 1}}</p>
-        <v-col cols="8" align="start" style="margin-left: -7px; margin-top: -6px;">
-          <span>Descrição:</span>
-          <p>{{ projeto.produto.descricao }}</p><br>
-          <span>Unidade:</span>
-          <p>{{ projeto.produto.unidade }}</p>
-        </v-col>
-        <v-col cols="9" align="start" class="mt-4" style="margin-left: -50px;">
-          <span>Preço Médio:</span>
-          <p>{{ formatPrice(projeto.produto.precoMedio) }}</p><br>
-          <span>Quantidade:</span>
-          <p>{{ projeto.quantidade }}</p>
-        </v-col>
+      <div class="d-flex flex-wrap flex-column mr-16" style="height: 150px; border: 2px solid white; width: 240px">
+        <div class="d-flex flex-column flex-wrap" align="start" style="width: 100%; height: 100%">
+          <p style="margin-right: -100px; padding-left: 5px">Produto {{ index + 1 }}</p>
+          <v-col cols="8" align="start" style="margin-left: -7px; margin-top: -6px">
+            <span>Descrição:</span>
+            <p>{{ projeto.produto.descricao }}</p>
+            <br />
+            <span>Unidade:</span>
+            <p>{{ projeto.produto.unidade }}</p>
+          </v-col>
+          <v-col cols="9" align="start" class="mt-4" style="margin-left: -50px">
+            <span>Preço Médio:</span>
+            <p>{{ formatPrice(projeto.produto.precoMedio) }}</p>
+            <br />
+            <span>Quantidade:</span>
+            <p>{{ projeto.quantidade }}</p>
+          </v-col>
+        </div>
       </div>
-    </div>
     </v-col>
   </v-row>
 
@@ -51,7 +53,7 @@
     </v-col>
     <v-col cols="1" align="start" class="h-50">
       <h4>Idade:</h4>
-      <p>{{ projetoData.produtor.dataNascimento }}</p>
+      <p>{{ age(projetoData.produtor.dataNascimento) }}</p>
     </v-col>
     <v-col cols="3" align="start" class="h-50">
       <h4>Email:</h4>
@@ -118,14 +120,14 @@
     Dados da CAF
     <v-icon>mdi-text-box-multiple-outline</v-icon>
   </h4>
-  <v-row dense style="height: 120px; width: 50vw" class="border-md pa-2">
+  <v-row dense style="height: 120px; width: 50vw" class="border-md pa-2 mb-2">
     <v-col cols="3" align="start" class="h-75">
       <h4>CAF:</h4>
       <p>{{ projetoData.produtor.caf }}</p>
     </v-col>
     <v-col cols="2" align="start" class="h-75">
       <h4>Validade da CAF:</h4>
-      <p>{{ projetoData.produtor.validadeCaf }}</p>
+      <p>{{ formatDate(projetoData.produtor.validadeCaf) }}</p>
     </v-col>
   </v-row>
 </template>
@@ -150,8 +152,22 @@ export default {
     ],
   }),
   methods: {
+    age(item) {
+      console.log('Método chamado')
+      const today = new Date();
+      const birthDate = new Date(item);
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      console.log(age)
+      return age;
+    },
+
     formatDate(val) {
-      return UtilsService.formatDateBr(val)
+      return UtilsService.formatDateBr(val);
     },
 
     formatPrice(val) {

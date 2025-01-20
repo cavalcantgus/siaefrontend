@@ -52,6 +52,12 @@
             <span>Clique para deletar um Projeto</span>
           </v-tooltip>
         </template>
+        <template v-slot:[`item.dataProjeto`]="{ item }">
+          <span>{{ formatDate(item.dataProjeto) }}</span>
+        </template>
+        <template v-slot:[`item.total`]="{ item }">
+          <span>{{ formatPrice(item.total) }}</span>
+        </template>
         <template v-slot:expanded-row="{ item }">
             <tr>
               <td :colspan="9" style="background-color: #37622a" class="text-white">
@@ -64,7 +70,7 @@
       <v-dialog v-model="dialog.create" width="70%">
         <v-card class="card-form align-self-center" width="100%">
           <v-card-title class="sticky-title title-border">
-            Cadastro de Produto
+            Cadastro de Projeto
             <v-spacer></v-spacer>
             <v-btn icon class="btn-close elevation-0" @click="dialog.create = !dialog.create">
               <v-icon prepend> mdi-close </v-icon>
@@ -123,7 +129,10 @@ export default {
       { text: "Editar", align: "center", value: "edit", width: "40px" },
       { text: "Remover", align: "center", value: "delete", width: "40px" },
       { title: "Produtor", align: "center", sortable: true, value: "produtor.nome" },
-      { title: "Endereço", align: "start", sortable: true, value: "produtor.endereco", width: "300px" },
+      { title: "Endereço", align: "center", sortable: true, value: "produtor.endereco", width: "300px" },
+      { title: "CAF", align: "center", sortable: true, value: "produtor.caf" },
+      { title: "Data Projeto", align: "center", sortable: true, value: "dataProjeto" },
+      { title: "Total Geral", align: "center", sortable: true, value: "total"},
     ],
     newItem: {},
     selectedRow: {},
@@ -139,6 +148,10 @@ export default {
     formatPrice(val) {
       val = UtilsService.formatReal(val);
       return val;
+    },
+
+    formatDate(val) {
+      return UtilsService.formatData(val)
     },
 
     async getProjects() {

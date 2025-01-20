@@ -19,7 +19,7 @@
             </v-btn>
             <div v-for="(produtoId, index) in items.itemsProducts" :key="index" class="grid-second-container">
               <v-col cols="" class="">
-                <v-select density="compact" name="product" :items="products" item-title="produto.descricao" item-value="id" v-model="items.itemsProducts[index].produtoId" variant="outlined" :rules="requiredField" clearable>
+                <v-select :color="isDuplicate? 'error': ''" density="compact" name="product" :items="products" item-title="produto.descricao" item-value="id" v-model="items.itemsProducts[index].produtoId" variant="outlined" :rules="requiredField" clearable>
                   <template v-slot:label>
                     <span>Produto <span style="color: red">*</span></span>
                   </template>
@@ -32,11 +32,17 @@
                 <v-text-field density="compact" name="precoMedio" label="Preço Médio" v-model="items.itemsProducts[index].precoMedio" variant="outlined" disabled></v-text-field>
               </v-col>
               <v-col cols="2">
-                <v-text-field density="compact" name="quantidade" label="Quantidade" v-model="items.itemsQuantity[index]" variant="outlined" :rules="requiredField"></v-text-field>
+                <v-text-field density="compact" name="quantidade" label="Quantidade" v-model="items.itemsQuantity[index]" variant="outlined" :disabled="isDuplicate"></v-text-field>
               </v-col>
               <v-btn size="30px" icon color="error" style="margin-top: 15px" @click="removeItem(index)">
                 <v-icon size="20px">mdi-delete</v-icon>
               </v-btn>
+              <v-alert v-if="quantityWarnings[index]" color="error" class="mt-2 mb-4 ml-4" density="compact" style="font-size: 0.8rem; height: 70px">
+                {{ quantityWarnings[index] }}
+              </v-alert>
+              <span v-if="isDuplicate" class="text-start text-error ml-3" style="font-size: 0.8rem; font-weight: bold; width: 100%; margin-top: -25px; margin-bottom: 20px;">
+                {{ `Itens duplicados. Por favor, remova-os, ou escolha outro.` }}
+            </span>
             </div>
           </v-col>
         </v-row>
@@ -56,7 +62,7 @@
         <v-tooltip location="top" :disabled="isFormValid">
           <template #activator="{ props }">
             <span v-bind="props">
-              <ConfirmButton :color="isFormValid ? 'success' : 'grey'" :onConfirm="localOnSubmit" :loading="isSubmitting">Salvar</ConfirmButton>
+              <ConfirmButton :color="isFormValid ? 'success' : 'grey'" :onConfirm="localOnSubmit" :loading="isSubmitting" :disabled="!isFormValid || isSubmitting">Salvar</ConfirmButton>
             </span>
           </template>
           <span>Preencha todos os campos obrigatórios (*) para habilitar o botão</span>
@@ -92,6 +98,7 @@ export default {
     unidade: "",
     precoMedio: "",
     isSubmitting: false,
+    isDuplicate: false,
     products: [],
     producers: [],
     items: {
@@ -104,6 +111,8 @@ export default {
       ],
       itemsQuantity: [],
     },
+    quantityWarnings: [],
+    quantityValid: true,
     requiredField: [(e) => (e !== null && e !== undefined && e !== "") || "Obrigatório"],
   }),
   watch: {
@@ -115,14 +124,19 @@ export default {
 
     "items.itemsProducts": {
       handler(newVal) {
-        this.updateTotalGeral()
+        this.validateQuantity();
+        this.updateTotalGeral();
         newVal.forEach((item, index) => {
           if (item && item.produtoId) {
-            const produto = this.products.find((p) => p.id === item.produtoId);
-            if (produto) {
-              this.items.itemsProducts[index].unidade = produto.produto.unidade;
-              this.items.itemsProducts[index].precoMedio = produto.produto.precoMedio;
+            if (item && item.produtoId) {
+              // Verifica se o produto já existe em outro índice
+               this.isDuplicate = newVal.some((prod, i) => i !== index && prod.produtoId === item.produtoId);
             }
+            const produto = this.products.find((p) => p.id === item.produtoId);
+              if (produto) {
+                this.items.itemsProducts[index].unidade = produto.produto.unidade;
+                this.items.itemsProducts[index].precoMedio = produto.produto.precoMedio;
+              }
           }
         });
       },
@@ -131,28 +145,50 @@ export default {
 
     "items.itemsQuantity": {
       handler() {
-        this.updateTotalGeral()
+        this.validateQuantity();
+        this.updateTotalGeral();
       },
-      deep: true
-    }
+      deep: true,
+    },
   },
   computed: {
     isFormValid() {
-      return;
+      const areItemsProductsValid = this.items.itemsProducts.every((item) => item.produtoId && item.unidade && item.precoMedio);
+      return !!(this.currentItem.produtorId && areItemsProductsValid && this.quantityValid && !this.isDuplicate);
     },
   },
   methods: {
+    validateQuantity() {
+      this.quantityWarnings = this.items.itemsProducts.map((pesquisa, index) => {
+        const pesquisaId = pesquisa.produtoId;
+        const quantity = this.items.itemsQuantity[index] || 0;
+
+        if (!pesquisaId) return null;
+
+        const selectedPesquisa = this.products.find((p) => p.id === pesquisaId);
+
+        if (selectedPesquisa && quantity > selectedPesquisa.quantidade) {
+          this.quantityValid = false;
+          return `A quantidade inserida excede o limite permitido para ${selectedPesquisa.produto.descricao} (${selectedPesquisa.quantidade}).`;
+        }
+        this.quantityValid = true;
+        return null;
+      });
+    },
+
     formatPrice(val) {
       val = UtilsService.formatReal(val);
       return val;
     },
 
     updateTotalGeral() {
-      this.totalGeral = this.items.itemsProducts.reduce((total, product, index) => {
-        const quantity = this.items.itemsQuantity[index] || 0
-        const precoMedio = parseFloat(product.precoMedio) || 0
-        return total + precoMedio * quantity
-      }, 0).toFixed(2)
+      this.totalGeral = this.items.itemsProducts
+        .reduce((total, product, index) => {
+          const quantity = this.items.itemsQuantity[index] || 0;
+          const precoMedio = parseFloat(product.precoMedio) || 0;
+          return total + precoMedio * quantity;
+        }, 0)
+        .toFixed(2);
     },
     addItem() {
       this.items.itemsProducts.push({
