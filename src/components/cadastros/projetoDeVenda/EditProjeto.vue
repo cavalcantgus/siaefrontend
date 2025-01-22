@@ -4,7 +4,7 @@
       <div class="grid-container">
         <v-row class="ml-1 w-100">
           <v-col cols="">
-            <v-select density="compact" name="producer" :items="producers" item-title="nome" item-value="id" v-model="currentItem.produtorId" variant="outlined" :rules="requiredField" clearable>
+            <v-select density="compact" name="producer" :items="producers" item-title="nome" item-value="id" return-object v-model="currentItem.produtor" variant="outlined" :rules="requiredField" clearable>
               <template v-slot:label>
                 <span>Produtor <span style="color: red">*</span></span>
               </template>
@@ -17,22 +17,22 @@
             <v-btn size="30px" icon style="margin-left: -26px; margin-bottom: -85px" color="primary" @click="addItem">
               <v-icon left size="20px">mdi-plus</v-icon>
             </v-btn>
-            <div v-for="(produtoId, index) in items.itemsProducts" :key="index" class="grid-second-container">
-              <v-col cols="">
-                <v-select :color="isDuplicate? 'error': ''" density="compact" name="product" :items="products" item-title="produto.descricao" item-value="id" v-model="items.itemsProducts[index].produtoId" variant="outlined" :rules="requiredField" clearable>
+            <div v-for="(projeto, index) in currentItem.projetoProdutos" :key="index" class="grid-second-container">
+              <v-col cols="" class="">
+                <v-select :color="isDuplicate ? 'error' : ''" density="compact" :items="products" item-title="descricao" item-value="id" return-object v-model="projeto.produto" variant="outlined" :rules="requiredField" clearable>
                   <template v-slot:label>
                     <span>Produto <span style="color: red">*</span></span>
                   </template>
                 </v-select>
               </v-col>
               <v-col cols="2">
-                <v-text-field density="compact" name="unidade" label="Unidade" v-model="items.itemsProducts[index].unidade" variant="outlined" disabled></v-text-field>
+                <v-text-field density="compact" label="Unidade" v-model="projeto.produto.unidade" variant="outlined" disabled></v-text-field>
               </v-col>
               <v-col cols="2">
-                <v-text-field density="compact" name="precoMedio" label="Preço Médio" v-model="items.itemsProducts[index].precoMedio" variant="outlined" disabled></v-text-field>
+                <v-text-field density="compact" label="Preço Médio" v-model="projeto.produto.precoMedio" variant="outlined" disabled></v-text-field>
               </v-col>
               <v-col cols="2">
-                <vuetify-money density="compact" name="quantidade" label="Quantidade" :options="options" v-model="items.itemsQuantity[index]" variant="outlined" :disabled="isDuplicate"></vuetify-money>
+                <vuetify-money density="compact" label="Quantidade" :options="options" v-model="projeto.quantidade" variant="outlined" :disabled="isDuplicate"></vuetify-money>
               </v-col>
               <v-btn size="30px" icon color="error" style="margin-top: 15px" @click="removeItem(index)">
                 <v-icon size="20px">mdi-delete</v-icon>
@@ -40,9 +40,9 @@
               <v-alert v-if="quantityWarnings[index]" color="error" class="mt-2 mb-6 ml-4" density="compact" style="font-size: 0.8rem; height: 70px">
                 {{ quantityWarnings[index] }}
               </v-alert>
-              <span v-if="isDuplicate" class="text-start text-error ml-3" style="font-size: 0.8rem; font-weight: bold; width: 100%; margin-top: -25px; margin-bottom: 20px;">
+              <span v-if="isDuplicate" class="text-start text-error ml-3" style="font-size: 0.8rem; font-weight: bold; width: 100%; margin-top: -25px; margin-bottom: 20px">
                 {{ `Itens duplicados. Por favor, remova-os, ou escolha outro.` }}
-            </span>
+              </span>
             </div>
           </v-col>
         </v-row>
@@ -67,7 +67,7 @@
         <v-tooltip location="top" :disabled="isFormValid">
           <template #activator="{ props }">
             <span v-bind="props">
-              <ConfirmButton :color="isFormValid ? 'success' : 'grey'" :onConfirm="localOnSubmit" :loading="isSubmitting" :disabled="!isFormValid || isSubmitting">Salvar</ConfirmButton>
+              <ConfirmButton :color="isFormValid ? 'success' : 'grey'" :onConfirm="localOnSubmit" :loading="isSubmitting">Salvar</ConfirmButton>
             </span>
           </template>
           <span>Preencha todos os campos obrigatórios (*) para habilitar o botão</span>
@@ -104,6 +104,7 @@ export default {
     precoMedio: "",
     isSubmitting: false,
     isDuplicate: false,
+    researchs: [],
     products: [],
     producers: [],
     items: {
@@ -120,7 +121,7 @@ export default {
       decimal: ",",
       thousands: ".",
       precision: "2",
-      masked: false
+      masked: false,
     },
     quantityWarnings: [],
     quantityValid: true,
@@ -133,31 +134,25 @@ export default {
       }
     },
 
-    "items.itemsProducts": {
+    "currentItem.projetoProdutos": {
       handler(newVal) {
         this.validateQuantity();
-        this.updateTotalGeral();
         newVal.forEach((item, index) => {
-          if (item && item.produtoId) {
-            if (item && item.produtoId) {
-              // Verifica se o produto já existe em outro índice
-               this.isDuplicate = newVal.some((prod, i) => i !== index && prod.produtoId === item.produtoId);
+          if (item && item.produto) {
+            // Atualiza os valores do produto associado
+            const produto = this.products.find((p) => p.id === item.produto.id);
+            if (produto) {
+              item.produto.unidade = produto.unidade;
+              item.produto.precoMedio = produto.precoMedio;
             }
-            const produto = this.products.find((p) => p.id === item.produtoId);
-              if (produto) {
-                this.items.itemsProducts[index].unidade = produto.produto.unidade;
-                this.items.itemsProducts[index].precoMedio = produto.produto.precoMedio;
-              }
           }
         });
-      },
-      deep: true,
-    },
 
-    "items.itemsQuantity": {
-      handler() {
-        this.validateQuantity();
+        // Atualiza o total geral após as mudanças
         this.updateTotalGeral();
+
+        // Verifica duplicidade após atualização
+        this.isDuplicate = newVal.some((item, index) => newVal.some((otherItem, otherIndex) => index !== otherIndex && item.produto && otherItem.produto && item.produto.id === otherItem.produto.id));
       },
       deep: true,
     },
@@ -170,17 +165,20 @@ export default {
   },
   methods: {
     validateQuantity() {
-      this.quantityWarnings = this.items.itemsProducts.map((pesquisa, index) => {
-        const pesquisaId = pesquisa.produtoId;
-        const quantity = this.items.itemsQuantity[index] || 0;
+      console.log("Método chamado");
+      this.quantityWarnings = this.currentItem.projetoProdutos.map((projeto, index) => {
+        const produtoId = projeto.produto.id;
+        console.log("Produto: ", produtoId);
+        const quantity = projeto.quantidade || 0;
 
-        if (!pesquisaId) return null;
+        if (!produtoId) return null;
 
-        const selectedPesquisa = this.products.find((p) => p.id === pesquisaId);
+        const selectedProdutoPesquisa = this.researchs.find((p) => p.produto.id === produtoId);
+        console.log("Pesquisa: ", selectedProdutoPesquisa);
 
-        if (selectedPesquisa && quantity > selectedPesquisa.quantidade) {
+        if (selectedProdutoPesquisa && quantity > selectedProdutoPesquisa.quantidade) {
           this.quantityValid = false;
-          return `A quantidade inserida excede o limite permitido para ${selectedPesquisa.produto.descricao} (${selectedPesquisa.quantidade}).`;
+          return `A quantidade inserida excede o limite permitido para ${selectedProdutoPesquisa.produto.descricao} (${selectedProdutoPesquisa.quantidade}).`;
         }
         this.quantityValid = true;
         return null;
@@ -193,26 +191,41 @@ export default {
     },
 
     updateTotalGeral() {
-      this.totalGeral = this.items.itemsProducts
-        .reduce((total, product, index) => {
-          const quantity = this.items.itemsQuantity[index] || 0;
-          const precoMedio = parseFloat(product.precoMedio) || 0;
+      console.log("Método chamado");
+      this.totalGeral = this.currentItem.projetoProdutos
+        .reduce((total, product) => {
+          console.log("Produto 1: ", product);
+          const quantity = parseFloat(product.quantidade) || 0;
+          console.log("Quantidade: ", quantity);
+          const precoMedio = parseFloat(product.produto?.precoMedio) || 0; // Verifique se 'produto' existe
+          console.log("Preço Médio: ", precoMedio);
           return total + precoMedio * quantity;
         }, 0)
         .toFixed(2);
     },
+
     addItem() {
-      this.items.itemsProducts.push({
-        produtoId: null,
-        unidade: null,
-        precoMedio: null,
+      this.currentItem.projetoProdutos.push({
+        produto: {
+          descricao: "",
+          epecificacao: "",
+          precoMedio: 0,
+          unidade: "",
+        },
+        quantidade: 0,
+        total: 0,
       });
-      this.items.itemsQuantity.push(null);
+      this.updateTotalGeral();
+      this.validateQuantity();
     },
     removeItem(index) {
-      this.items.itemsProducts.splice(index, 1);
-      this.items.itemsQuantity.splice(index, 1);
+      if (this.currentItem.projetoProdutos && this.currentItem.projetoProdutos.length > index) {
+        this.currentItem.projetoProdutos.splice(index, 1);
+        this.updateTotalGeral(); // Atualiza o total geral após remoção
+        this.validateQuantity(); // Revalida as quantidades
+      }
     },
+
     resetState() {
       Object.keys(this.currentItem).forEach((key) => {
         this.currentItem[key] = null;
@@ -222,8 +235,7 @@ export default {
       try {
         const fields = {
           ...this.currentItem,
-          pesquisasId: this.items.itemsProducts.map((item) => item.produtoId),
-          quantidade: this.items.itemsQuantity,
+          projetoProdutos: this.currentItem.projetoProdutos
         };
         console.log(fields);
         this.onSubmit(fields);
@@ -232,9 +244,9 @@ export default {
       }
     },
 
-    async getResearchs() {
+    async getProducts() {
       try {
-        const response = await axios.get("/public/pesquisas");
+        const response = await axios.get("/public/produtos");
         console.log(response.data);
 
         if (Array.isArray(response.data)) {
@@ -247,6 +259,25 @@ export default {
       } catch (error) {
         console.log("Error: ", error);
         this.products = [];
+      }
+    },
+
+    async getResearchs() {
+      try {
+        const response = await axios.get("/public/pesquisas");
+        console.log(response.data);
+
+        if (Array.isArray(response.data)) {
+          this.researchs = response.data;
+          this.researchs.forEach();
+          console.log(response.data);
+        } else {
+          console.log("A resposta da API não é um Array");
+          this.researchs = [];
+        }
+      } catch (error) {
+        console.log("Error: ", error);
+        this.researchs = [];
       }
     },
 
@@ -263,7 +294,7 @@ export default {
     },
   },
   mounted() {
-    this.getResearchs(), this.getProductors();
+    this.getProducts(), this.getProductors(), this.getResearchs(), this.updateTotalGeral();
   },
 };
 </script>
@@ -274,7 +305,7 @@ export default {
   flex-wrap: wrap;
   color: #000000;
   gap: 0.6rem;
-  row-gap: 6px;
+  row-gap: 2px;
 }
 
 .grid-second-container {

@@ -2,7 +2,7 @@
   <div class="pa-4 pr-12 pl-12">
     <v-form @submit.prevent="localOnSubmit" ref="formRef">
       <div class="grid-container">
-        <v-select density="compact" name="products" :items="products" item-title="descricao" item-value="id" v-model="currentItem.produtoId" :rules="requiredField" variant="outlined">
+        <v-select density="compact" name="products" :items="products" item-title="descricao" item-value="id" v-model="currentItem.produtoId" :rules="requiredField" variant="outlined" max-width="360px">
           <template v-slot:label>
             <span>Produto <span style="color: red">*</span></span>
           </template>
@@ -10,10 +10,9 @@
         <div v-for="(preco, index) in currentItem.precos" :key="index">
           <MoneyInput v-model="currentItem.precos[index]" style="width: 120px" type="number" :label="`Preço ${index + 1}`" density="compact" variant="outlined" :placeholder="`Preço ${index + 1}`"></MoneyInput>
         </div>
+        <vuetify-money density="compact" name="quantidade" type="number" label="Quantidade" :options="options" v-model="currentItem.quantidade" :rules="requiredField" variant="outlined" style="width: 130px"></vuetify-money>
       </div>
-      <v-text-field density="compact" name="quantidade" type="number" label="Quantidade" v-model="currentItem.quantidade" :rules="requiredField" variant="outlined">
-
-      </v-text-field>
+      
     </v-form>
     <v-row class="justify-end dense pt-6">
       <v-col class="text-end">
@@ -52,6 +51,12 @@ export default {
     },
   },
   data: () => ({
+    options: {
+      decimal: ",",
+      thousands: ".",
+      precision: "2",
+      masked: false
+    },
     isSubmitting: false,
     products: [],
     requiredField: [(e) => (e !== null && e !== undefined && e !== "") || "Obrigatório"],
