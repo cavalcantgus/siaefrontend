@@ -4,7 +4,7 @@
   <h1 style="color: #57a340; margin-top: 10px; padding: 30px; font-size: 3rem">Projeto De Venda</h1>
   <v-row justify="center" class="pr-2">
     <v-col cols="12">
-      <v-data-table-virtual :items="filteredProjects" :headers="headers" :search="search" single-expand  show-expand v-model:expanded="expanded" :fixed-header="true" height="700px">
+      <v-data-table-virtual :items="filteredProjects" :headers="headers" :search="search" single-expand show-expand v-model:expanded="expanded" :fixed-header="true" height="700px">
         <template v-slot:top>
           <v-row class="mt-2 mb-8 mx-3">
             <v-col cols="5">
@@ -52,6 +52,16 @@
             <span>Clique para deletar um Projeto</span>
           </v-tooltip>
         </template>
+        <template v-slot:[`item.download`]="{ item }">
+          <v-tooltip location="top">
+            <template #activator="{ props }">
+              <ConfirmButton icon v-bind="props" :onConfirm="() => onDownloadRow(item)" class="elevation-0">
+                <v-icon color="primary">mdi-download</v-icon>
+              </ConfirmButton>
+            </template>
+            <span>Clique para deletar um Projeto</span>
+          </v-tooltip>
+        </template>
         <template v-slot:[`item.dataProjeto`]="{ item }">
           <span>{{ formatDate(item.dataProjeto) }}</span>
         </template>
@@ -59,13 +69,13 @@
           <span>{{ formatPrice(item.total) }}</span>
         </template>
         <template v-slot:expanded-row="{ item }">
-            <tr>
-              <td :colspan="9" style="background-color: #37622a" class="text-white">
-                {{ console.log(item) }}
-                <ProjetoDeVendaExpand :projetoData="item"></ProjetoDeVendaExpand>
-              </td>
-            </tr>
-          </template>
+          <tr>
+            <td :colspan="9" style="background-color: #37622a" class="text-white">
+              {{ console.log(item) }}
+              <ProjetoDeVendaExpand :projetoData="item"></ProjetoDeVendaExpand>
+            </td>
+          </tr>
+        </template>
       </v-data-table-virtual>
       <v-dialog v-model="dialog.create" width="70%">
         <v-card class="card-form align-self-center" width="100%">
@@ -88,7 +98,7 @@
               <v-icon prepend> mdi-close </v-icon>
             </v-btn>
           </v-card-title>
-          <EditProdutor :currentItem="selectedRow" :onSubmit="updateProduct" :files="files"></EditProdutor>
+          <EditProjeto :currentItem="selectedRow" :onSubmit="updateProject"></EditProjeto>
         </v-card>
       </v-dialog>
     </v-col>
@@ -99,7 +109,7 @@
 import axios from "@/services/axios.js";
 import NavBar from "../../NavBar.vue";
 import NovoProduto from "./NovoProjeto.vue";
-import EditProdutor from "./EditProduto.vue";
+import EditProjeto from "./EditProjeto.vue";
 import ProjetoDeVendaExpand from "./ProjetoDeVendaExpand.vue";
 import { useToast } from "vue-toastification";
 import UtilsService from "../../../services/utilsService";
@@ -112,7 +122,7 @@ export default {
     NavBar,
     NovoProduto,
     ProjetoDeVendaExpand,
-    EditProdutor,
+    EditProjeto,
     BtnComeBack,
     ConfirmButton,
   },
@@ -132,7 +142,8 @@ export default {
       { title: "Endereço", align: "center", sortable: true, value: "produtor.endereco", width: "300px" },
       { title: "CAF", align: "center", sortable: true, value: "produtor.caf" },
       { title: "Data Projeto", align: "center", sortable: true, value: "dataProjeto" },
-      { title: "Total Geral", align: "center", sortable: true, value: "total"},
+      { title: "Total Geral", align: "center", sortable: true, value: "total" },
+      { title: "Relatório", align: "center", sortable: true, value: "download" },
     ],
     newItem: {},
     selectedRow: {},
@@ -151,7 +162,13 @@ export default {
     },
 
     formatDate(val) {
-      return UtilsService.formatData(val)
+      return UtilsService.formatData(val);
+    },
+
+    downloadRelatorio(item) {
+      console.log("Método chamado");
+      const url = `http://localhost:8080/public/projetos/relatorio/generate/${item.id}`;
+      window.location.href = url; // Redireciona o navegador e força o download
     },
 
     async getProjects() {
@@ -190,24 +207,25 @@ export default {
       }
     },
 
-    async updateProduct(fields) {
+    async updateProject(fields) {
       const toast = useToast();
 
       try {
-        const response = await axios.put(`/public/produtos/produto/${fields.id}`, fields);
+        const response = await axios.put(`/public/projetos/projeto/${fields.id}`, fields);
 
         console.log(response.data);
+        console.log(response)
 
         if (response.status !== 200) {
           throw new Error(`Erro: ${response.status}`);
         }
-        toast.success("Produto atualizado com sucesso!");
+        toast.success("Projeto atualizado com sucesso!");
       } catch (error) {
         console.error("Erro: ", error);
         toast.error("Erro ao atualizar produto: ", error);
       } finally {
         this.dialog.update = false;
-        this.getProducts();
+        this.getProjects();
       }
     },
 
@@ -236,6 +254,12 @@ export default {
       console.log("Método chamado");
       this.deleteRow = { ...row };
       this.deleteProduct(this.deleteRow);
+    },
+
+    onDownloadRow(row) {
+      console.log("Método chamado");
+      this.selectedRow = { ...row };
+      this.downloadRelatorio(this.selectedRow);
     },
   },
   mounted() {

@@ -98,7 +98,7 @@
         </template>
       </v-data-table>
       <v-dialog v-model="dialog.create">
-        <v-card class="card-form align-self-center" width="60%">
+        <v-card class="card-form align-self-center" width="50%">
           <v-card-title class="sticky-title title-border">
             Cadastro de Produto
             <v-spacer></v-spacer>
@@ -110,7 +110,7 @@
         </v-card>
       </v-dialog>
       <v-dialog v-model="dialog.update">
-        <v-card class="card-form align-self-center" width="60%">
+        <v-card class="card-form align-self-center" width="50%">
           <v-card-title class="sticky-title title-border">
             Editar Produtor: {{ selectedRow.id }}
             <v-spacer></v-spacer>
