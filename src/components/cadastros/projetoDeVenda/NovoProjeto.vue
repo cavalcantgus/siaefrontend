@@ -34,7 +34,7 @@
               <v-col cols="2">
                 <vuetify-money density="compact" name="quantidade" label="Quantidade" :options="options" v-model="items.itemsQuantity[index]" variant="outlined" :disabled="isDuplicate"></vuetify-money>
               </v-col>
-              <v-btn size="30px" icon color="error" style="margin-top: 15px" @click="removeItem(index)">
+              <v-btn v-if="items.itemsProducts.length > 1" size="30px" icon color="error" style="margin-top: 15px" @click="removeItem(index)">
                 <v-icon size="20px">mdi-delete</v-icon>
               </v-btn>
               <v-alert v-if="quantityWarnings[index]" color="error" class="mt-2 mb-6 ml-4" density="compact" style="font-size: 0.8rem; height: 70px">
@@ -144,6 +144,7 @@ export default {
                this.isDuplicate = newVal.some((prod, i) => i !== index && prod.produtoId === item.produtoId);
             }
             const produto = this.products.find((p) => p.id === item.produtoId);
+            console.log(item.produtoId)
               if (produto) {
                 this.items.itemsProducts[index].unidade = produto.produto.unidade;
                 this.items.itemsProducts[index].precoMedio = produto.produto.precoMedio;
