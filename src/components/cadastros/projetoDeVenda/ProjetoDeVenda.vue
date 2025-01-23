@@ -229,14 +229,14 @@ export default {
       }
     },
 
-    async deleteProduct(fields) {
+    async deleteProject(fields) {
       const toast = useToast();
       try {
-        const response = await axios.delete(`/public/produtos/produto/${fields.id}`, fields);
+        const response = await axios.delete(`/public/projetos/projeto/${fields.id}`, fields);
         if (response.status !== 204) {
           throw new Error(`Erro: `, response.status);
         }
-        toast.success("Produto removido com sucesso!");
+        toast.success("Projeto removido com sucesso!");
       } catch (error) {
         toast.error("Erro ao deletar produto: ", error);
         console.error("Erro: ", error);
@@ -252,8 +252,8 @@ export default {
 
     onDeleteRow(row) {
       console.log("Método chamado");
-      this.deleteRow = { ...row };
-      this.deleteProduct(this.deleteRow);
+      this.selectedRow = { ...row };
+      this.deleteProject(this.selectedRow);
     },
 
     onDownloadRow(row) {
