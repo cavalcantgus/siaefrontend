@@ -4,7 +4,18 @@
       <div class="grid-container">
         <v-row class="ml-1 w-100">
           <v-col cols="">
-            <v-select density="compact" name="producer" :items="producers" item-title="nome" item-value="id" return-object v-model="currentItem.produtor" variant="outlined" :rules="requiredField" clearable>
+            <v-select
+              density="compact"
+              name="producer"
+              :items="producers"
+              item-title="nome"
+              item-value="id"
+              return-object
+              v-model="currentItem.produtor"
+              variant="outlined"
+              :rules="requiredField"
+              clearable
+            >
               <template v-slot:label>
                 <span>Produtor <span style="color: red">*</span></span>
               </template>
@@ -14,34 +25,122 @@
 
         <v-row class="w-100" style="margin-top: -50px; margin-left: -8px">
           <v-col cols="12">
-            <v-btn size="30px" icon style="margin-left: -26px; margin-bottom: -85px" color="primary" @click="addItem">
+            <v-btn
+              size="30px"
+              icon
+              style="margin-left: -26px; margin-bottom: -85px"
+              color="primary"
+              @click="addItem"
+            >
               <v-icon left size="20px">mdi-plus</v-icon>
             </v-btn>
-            <div v-for="(projeto, index) in currentItem.projetoProdutos" :key="index" class="grid-second-container">
+            <div
+              v-for="(projeto, index) in currentItem.projetoProdutos"
+              :key="index"
+              class="grid-second-container"
+            >
               <v-col cols="" class="">
-                <v-select :color="isDuplicate ? 'error' : ''" density="compact" :items="products" item-title="descricao" item-value="id" return-object v-model="projeto.produto" variant="outlined" :rules="requiredField" clearable>
+                <v-select
+                  :color="isDuplicate ? 'error' : ''"
+                  density="compact"
+                  :items="products"
+                  item-title="descricao"
+                  item-value="id"
+                  return-object
+                  v-model="projeto.produto"
+                  variant="outlined"
+                  :rules="requiredField"
+                  clearable
+                >
                   <template v-slot:label>
                     <span>Produto <span style="color: red">*</span></span>
                   </template>
                 </v-select>
               </v-col>
               <v-col cols="2">
-                <v-text-field density="compact" label="Unidade" v-model="projeto.produto.unidade" variant="outlined" disabled></v-text-field>
+                <v-text-field
+                  density="compact"
+                  label="Unidade"
+                  v-model="projeto.produto.unidade"
+                  variant="outlined"
+                  disabled
+                ></v-text-field>
               </v-col>
               <v-col cols="2">
-                <v-text-field density="compact" label="Preço Médio" v-model="projeto.produto.precoMedio" variant="outlined" disabled></v-text-field>
+                <v-text-field
+                  density="compact"
+                  label="Preço Médio"
+                  v-model="projeto.produto.precoMedio"
+                  variant="outlined"
+                  disabled
+                ></v-text-field>
               </v-col>
               <v-col cols="2">
-                <vuetify-money density="compact" label="Quantidade" :options="options" v-model="projeto.quantidade" variant="outlined" :disabled="isDuplicate"></vuetify-money>
+                <vuetify-money
+                  density="compact"
+                  label="Quantidade"
+                  :options="options"
+                  v-model="projeto.quantidade"
+                  variant="outlined"
+                  :disabled="isDuplicate"
+                ></vuetify-money>
               </v-col>
-              <v-btn size="30px" icon color="error" style="margin-top: 15px" @click="removeItem(index)">
+              <div class="mt-3">
+                <v-text-field
+                  density="compact"
+                  name="inicioEntrega"
+                  label="De"
+                  type="date"
+                  v-model="projeto.inicioEntrega"
+                  variant="outlined"
+                  :rules="requiredField"
+                ></v-text-field>
+              </div>
+
+              <div class="mt-3 ml-3 mr-3">
+                <v-text-field
+                  density="compact"
+                  name="fimEntrega"
+                  label="Até"
+                  type="date"
+                  v-model="projeto.fimEntrega"
+                  variant="outlined"
+                  :rules="requiredField"
+                  :hide-details="false"
+                ></v-text-field>
+              </div>
+              <v-btn
+                size="30px"
+                icon
+                color="error"
+                style="margin-top: 15px"
+                @click="removeItem(index)"
+              >
                 <v-icon size="20px">mdi-delete</v-icon>
               </v-btn>
-              <v-alert v-if="quantityWarnings[index]" color="error" class="mt-2 mb-6 ml-4" density="compact" style="font-size: 0.8rem; height: 70px">
+              <v-alert
+                v-if="quantityWarnings[index]"
+                color="error"
+                class="mt-2 mb-6 ml-4"
+                density="compact"
+                style="font-size: 0.8rem; height: 70px"
+              >
                 {{ quantityWarnings[index] }}
               </v-alert>
-              <span v-if="isDuplicate" class="text-start text-error ml-3" style="font-size: 0.8rem; font-weight: bold; width: 100%; margin-top: -25px; margin-bottom: 20px">
-                {{ `Itens duplicados. Por favor, remova-os, ou escolha outro.` }}
+              <span
+                v-if="isDuplicate"
+                class="text-start text-error ml-3"
+                style="
+                  font-size: 0.8rem;
+                  font-weight: bold;
+                  width: 100%;
+                  margin-top: -25px;
+                  margin-bottom: 20px;
+                "
+              >
+                {{
+                  `Itens duplicados. Por favor, remova-os, ou escolha outro.`
+                }}
               </span>
             </div>
           </v-col>
@@ -50,7 +149,17 @@
           <v-col cols="4">
             <v-tooltip location="end">
               <template #activator="{ props }">
-                <v-text-field v-bind="props" max-width="170px" density="compact" name="dataProjeto" label="Data do Projeto" type="date" v-model="currentItem.dataProjeto" variant="outlined" :rules="requiredField"></v-text-field>
+                <v-text-field
+                  v-bind="props"
+                  max-width="170px"
+                  density="compact"
+                  name="dataProjeto"
+                  label="Data do Projeto"
+                  type="date"
+                  v-model="currentItem.dataProjeto"
+                  variant="outlined"
+                  :rules="requiredField"
+                ></v-text-field>
               </template>
               <span>Obs: Utilizar a data de realização da Chamada Pública</span>
             </v-tooltip>
@@ -67,10 +176,19 @@
         <v-tooltip location="top" :disabled="isFormValid">
           <template #activator="{ props }">
             <span v-bind="props">
-              <ConfirmButton :color="isFormValid ? 'success' : 'grey'" :onConfirm="localOnSubmit" :loading="isSubmitting" :disabled="!isFormValid || isSubmitting">Salvar</ConfirmButton>
+              <ConfirmButton
+                :color="isFormValid ? 'success' : 'grey'"
+                :onConfirm="localOnSubmit"
+                :loading="isSubmitting"
+                :disabled="!isFormValid || isSubmitting"
+                >Salvar</ConfirmButton
+              >
             </span>
           </template>
-          <span>Preencha todos os campos obrigatórios (*) para habilitar o botão</span>
+          <span
+            >Preencha todos os campos obrigatórios (*) para habilitar o
+            botão</span
+          >
         </v-tooltip>
       </v-col>
     </v-row>
@@ -125,7 +243,9 @@ export default {
     },
     quantityWarnings: [],
     quantityValid: true,
-    requiredField: [(e) => (e !== null && e !== undefined && e !== "") || "Obrigatório"],
+    requiredField: [
+      (e) => (e !== null && e !== undefined && e !== "") || "Obrigatório",
+    ],
   }),
   watch: {
     dialogAtivo(newValue) {
@@ -152,37 +272,59 @@ export default {
         this.updateTotalGeral();
 
         // Verifica duplicidade após atualização
-        this.isDuplicate = newVal.some((item, index) => newVal.some((otherItem, otherIndex) => index !== otherIndex && item.produto && otherItem.produto && item.produto.id === otherItem.produto.id));
+        this.isDuplicate = newVal.some((item, index) =>
+          newVal.some(
+            (otherItem, otherIndex) =>
+              index !== otherIndex &&
+              item.produto &&
+              otherItem.produto &&
+              item.produto.id === otherItem.produto.id
+          )
+        );
       },
       deep: true,
     },
   },
   computed: {
     isFormValid() {
-      const areItemsProductsValid = this.currentItem.projetoProdutos.every((item) => item.produto);
-      return !!(this.currentItem.produtor && areItemsProductsValid && this.quantityValid && !this.isDuplicate);
+      const areItemsProductsValid = this.currentItem.projetoProdutos.every(
+        (item) => item.produto
+      );
+      return !!(
+        this.currentItem.produtor &&
+        areItemsProductsValid &&
+        this.quantityValid &&
+        !this.isDuplicate
+      );
     },
   },
   methods: {
     validateQuantity() {
       console.log("Método chamado");
-      this.quantityWarnings = this.currentItem.projetoProdutos.map((projeto, index) => {
-        const produtoId = projeto.produto.id;
-        console.log("Produto: ", produtoId);
-        const quantity = projeto.quantidade || 0;
+      this.quantityWarnings = this.currentItem.projetoProdutos.map(
+        (projeto, index) => {
+          const produtoId = projeto.produto.id;
+          console.log("Produto: ", produtoId);
+          const quantity = projeto.quantidade || 0;
 
-        if (!produtoId) return null;
+          if (!produtoId) return null;
 
-        const selectedProdutoPesquisa = this.researchs.find((p) => p.produto.id === produtoId);
-        console.log("Pesquisa: ", selectedProdutoPesquisa);
+          const selectedProdutoPesquisa = this.researchs.find(
+            (p) => p.produto.id === produtoId
+          );
+          console.log("Pesquisa: ", selectedProdutoPesquisa);
 
-        if (selectedProdutoPesquisa && quantity > selectedProdutoPesquisa.quantidade) {
-          this.quantityValid = false;
-          return `A quantidade inserida excede o limite permitido para ${selectedProdutoPesquisa.produto.descricao} (${selectedProdutoPesquisa.quantidade}).`;
+          if (
+            selectedProdutoPesquisa &&
+            quantity > selectedProdutoPesquisa.quantidade
+          ) {
+            this.quantityValid = false;
+            return `A quantidade inserida excede o limite permitido para ${selectedProdutoPesquisa.produto.descricao} (${selectedProdutoPesquisa.quantidade}).`;
+          }
+          this.quantityValid = true;
+          return null;
         }
-        this.quantityValid = true;
-        return null;
-      });
+      );
     },
 
     formatPrice(val) {
@@ -213,13 +355,18 @@ export default {
           unidade: "",
         },
         quantidade: 0,
+        inicioEntrega: null,
+        fimEntrega: null,
         total: 0,
       });
       this.updateTotalGeral();
       this.validateQuantity();
     },
     removeItem(index) {
-      if (this.currentItem.projetoProdutos && this.currentItem.projetoProdutos.length > index) {
+      if (
+        this.currentItem.projetoProdutos &&
+        this.currentItem.projetoProdutos.length > index
+      ) {
         this.currentItem.projetoProdutos.splice(index, 1);
         this.updateTotalGeral(); // Atualiza o total geral após remoção
         this.validateQuantity(); // Revalida as quantidades
@@ -235,7 +382,7 @@ export default {
       try {
         const fields = {
           ...this.currentItem,
-          projetoProdutos: this.currentItem.projetoProdutos
+          projetoProdutos: this.currentItem.projetoProdutos,
         };
         console.log(fields);
         this.onSubmit(fields);
@@ -294,7 +441,10 @@ export default {
     },
   },
   mounted() {
-    this.getProducts(), this.getProductors(), this.getResearchs(), this.updateTotalGeral();
+    this.getProducts(),
+      this.getProductors(),
+      this.getResearchs(),
+      this.updateTotalGeral();
   },
 };
 </script>
