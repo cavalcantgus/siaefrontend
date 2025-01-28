@@ -48,7 +48,7 @@ export default {
         {title: 'PAUTA DA CHAMADA', route: "/pauta-da-chamada"}, 
        {title: 'PROJETO DE VENDA', route: "/projeto-de-venda"}, 
         {title: 'CRONOGRAMA DE ENTREGA', route: "/cadastro-produtor"}, 
-        {title: 'COMPROVANTE DE RECEBIMENTO', route: "/cadastro-produtor"}, 
+        {title: 'COMPROVANTE DE RECEBIMENTO', route: "/comprovante"}, 
         {title: 'CONTRATOS', route: "/cadastro-produtor"}
     ],
   }),
