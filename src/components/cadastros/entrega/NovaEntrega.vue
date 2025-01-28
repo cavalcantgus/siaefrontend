@@ -43,9 +43,9 @@
                   :color="isDuplicate ? 'error' : ''"
                   density="compact"
                   name="product"
-                  :items="products"
+                  :items="projects"
                   item-title="produto.descricao"
-                  item-value="id"
+                  item-value="produto.id"
                   v-model="items.itemsProducts[index].produtoId"
                   variant="outlined"
                   :rules="requiredField"
@@ -56,7 +56,7 @@
                   </template>
                 </v-select>
               </v-col>
-              <v-col cols="1">
+              <v-col cols="2">
                 <v-text-field
                   density="compact"
                   name="unidade"
@@ -87,31 +87,7 @@
                   :disabled="isDuplicate"
                 ></vuetify-money>
               </v-col>
-              <div class="mt-3">
-                <v-text-field
-                density="compact"
-                name="inicioEntrega"
-                label="De"
-                type="date"
-                v-model="items.itemsInicioEntrega[index]"
-                variant="outlined"
-                :rules="requiredField"
-              ></v-text-field>
-              </div>
-
-              <div class="mt-3 ml-3 mr-3">
-                <v-text-field
-                density="compact"
-                name="fimEntrega"
-                label="Até"
-                type="date"
-                v-model="items.itemsFimEntrega[index]"
-                variant="outlined"
-                :rules="requiredField"
-                :hide-details="false"
-              ></v-text-field>
-
-              </div>
+  
               <v-btn
                 v-if="items.itemsProducts.length > 1"
                 size="30px"
@@ -158,14 +134,14 @@
                   max-width="170px"
                   density="compact"
                   name="dataProjeto"
-                  label="Data do Projeto"
+                  label="Data da Entrega"
                   type="date"
-                  v-model="currentItem.dataProjeto"
+                  v-model="currentItem.dataEntrega"
                   variant="outlined"
                   :rules="requiredField"
                 ></v-text-field>
               </template>
-              <span>Obs: Utilizar a data de realização da Chamada Pública</span>
+              <span>Obs: Utilizar a data de recebimento do(s) produto(s)</span>
             </v-tooltip>
           </v-col>
           <v-col align="end" class="align-self-center">
@@ -222,11 +198,9 @@ export default {
   },
   data: () => ({
     totalGeral: 0,
-    unidade: "",
-    precoMedio: "",
     isSubmitting: false,
     isDuplicate: false,
-    products: [],
+    projects: [],
     producers: [],
     items: {
       itemsProducts: [
@@ -237,8 +211,6 @@ export default {
         },
       ],
       itemsQuantity: [],
-      itemsInicioEntrega: [],
-      itemsFimEntrega: [],
     },
     options: {
       decimal: ",",
@@ -271,12 +243,12 @@ export default {
                 (prod, i) => i !== index && prod.produtoId === item.produtoId
               );
             }
-            const produto = this.products.find((p) => p.id === item.produtoId);
+            const projetoProduto = this.projects.find((p) => p.produto.id === item.produtoId);
             console.log(item.produtoId);
-            if (produto) {
-              this.items.itemsProducts[index].unidade = produto.produto.unidade;
+            if (projetoProduto) {
+              this.items.itemsProducts[index].unidade = projetoProduto.produto.unidade;
               this.items.itemsProducts[index].precoMedio =
-                produto.produto.precoMedio;
+                projetoProduto.produto.precoMedio;
             }
           }
         });
@@ -294,18 +266,12 @@ export default {
   },
   computed: {
     isFormValid() {
-      const areItemInicioEntrega = this.items.itemsInicioEntrega.every(
-      (item) => item && item.trim() !== "" && !isNaN(Date.parse(item)))
-      const areItemFimEntrega = this.items.itemsFimEntrega.every(
-      (item) => item && item.trim() !== "" && !isNaN(Date.parse(item)))
       const areItemsProductsValid = this.items.itemsProducts.every(
         (item) => item.produtoId && item.unidade && item.precoMedio
       );
       return !!(
         this.currentItem.produtorId &&
         areItemsProductsValid &&
-        areItemInicioEntrega &&
-        areItemFimEntrega &&
         this.quantityValid &&
         !this.isDuplicate
       );
@@ -314,19 +280,19 @@ export default {
   methods: {
     validateQuantity() {
       this.quantityWarnings = this.items.itemsProducts.map(
-        (pesquisa, index) => {
-          const pesquisaId = pesquisa.produtoId;
+        (projeto, index) => {
+          const produtoId = projeto.produtoId;
           const quantity = this.items.itemsQuantity[index] || 0;
 
-          if (!pesquisaId) return null;
+          if (!produtoId) return null;
 
-          const selectedPesquisa = this.products.find(
-            (p) => p.id === pesquisaId
+          const selectedProduto = this.projects.find(
+            (p) => p.id === produtoId
           );
 
-          if (selectedPesquisa && quantity > selectedPesquisa.quantidade) {
+          if (selectedProduto && quantity > selectedProduto.quantidade) {
             this.quantityValid = false;
-            return `A quantidade inserida excede o limite permitido para ${selectedPesquisa.produto.descricao} (${selectedPesquisa.quantidade}).`;
+            return `A quantidade inserida excede o limite de entrega para ${selectedProduto.produto.descricao} (${selectedProduto.quantidade}).`;
           }
           this.quantityValid = true;
           return null;
@@ -355,14 +321,10 @@ export default {
         precoMedio: null,
       });
       this.items.itemsQuantity.push(null);
-      this.items.itemsInicioEntrega.push(null);
-      this.items.itemsFimEntrega.push(null);
     },
     removeItem(index) {
       this.items.itemsProducts.splice(index, 1);
       this.items.itemsQuantity.splice(index, 1);
-      this.items.itemsInicioEntrega.splice(index, 1);
-      this.items.itemsFimEntrega.splice(index, 1)
     },
     resetState() {
       Object.keys(this.currentItem).forEach((key) => {
@@ -373,9 +335,7 @@ export default {
       try {
         const fields = {
           ...this.currentItem,
-          pesquisasId: this.items.itemsProducts.map((item) => item.produtoId),
-          inicioEntrega: this.items.itemsInicioEntrega,
-          fimEntrega: this.items.itemsFimEntrega,
+          produtoIds: this.items.itemsProducts.map((item) => item.produtoId),
           quantidade: this.items.itemsQuantity,
         };
         console.log(fields);
@@ -385,21 +345,24 @@ export default {
       }
     },
 
-    async getResearchs() {
+    async getProjects() {
       try {
-        const response = await axios.get("/public/pesquisas");
+        const response = await axios.get("/public/projetos");
         console.log(response.data);
 
         if (Array.isArray(response.data)) {
-          this.products = response.data;
-          console.log(response.data);
+          response.data.forEach((item) =>{
+            const { projetoProdutos } = item
+            this.projects.push( ...projetoProdutos )
+          })
+          console.log("Novo array", this.projects)
         } else {
           console.log("A resposta da API não é um Array");
-          this.products = [];
+          this.projects = [];
         }
       } catch (error) {
         console.log("Error: ", error);
-        this.products = [];
+        this.projects = [];
       }
     },
 
@@ -416,7 +379,7 @@ export default {
     },
   },
   mounted() {
-    this.getResearchs(), this.getProductors();
+    this.getProjects(), this.getProductors();
   },
 };
 </script>

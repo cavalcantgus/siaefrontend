@@ -77,8 +77,8 @@
           </tr>
         </template>
       </v-data-table-virtual>
-      <v-dialog v-model="dialog.create" width="100%">
-        <v-card class="card-form align-self-center" width="100%">
+      <v-dialog v-model="dialog.create" width="75%">
+        <v-card class="card-form align-self-center">
           <v-card-title class="sticky-title title-border">
             Gerar Comprovante
             <v-spacer></v-spacer>
@@ -86,7 +86,7 @@
               <v-icon prepend> mdi-close </v-icon>
             </v-btn>
           </v-card-title>
-          <NovoProduto :currentItem="newItem" :onSubmit="createProject" :dialogAtivo="dialog.create"></NovoProduto>
+          <NovaEntrega :currentItem="newItem" :onSubmit="createProof" :dialogAtivo="dialog.create"></NovaEntrega>
         </v-card>
       </v-dialog>
       <v-dialog v-model="dialog.update">
@@ -108,7 +108,7 @@
 <script>
 import axios from "@/services/axios.js";
 import NavBar from "../../NavBar.vue";
-import NovoProduto from "./NovoProjeto.vue";
+import NovaEntrega from "./NovaEntrega.vue";
 import EditProjeto from "./EditProjeto.vue";
 import ProjetoDeVendaExpand from "./ProjetoDeVendaExpand.vue";
 import { useToast } from "vue-toastification";
@@ -120,7 +120,7 @@ export default {
   name: "CadastroProdutor",
   components: {
     NavBar,
-    NovoProduto,
+    NovaEntrega,
     ProjetoDeVendaExpand,
     EditProjeto,
     BtnComeBack,
@@ -187,27 +187,27 @@ export default {
         this.proofs = [];
       }
     },
-    async createProject(fields) {
+    async createProof(fields) {
       const toast = useToast();
       console.log(fields);
       try {
-        const response = await axios.post("/public/projetos/projeto", fields);
+        const response = await axios.post("/public/comprovantes/comprovante", fields);
         console.log(response.data);
 
         if (response.status !== 201) {
           throw new Error(`Erro: ${response.status}`);
         }
-        toast.success("Projeto cadastrado com sucesso!");
+        toast.success("Entrega cadastrada com sucesso!");
       } catch (error) {
         console.error("Erro: ", error);
-        toast.error("Erro ao cadastrar projeto: ", error);
+        toast.error("Erro ao cadastrar entrega: ", error);
       } finally {
         this.dialog.create = false;
         this.getProjects();
       }
     },
 
-    async updateProject(fields) {
+    async updateProof(fields) {
       const toast = useToast();
 
       try {
@@ -229,7 +229,7 @@ export default {
       }
     },
 
-    async deleteProject(fields) {
+    async deleteProof(fields) {
       const toast = useToast();
       try {
         const response = await axios.delete(`/public/projetos/projeto/${fields.id}`, fields);
