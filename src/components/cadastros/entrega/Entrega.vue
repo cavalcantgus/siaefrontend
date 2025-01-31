@@ -98,7 +98,7 @@
               <v-icon prepend> mdi-close </v-icon>
             </v-btn>
           </v-card-title>
-          <EditProjeto :currentItem="selectedRow" :onSubmit="updateProject"></EditProjeto>
+          <EditProjeto :currentItem="selectedRow" :onSubmit="updateProof"></EditProjeto>
         </v-card>
       </v-dialog>
     </v-col>
@@ -211,7 +211,7 @@ export default {
       const toast = useToast();
 
       try {
-        const response = await axios.put(`/public/projetos/projeto/${fields.id}`, fields);
+        const response = await axios.put(`/public/comprovantes/comprovante/${fields.id}`, fields);
 
         console.log(response.data);
         console.log(response)
@@ -219,10 +219,10 @@ export default {
         if (response.status !== 200) {
           throw new Error(`Erro: ${response.status}`);
         }
-        toast.success("Projeto atualizado com sucesso!");
+        toast.success("Entrega atualizado com sucesso!");
       } catch (error) {
         console.error("Erro: ", error);
-        toast.error("Erro ao atualizar produto: ", error);
+        toast.error("Erro ao atualizar entrega: ", error);
       } finally {
         this.dialog.update = false;
         this.getProjects();

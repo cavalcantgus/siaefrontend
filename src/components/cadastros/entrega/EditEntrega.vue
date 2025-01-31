@@ -44,7 +44,7 @@
                   :color="isDuplicate ? 'error' : ''"
                   density="compact"
                   :items="projects"
-                  item-title="produto.descricao"
+                  item-title="descricao"
                   item-value="id"
                   return-object
                   v-model="entrega.produto"
@@ -158,7 +158,7 @@
                 :color="isFormValid ? 'success' : 'grey'"
                 :onConfirm="localOnSubmit"
                 :loading="isSubmitting"
-                :disabled="!isFormValid || isSubmitting"
+                
                 >Salvar</ConfirmButton
               >
             </span>
@@ -235,7 +235,7 @@ export default {
 
     "currentItem.detalhesEntrega": {
       handler(newVal) {
-        this.validateQuantity();
+        // this.validateQuantity();
         newVal.forEach((item, index) => {
           if (item && item.produto) {
             // Atualiza os valores do produto associado
@@ -335,7 +335,7 @@ export default {
     },
 
     addItem() {
-      this.currentItem.projetoProdutos.push({
+      this.currentItem.detalhesEntrega.push({
         produto: {
           descricao: "",
           epecificacao: "",
@@ -343,12 +343,10 @@ export default {
           unidade: "",
         },
         quantidade: 0,
-        inicioEntrega: null,
-        fimEntrega: null,
         total: 0,
       });
-      this.updateTotalGeral();
-      this.validateQuantity();
+      // this.updateTotalGeral();
+      // this.validateQuantity();
     },
     removeItem(index) {
       if (
@@ -370,7 +368,7 @@ export default {
       try {
         const fields = {
           ...this.currentItem,
-          projetoProdutos: this.currentItem.projetoProdutos,
+          detalhesEntrega: this.currentItem.detalhesEntrega
         };
         console.log(fields);
         this.onSubmit(fields);
@@ -403,7 +401,10 @@ export default {
         console.log(response.data);
 
         const { projetoProdutos } = response.data
-        this.projects = [ ...projetoProdutos ]
+        projetoProdutos.forEach((p) => {
+          const { produto } = p
+          this.projects.push(produto)
+        })
         console.log(this.projects)
       } catch (error) {
         console.error("Error: ", error);
