@@ -109,7 +109,7 @@
 import axios from "@/services/axios.js";
 import NavBar from "../../NavBar.vue";
 import NovaEntrega from "./NovaEntrega.vue";
-import EditProjeto from "./EditProjeto.vue";
+import EditProjeto from "./EditEntrega.vue";
 import ProjetoDeVendaExpand from "./ProjetoDeVendaExpand.vue";
 import { useToast } from "vue-toastification";
 import UtilsService from "../../../services/utilsService";

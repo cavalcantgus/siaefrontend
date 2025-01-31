@@ -35,7 +35,7 @@
               <v-icon left size="20px">mdi-plus</v-icon>
             </v-btn>
             <div
-              v-for="(projeto, index) in currentItem.projetoProdutos"
+              v-for="(entrega, index) in currentItem.detalhesEntrega"
               :key="index"
               class="grid-second-container"
             >
@@ -43,11 +43,11 @@
                 <v-select
                   :color="isDuplicate ? 'error' : ''"
                   density="compact"
-                  :items="products"
-                  item-title="descricao"
+                  :items="projects"
+                  item-title="produto.descricao"
                   item-value="id"
                   return-object
-                  v-model="projeto.produto"
+                  v-model="entrega.produto"
                   variant="outlined"
                   :rules="requiredField"
                   clearable
@@ -61,7 +61,7 @@
                 <v-text-field
                   density="compact"
                   label="Unidade"
-                  v-model="projeto.produto.unidade"
+                  v-model="entrega.produto.unidade"
                   variant="outlined"
                   disabled
                 ></v-text-field>
@@ -70,7 +70,7 @@
                 <v-text-field
                   density="compact"
                   label="Preço Médio"
-                  v-model="projeto.produto.precoMedio"
+                  v-model="entrega.produto.precoMedio"
                   variant="outlined"
                   disabled
                 ></v-text-field>
@@ -80,35 +80,13 @@
                   density="compact"
                   label="Quantidade"
                   :options="options"
-                  v-model="projeto.quantidade"
+                  v-model="entrega.quantidade"
                   variant="outlined"
                   :disabled="isDuplicate"
                 ></vuetify-money>
               </v-col>
-              <div class="mt-3">
-                <v-text-field
-                  density="compact"
-                  name="inicioEntrega"
-                  label="De"
-                  type="date"
-                  v-model="projeto.inicioEntrega"
-                  variant="outlined"
-                  :rules="requiredField"
-                ></v-text-field>
-              </div>
+              >
 
-              <div class="mt-3 ml-3 mr-3">
-                <v-text-field
-                  density="compact"
-                  name="fimEntrega"
-                  label="Até"
-                  type="date"
-                  v-model="projeto.fimEntrega"
-                  variant="outlined"
-                  :rules="requiredField"
-                  :hide-details="false"
-                ></v-text-field>
-              </div>
               <v-btn
                 size="30px"
                 icon
@@ -156,7 +134,7 @@
                   name="dataProjeto"
                   label="Data do Projeto"
                   type="date"
-                  v-model="currentItem.dataProjeto"
+                  v-model="currentItem.dataDaEntrega"
                   variant="outlined"
                   :rules="requiredField"
                 ></v-text-field>
@@ -222,9 +200,10 @@ export default {
     precoMedio: "",
     isSubmitting: false,
     isDuplicate: false,
-    researchs: [],
+    projects: [],
     products: [],
     producers: [],
+    entregas: [],
     items: {
       itemsProducts: [
         {
@@ -254,7 +233,7 @@ export default {
       }
     },
 
-    "currentItem.projetoProdutos": {
+    "currentItem.detalhesEntrega": {
       handler(newVal) {
         this.validateQuantity();
         newVal.forEach((item, index) => {
@@ -269,7 +248,7 @@ export default {
         });
 
         // Atualiza o total geral após as mudanças
-        this.updateTotalGeral();
+        // this.updateTotalGeral();
 
         // Verifica duplicidade após atualização
         this.isDuplicate = newVal.some((item, index) =>
@@ -287,39 +266,48 @@ export default {
   },
   computed: {
     isFormValid() {
-      const areItemsProductsValid = this.currentItem.projetoProdutos.every(
-        (item) => item.produto
-      );
-      return !!(
-        this.currentItem.produtor &&
-        areItemsProductsValid &&
-        this.quantityValid &&
-        !this.isDuplicate
-      );
+      // const areItemsProductsValid = this.currentItem.projetoProdutos.every(
+      //   (item) => item.produto
+      // );
+      // return !!(
+      //   this.currentItem.produtor &&
+      //   areItemsProductsValid &&
+      //   this.quantityValid &&
+      //   !this.isDuplicate
+      // );
     },
   },
   methods: {
     validateQuantity() {
       console.log("Método chamado");
-      this.quantityWarnings = this.currentItem.projetoProdutos.map(
-        (projeto, index) => {
-          const produtoId = projeto.produto.id;
+      this.quantityWarnings = this.currentItem.detalhesEntrega.map(
+        (entrega, index) => {
+          const produtoId = entrega.produto.id;
           console.log("Produto: ", produtoId);
-          const quantity = projeto.quantidade || 0;
+          const quantity = entrega.quantidade || 0;
 
           if (!produtoId) return null;
 
-          const selectedProdutoPesquisa = this.researchs.find(
+          const selectedProjetoProduto = this.projects.find(
             (p) => p.produto.id === produtoId
           );
-          console.log("Pesquisa: ", selectedProdutoPesquisa);
+          console.log("Pesquisa: ", selectedProjetoProduto);
+
+          const entregaAssociada = this.entregas.find((e) => e.id === this.currentItem.id)
+          console.log(entregaAssociada)
+
+          const { detalhesEntrega } = entregaAssociada
+          console.log(detalhesEntrega)
+
+          const quantityEntregaAssociada = detalhesEntrega.find((d) => d.produto.id === produtoId)
+          console.log(quantityEntregaAssociada)
 
           if (
-            selectedProdutoPesquisa &&
-            quantity > selectedProdutoPesquisa.quantidade
+            selectedProjetoProduto &&
+            quantity > selectedProjetoProduto.quantidade && quantity > quantityEntregaAssociada.quantidade
           ) {
             this.quantityValid = false;
-            return `A quantidade inserida excede o limite permitido para ${selectedProdutoPesquisa.produto.descricao} (${selectedProdutoPesquisa.quantidade}).`;
+            return `A quantidade ${quantity} inserida excede o limite permitido para ${selectedProjetoProduto.produto.descricao} (${selectedProjetoProduto.quantidade}).`;
           }
           this.quantityValid = true;
           return null;
@@ -404,27 +392,33 @@ export default {
           this.products = [];
         }
       } catch (error) {
-        console.log("Error: ", error);
+        console.error("Error: ", error);
         this.products = [];
       }
     },
 
-    async getResearchs() {
+    async getProjects() {
       try {
-        const response = await axios.get("/public/pesquisas");
+        const response = await axios.get(`/public/projetos/projeto/${this.currentItem.produtor.id}`);
         console.log(response.data);
 
-        if (Array.isArray(response.data)) {
-          this.researchs = response.data;
-          this.researchs.forEach();
-          console.log(response.data);
-        } else {
-          console.log("A resposta da API não é um Array");
-          this.researchs = [];
-        }
+        const { projetoProdutos } = response.data
+        this.projects = [ ...projetoProdutos ]
+        console.log(this.projects)
+      } catch (error) {
+        console.error("Error: ", error);
+        this.projects = [];
+      }
+    },
+
+    async getDeliverys() {
+      try {
+        const response = await axios.get(`/public/comprovantes`);
+        this.entregas = response.data
+        console.log(this.entregas)
       } catch (error) {
         console.log("Error: ", error);
-        this.researchs = [];
+        this.entregas = [];
       }
     },
 
@@ -443,8 +437,9 @@ export default {
   mounted() {
     this.getProducts(),
       this.getProductors(),
-      this.getResearchs(),
-      this.updateTotalGeral();
+      this.getProjects(),
+      this.getDeliverys()
+      // this.updateTotalGeral();
   },
 };
 </script>
