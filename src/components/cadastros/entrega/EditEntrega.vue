@@ -3,7 +3,7 @@
     <v-form @submit.prevent="localOnSubmit" ref="formRef">
       <div class="grid-container">
         <v-row class="ml-1 w-100">
-          <v-col cols="">
+          <v-col cols="11">
             <v-select
               density="compact"
               name="producer"
@@ -24,7 +24,7 @@
         </v-row>
 
         <v-row class="w-100" style="margin-top: -50px; margin-left: -8px">
-          <v-col cols="12">
+          <v-col cols="11">
             <v-btn
               size="30px"
               icon
@@ -39,11 +39,11 @@
               :key="index"
               class="grid-second-container"
             >
-              <v-col cols="" class="">
+              <v-col cols="4" class="">
                 <v-select
                   :color="isDuplicate ? 'error' : ''"
                   density="compact"
-                  :items="projects"
+                  :items="products"
                   item-title="descricao"
                   item-value="id"
                   return-object
@@ -85,9 +85,9 @@
                   :disabled="isDuplicate"
                 ></vuetify-money>
               </v-col>
-              >
+              
 
-              <v-btn
+              <v-btn v-if="currentItem.detalhesEntrega.length > 1"
                 size="30px"
                 icon
                 color="error"
@@ -101,7 +101,7 @@
                 color="error"
                 class="mt-2 mb-6 ml-4"
                 density="compact"
-                style="font-size: 0.8rem; height: 70px"
+                style="font-size: 0.7rem; height: 80px; font-weight: bold;"
               >
                 {{ quantityWarnings[index] }}
               </v-alert>
@@ -131,13 +131,16 @@
                   v-bind="props"
                   max-width="170px"
                   density="compact"
-                  name="dataProjeto"
-                  label="Data do Projeto"
+                  name="dataDaEntrega"
                   type="date"
                   v-model="currentItem.dataDaEntrega"
                   variant="outlined"
                   :rules="requiredField"
-                ></v-text-field>
+                >
+                <template v-slot:label>
+                  <span>Data Da Entrega</span> <span style="color: red;">*</span>
+                </template>
+              </v-text-field>
               </template>
               <span>Obs: Utilizar a data de realização da Chamada Pública</span>
             </v-tooltip>
@@ -233,9 +236,18 @@ export default {
       }
     },
 
+    "currentItem.produtor": {
+      handler() {
+        this.getProducts()
+        this.getProjects()
+      },
+
+      deep: true
+    },
+
     "currentItem.detalhesEntrega": {
       handler(newVal) {
-        // this.validateQuantity();
+        this.validateQuantity();
         newVal.forEach((item, index) => {
           if (item && item.produto) {
             // Atualiza os valores do produto associado
@@ -248,7 +260,7 @@ export default {
         });
 
         // Atualiza o total geral após as mudanças
-        // this.updateTotalGeral();
+        this.updateTotalGeral();
 
         // Verifica duplicidade após atualização
         this.isDuplicate = newVal.some((item, index) =>
@@ -283,7 +295,6 @@ export default {
       this.quantityWarnings = this.currentItem.detalhesEntrega.map(
         (entrega, index) => {
           const produtoId = entrega.produto.id;
-          console.log("Produto: ", produtoId);
           const quantity = entrega.quantidade || 0;
 
           if (!produtoId) return null;
@@ -293,18 +304,9 @@ export default {
           );
           console.log("Pesquisa: ", selectedProjetoProduto);
 
-          const entregaAssociada = this.entregas.find((e) => e.id === this.currentItem.id)
-          console.log(entregaAssociada)
-
-          const { detalhesEntrega } = entregaAssociada
-          console.log(detalhesEntrega)
-
-          const quantityEntregaAssociada = detalhesEntrega.find((d) => d.produto.id === produtoId)
-          console.log(quantityEntregaAssociada)
-
           if (
             selectedProjetoProduto &&
-            quantity > selectedProjetoProduto.quantidade && quantity > quantityEntregaAssociada.quantidade
+            quantity > selectedProjetoProduto.quantidade 
           ) {
             this.quantityValid = false;
             return `A quantidade ${quantity} inserida excede o limite permitido para ${selectedProjetoProduto.produto.descricao} (${selectedProjetoProduto.quantidade}).`;
@@ -322,13 +324,11 @@ export default {
 
     updateTotalGeral() {
       console.log("Método chamado");
-      this.totalGeral = this.currentItem.projetoProdutos
-        .reduce((total, product) => {
-          console.log("Produto 1: ", product);
-          const quantity = parseFloat(product.quantidade) || 0;
+      this.totalGeral = this.currentItem.detalhesEntrega
+        .reduce((total, entrega) => {
+          const quantity = parseFloat(entrega.quantidade) || 0;
           console.log("Quantidade: ", quantity);
-          const precoMedio = parseFloat(product.produto?.precoMedio) || 0; // Verifique se 'produto' existe
-          console.log("Preço Médio: ", precoMedio);
+          const precoMedio = parseFloat(entrega.produto?.precoMedio) || 0; // Verifique se 'produto' existe
           return total + precoMedio * quantity;
         }, 0)
         .toFixed(2);
@@ -350,12 +350,12 @@ export default {
     },
     removeItem(index) {
       if (
-        this.currentItem.projetoProdutos &&
-        this.currentItem.projetoProdutos.length > index
+        this.currentItem.detalhesEntrega &&
+        this.currentItem.detalhesEntrega.length > index
       ) {
-        this.currentItem.projetoProdutos.splice(index, 1);
-        this.updateTotalGeral(); // Atualiza o total geral após remoção
-        this.validateQuantity(); // Revalida as quantidades
+        this.currentItem.detalhesEntrega.splice(index, 1);
+        // this.updateTotalGeral(); // Atualiza o total geral após remoção
+        // this.validateQuantity(); // Revalida as quantidades
       }
     },
 
@@ -377,38 +377,35 @@ export default {
       }
     },
 
-    async getProducts() {
-      try {
-        const response = await axios.get("/public/produtos");
-        console.log(response.data);
-
-        if (Array.isArray(response.data)) {
-          this.products = response.data;
-          console.log(response.data);
-        } else {
-          console.log("A resposta da API não é um Array");
-          this.products = [];
-        }
-      } catch (error) {
-        console.error("Error: ", error);
-        this.products = [];
-      }
-    },
-
     async getProjects() {
       try {
         const response = await axios.get(`/public/projetos/projeto/${this.currentItem.produtor.id}`);
         console.log(response.data);
-
+        
         const { projetoProdutos } = response.data
-        projetoProdutos.forEach((p) => {
-          const { produto } = p
-          this.projects.push(produto)
-        })
+        this.projects = [ ...projetoProdutos ]
         console.log(this.projects)
       } catch (error) {
         console.error("Error: ", error);
         this.projects = [];
+      }
+    },
+
+    async getProducts() {
+      try {
+        const response = await axios.get(`/public/projetos/projeto/${this.currentItem.produtor.id}`);
+        console.log(response.data);
+        
+        this.products = []
+        const { projetoProdutos } = response.data
+        projetoProdutos.forEach((p) => {
+          const { produto } = p
+          this.products.push(produto)
+        })
+        console.log(this.products)
+      } catch (error) {
+        console.error("Error: ", error);
+        this.products = [];
       }
     },
 
@@ -436,9 +433,9 @@ export default {
     },
   },
   mounted() {
-    this.getProducts(),
+    this.getProjects(),
       this.getProductors(),
-      this.getProjects(),
+      this.getProducts(),
       this.getDeliverys()
       // this.updateTotalGeral();
   },
@@ -451,7 +448,7 @@ export default {
   flex-wrap: wrap;
   color: #000000;
   gap: 0.6rem;
-  row-gap: 2px;
+  row-gap: 8px;
 }
 
 .grid-second-container {
