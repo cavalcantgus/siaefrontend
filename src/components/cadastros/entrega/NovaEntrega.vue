@@ -3,7 +3,7 @@
     <v-form @submit.prevent="localOnSubmit" ref="formRef">
       <div class="grid-container">
         <v-row class="ml-1 w-100">
-          <v-col cols="">
+          <v-col cols="11">
             <v-select
               density="compact"
               name="producer"
@@ -23,7 +23,7 @@
         </v-row>
 
         <v-row class="w-100" style="margin-top: -50px; margin-left: -8px">
-          <v-col cols="12">
+          <v-col cols="11">
             <v-btn
               size="30px"
               icon
@@ -38,14 +38,14 @@
               :key="index"
               class="grid-second-container"
             >
-              <v-col cols="3">
+              <v-col cols="4">
                 <v-select
                   :color="isDuplicate ? 'error' : ''"
                   density="compact"
                   name="product"
-                  :items="projects"
-                  item-title="produto.descricao"
-                  item-value="produto.id"
+                  :items="products"
+                  item-title="descricao"
+                  item-value="id"
                   v-model="items.itemsProducts[index].produtoId"
                   variant="outlined"
                   :rules="requiredField"
@@ -103,7 +103,7 @@
                 color="error"
                 class="mt-2 mb-6 ml-4"
                 density="compact"
-                style="font-size: 0.8rem; height: 70px"
+                style="font-size: 0.7rem; height: 80px; font-weight: bold;"
               >
                 {{ quantityWarnings[index] }}
               </v-alert>
@@ -134,12 +134,16 @@
                   max-width="170px"
                   density="compact"
                   name="dataProjeto"
-                  label="Data da Entrega"
                   type="date"
                   v-model="currentItem.dataEntrega"
                   variant="outlined"
                   :rules="requiredField"
-                ></v-text-field>
+                >
+                <template v-slot:label>
+                  <span>Data Da Entrega</span> <span style="color: red;">*</span>
+                </template>
+              </v-text-field>
+                
               </template>
               <span>Obs: Utilizar a data de recebimento do(s) produto(s)</span>
             </v-tooltip>
@@ -200,6 +204,7 @@ export default {
     totalGeral: 0,
     isSubmitting: false,
     isDuplicate: false,
+    products: [],
     projects: [],
     producers: [],
     items: {
@@ -231,6 +236,17 @@ export default {
       }
     },
 
+    "currentItem.produtorId": {
+      handler() {
+        this.getProducts()
+        this.items.itemsProducts.forEach((item) => {
+          item.produtoId = null
+        })
+      },
+
+      deep: true
+    },
+
     "items.itemsProducts": {
       handler(newVal) {
         this.validateQuantity();
@@ -243,12 +259,12 @@ export default {
                 (prod, i) => i !== index && prod.produtoId === item.produtoId
               );
             }
-            const projetoProduto = this.projects.find((p) => p.produto.id === item.produtoId);
-            console.log(item.produtoId);
-            if (projetoProduto) {
-              this.items.itemsProducts[index].unidade = projetoProduto.produto.unidade;
-              this.items.itemsProducts[index].precoMedio =
-                projetoProduto.produto.precoMedio;
+            const produto = this.products.find((p) => p.id === item.produtoId);
+            console.log("Produto: ", produto)
+            console.log("Produto: ", this.products)
+            if (produto) {
+              this.items.itemsProducts[index].unidade = produto.unidade;
+              this.items.itemsProducts[index].precoMedio = produto.precoMedio;
             }
           }
         });
@@ -273,7 +289,8 @@ export default {
         this.currentItem.produtorId &&
         areItemsProductsValid &&
         this.quantityValid &&
-        !this.isDuplicate
+        !this.isDuplicate &&
+        this.currentItem.dataEntrega
       );
     },
   },
@@ -287,7 +304,7 @@ export default {
           if (!produtoId) return null;
 
           const selectedProduto = this.projects.find(
-            (p) => p.id === produtoId
+            (p) => p.produto.id === produtoId
           );
 
           if (selectedProduto && quantity > selectedProduto.quantidade) {
@@ -345,6 +362,24 @@ export default {
       }
     },
 
+    async getProducts() {
+      try {
+        const response = await axios.get(`/public/projetos/projeto/${this.currentItem.produtorId}`);
+        console.log(response.data);
+        
+        this.products = []
+        const { projetoProdutos } = response.data
+        projetoProdutos.forEach((p) => {
+          const { produto } = p
+          this.products.push(produto)
+        })
+        console.log(this.products)
+      } catch (error) {
+        console.error("Error: ", error);
+        this.products = [];
+      }
+    },
+
     async getProjects() {
       try {
         const response = await axios.get("/public/projetos");
@@ -379,7 +414,7 @@ export default {
     },
   },
   mounted() {
-    this.getProjects(), this.getProductors();
+    this.getProjects(), this.getProductors(), this.getProducts();
   },
 };
 </script>

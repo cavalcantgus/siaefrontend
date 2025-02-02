@@ -3,7 +3,7 @@
     <v-form @submit.prevent="localOnSubmit" ref="formRef">
       <div class="grid-container">
         <v-row class="ml-1 w-100">
-          <v-col cols="">
+          <v-col cols="12">
             <v-select
               density="compact"
               name="producer"
@@ -63,7 +63,7 @@
                   label="Unidade"
                   v-model="items.itemsProducts[index].unidade"
                   variant="outlined"
-                  disabled
+                  disabled 
                 ></v-text-field>
               </v-col>
               <v-col cols="2">
@@ -76,7 +76,7 @@
                   disabled
                 ></v-text-field>
               </v-col>
-              <v-col cols="2">
+              <v-col cols="1">
                 <vuetify-money
                   density="compact"
                   name="quantidade"
@@ -127,7 +127,7 @@
                 color="error"
                 class="mt-2 mb-6 ml-4"
                 density="compact"
-                style="font-size: 0.8rem; height: 70px"
+                style="font-size: 0.7rem; height: 80px; font-weight: bold;"
               >
                 {{ quantityWarnings[index] }}
               </v-alert>

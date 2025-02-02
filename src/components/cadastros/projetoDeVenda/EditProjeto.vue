@@ -3,7 +3,7 @@
     <v-form @submit.prevent="localOnSubmit" ref="formRef">
       <div class="grid-container">
         <v-row class="ml-1 w-100">
-          <v-col cols="">
+          <v-col cols="12">
             <v-select
               density="compact"
               name="producer"
@@ -39,7 +39,7 @@
               :key="index"
               class="grid-second-container"
             >
-              <v-col cols="" class="">
+              <v-col cols="3" class="">
                 <v-select
                   :color="isDuplicate ? 'error' : ''"
                   density="compact"
@@ -57,7 +57,7 @@
                   </template>
                 </v-select>
               </v-col>
-              <v-col cols="2">
+              <v-col cols="1">
                 <v-text-field
                   density="compact"
                   label="Unidade"
@@ -75,7 +75,7 @@
                   disabled
                 ></v-text-field>
               </v-col>
-              <v-col cols="2">
+              <v-col cols="1">
                 <vuetify-money
                   density="compact"
                   label="Quantidade"
@@ -109,7 +109,7 @@
                   :hide-details="false"
                 ></v-text-field>
               </div>
-              <v-btn
+              <v-btn v-if="currentItem.projetoProdutos.length > 1"
                 size="30px"
                 icon
                 color="error"
@@ -123,7 +123,7 @@
                 color="error"
                 class="mt-2 mb-6 ml-4"
                 density="compact"
-                style="font-size: 0.8rem; height: 70px"
+                style="font-size: 0.7rem; height: 80px; font-weight: bold;"
               >
                 {{ quantityWarnings[index] }}
               </v-alert>
@@ -416,7 +416,6 @@ export default {
 
         if (Array.isArray(response.data)) {
           this.researchs = response.data;
-          this.researchs.forEach();
           console.log(response.data);
         } else {
           console.log("A resposta da API não é um Array");
