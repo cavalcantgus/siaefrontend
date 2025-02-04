@@ -1,33 +1,22 @@
 <template>
-  <v-data-table-virtual :headers="headers" :items="filteredProofs" height="350px">
+  <v-data-table-virtual density="comfortable"  :headers="headers" :items="proofsPerMonthYear" height="300px" no-data-text="Nenhuma entrega encontrada">
     <template v-slot:top>
-      <v-row class="mt-2 mb-8 mx-3 ga-2" align="center">
-        <h3>Buscar entregas por:</h3>
+      <v-row class="mt-2 mb-6 mx-3 ga-2" align="center">
+        <span style="color: gray; font-weight: bold;">Buscar entregas por:</span>
         <v-col cols="3" class="mt-4">
           <v-select density="compact" :items="months" item-title="text" item-value="value" variant="outlined" v-model="selectedMonth" clearable>
-            <template v-slot:label> <span>Mês</span> <span style="color: red">*</span> </template>
+            <template v-slot:label> <span>Mês</span> <span style="color: red;" >*</span> </template>
           </v-select>
         </v-col>
-        <v-col cols="2" class="mt-4">
+        <v-col cols="3" class="mt-4">
           <v-select density="compact" :items="gerarAnos" variant="outlined" v-model="selectedYear" clearable>
-            <template v-slot:label> <span>Ano</span> <span style="color: red">*</span> </template>
+            <template v-slot:label> <span>Ano</span> <span style="color: red;">*</span> </template>
           </v-select>
-        </v-col>
-        <v-col class="button-group mr-4" align="end">
-          <v-tooltip location="top">
-            <template #activator="{ props }">
-              <v-btn color="primary" class="elevation-3 compact-btn ml-3" min-width="25%" @click="proofsPerMonthYear" v-bind="props">
-                <v-icon small class="compact-icon" left>mdi-magnify</v-icon>
-                <div class="d-flex flex-column compact-btn-text"><span>Buscar</span></div>
-              </v-btn>
-            </template>
-            <span>Clique para buscar entregas</span>
-          </v-tooltip>
         </v-col>
       </v-row>
     </template>
   </v-data-table-virtual>
-  <v-row class="justify-end dense mb-3">
+  <v-row class="justify-end dense mt-2 mb-3">
     <v-col class="button-group mr-9" align="end" cols="2">
       <v-tooltip location="start" :disabled="this.selectedMonth && this.selectedYear">
         <template #activator="{ props }">
@@ -88,9 +77,7 @@ export default {
       const anoInicio = 1900; // Define o ano inicial
       return Array.from({ length: anoAtual - anoInicio + 1 }, (_, i) => anoAtual - i);
     },
-  },
 
-  methods: {
     proofsPerMonthYear() {
       if (!this.selectedMonth || !this.selectedYear) {
         console.log("teste");
@@ -111,6 +98,9 @@ export default {
       return this.filteredProofs;
     },
 
+  },
+
+  methods: {
     async getProofs() {
       try {
         const response = await axios.get("/public/comprovantes");
@@ -118,7 +108,6 @@ export default {
 
         if (Array.isArray(response.data)) {
           this.proofs = response.data;
-          this.filteredProofs = this.proofs;
         } else {
           console.log("A resposta da API não é um Array");
           this.proofs = [];
