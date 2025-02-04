@@ -119,7 +119,7 @@
       <v-dialog v-model="dialog.download">
         <v-card class="card-form align-self-center" width="65%">
           <v-card-title class="sticky-title title-border">
-            Editar Comprovante: {{ selectedRow.id }}
+            <h3 class="report">Relatório de Entregas</h3>
             <v-spacer></v-spacer>
             <v-btn icon class="btn-close elevation-0" @click="dialog.download = !dialog.download">
               <v-icon prepend> mdi-close </v-icon>
@@ -371,5 +371,13 @@ td {
 
 .v-data-table__expand-icon {
   margin-left: 0; /* Remover qualquer margem esquerda */
+}
+
+.report {
+  display: flex;
+  color: gray;
+  width: 100vw;
+  margin-left: 50px;
+  justify-content: center;
 }
 </style>

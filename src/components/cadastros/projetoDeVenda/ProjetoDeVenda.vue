@@ -78,7 +78,7 @@
         </template>
       </v-data-table-virtual>
       <v-dialog v-model="dialog.create">
-        <v-card class="card-form align-self-center" width="75%">
+        <v-card class="card-form align-self-center" width="100%">
           <v-card-title class="sticky-title title-border">
             Cadastro de Projeto
             <v-spacer></v-spacer>
