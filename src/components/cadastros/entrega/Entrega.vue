@@ -31,7 +31,21 @@
               </v-tooltip>
             </v-col>
           </v-row>
+          <v-row justify="start" class="ml-0 mb-2" style="margin-top: -20px;">
+          <v-col class="button-group mr-4" align="start" cols="auto">
+              <v-tooltip location="end">
+                <template #activator="{ props }">
+                  <v-btn color="primary" class="elevation-3 compact-btn ml-3" min-width="25%" @click="dialog.download = true" v-bind="props">
+                    <v-icon small class="compact-icon" left>mdi-plus</v-icon>
+                    <div class="d-flex flex-column compact-btn-text" style="font-size: 0.6rem"><span>Relatórios</span></div>
+                  </v-btn>
+                </template>
+                <span>Clique para gerar relatórios</span>
+              </v-tooltip>
+            </v-col>
+        </v-row>
         </template>
+       
         <template v-slot:[`item.edit`]="{ item }">
           <v-tooltip location="top">
             <template #activator="{ props }">
@@ -101,6 +115,19 @@
           <EditProjeto :currentItem="selectedRow" :onSubmit="updateProof"></EditProjeto>
         </v-card>
       </v-dialog>
+
+      <v-dialog v-model="dialog.download">
+        <v-card class="card-form align-self-center" width="65%">
+          <v-card-title class="sticky-title title-border">
+            Editar Comprovante: {{ selectedRow.id }}
+            <v-spacer></v-spacer>
+            <v-btn icon class="btn-close elevation-0" @click="dialog.download = !dialog.download">
+              <v-icon prepend> mdi-close </v-icon>
+            </v-btn>
+          </v-card-title>
+          <RelatorioMensal :onSubmit="downloadRelatorioMensal"></RelatorioMensal>
+        </v-card>
+      </v-dialog>
     </v-col>
   </v-row>
 </template>
@@ -115,6 +142,7 @@ import { useToast } from "vue-toastification";
 import UtilsService from "../../../services/utilsService";
 import BtnComeBack from "../../template/BtnComeBack.vue";
 import ConfirmButton from "../../template/ConfirmButton.vue";
+import RelatorioMensal from "./RelatorioMensal.vue";
 
 export default {
   name: "CadastroProdutor",
@@ -125,11 +153,13 @@ export default {
     EditProjeto,
     BtnComeBack,
     ConfirmButton,
+    RelatorioMensal,
   },
   data: () => ({
     dialog: {
       create: false,
       update: false,
+      download: false,
     },
     search: "",
     singleExpand: false,
@@ -168,6 +198,13 @@ export default {
     downloadRelatorio(item) {
       console.log("Método chamado");
       const url = `http://localhost:8080/public/comprovantes/relatorio/generate/${item.id}`;
+      window.location.href = url; // Redireciona o navegador e força o download
+    },
+
+    downloadRelatorioMensal(fields) {
+      console.log(fields)
+      const { mes, ano } = fields 
+      const url = `http://localhost:8080/public/comprovantes/relatorio/mensal/generate/${mes}/${ano}`;
       window.location.href = url; // Redireciona o navegador e força o download
     },
 
