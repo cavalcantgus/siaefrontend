@@ -151,6 +151,19 @@
           <v-col align="end" class="align-self-center">
             <h4>Total</h4>
             <span>{{ formatPrice(totalGeral) }}</span>
+            <span v-if="passedOfLimit" style="
+                  font-size: 0.8rem;
+                  font-weight: bold;
+                  width: 100%;
+                  margin-top: -25px;
+                  margin-bottom: 20px;
+                "
+              >
+                {{
+                  `Limite máximo atingido. Por favor, reduza a quantidade`
+                }}
+
+            </span>
           </v-col>
         </v-row>
       </div>
@@ -201,12 +214,14 @@ export default {
     },
   },
   data: () => ({
+    passedOfLimit: false,
     totalGeral: 0,
     isSubmitting: false,
     isDuplicate: false,
     products: [],
     projects: [],
     producers: [],
+    proofs: [],
     items: {
       itemsProducts: [
         {
@@ -307,10 +322,13 @@ export default {
             (p) => p.produto.id === produtoId
           );
 
+
           if (selectedProduto && quantity > selectedProduto.quantidade) {
             this.quantityValid = false;
             return `A quantidade inserida excede o limite de entrega para ${selectedProduto.produto.descricao} (${selectedProduto.quantidade}).`;
           }
+
+          
           this.quantityValid = true;
           return null;
         }
@@ -330,6 +348,9 @@ export default {
           return total + precoMedio * quantity;
         }, 0)
         .toFixed(2);
+        if(this.totalGeral > 40000) {
+          this.passedOfLimit
+        }
     },
     addItem() {
       this.items.itemsProducts.push({
@@ -412,9 +433,26 @@ export default {
         this.producers = [];
       }
     },
+
+    async getProofs() {
+      try {
+        const response = await axios.get("/public/comprovantes");
+        console.log(response.data);
+
+        if (Array.isArray(response.data)) {
+          this.proofs = response.data;
+        } else {
+          console.log("A resposta da API não é um Array");
+          this.proofs = [];
+        }
+      } catch (error) {
+        console.log("Error: ", error);
+        this.proofs = [];
+      }
+    },
   },
   mounted() {
-    this.getProjects(), this.getProductors(), this.getProducts();
+    this.getProjects(), this.getProductors(), this.getProducts(), this.getProofs();
   },
 };
 </script>
