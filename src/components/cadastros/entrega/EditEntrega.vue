@@ -3,7 +3,7 @@
     <v-form @submit.prevent="localOnSubmit" ref="formRef">
       <div class="grid-container">
         <v-row class="ml-1 w-100">
-          <v-col cols="11">
+          <v-col cols="12" sm="6" md="4" lg="11" xl="12">
             <v-select
               density="compact"
               name="producer"
@@ -101,7 +101,8 @@
                 color="error"
                 class="mt-2 mb-6 ml-4"
                 density="compact"
-                style="font-size: 0.7rem; height: 80px; font-weight: bold"
+                min-width="50px"
+                style="font-size: 0.6rem; height: 80px; font-weight: bold;"
               >
                 {{ quantityWarnings[index] }}
               </v-alert>
@@ -162,6 +163,7 @@
                 :color="isFormValid ? 'success' : 'grey'"
                 :onConfirm="localOnSubmit"
                 :loading="isSubmitting"
+                :disabled="!isFormValid || isSubmitting"
                 >Salvar</ConfirmButton
               >
             </span>
@@ -279,15 +281,15 @@ export default {
   },
   computed: {
     isFormValid() {
-      // const areItemsProductsValid = this.currentItem.projetoProdutos.every(
-      //   (item) => item.produto
-      // );
-      // return !!(
-      //   this.currentItem.produtor &&
-      //   areItemsProductsValid &&
-      //   this.quantityValid &&
-      //   !this.isDuplicate
-      // );
+      const areItemsProductsValid = this.currentItem.detalhesEntrega.every(
+        (item) => item.produto
+      );
+      return !!(
+        this.currentItem.produtor &&
+        areItemsProductsValid &&
+        this.quantityValid &&
+        !this.isDuplicate
+      );
     },
   },
   methods: {
@@ -325,7 +327,7 @@ export default {
 
           if (quantity > remainingQuantity) {
             this.quantityValid = false;
-            return `A quantidade ${quantity} inserida excede o limite restante permitido para ${selectedProjetoProduto.produto.descricao} (${remainingQuantity}).`;
+            return `A quantidade inserida excede o limite restante permitido para ${selectedProjetoProduto.produto.descricao} (${remainingQuantity}).`;
           }
           this.quantityValid = true;
           return null;
