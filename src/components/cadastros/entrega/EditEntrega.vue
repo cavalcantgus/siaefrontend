@@ -85,9 +85,9 @@
                   :disabled="isDuplicate"
                 ></vuetify-money>
               </v-col>
-              
 
-              <v-btn v-if="currentItem.detalhesEntrega.length > 1"
+              <v-btn
+                v-if="currentItem.detalhesEntrega.length > 1"
                 size="30px"
                 icon
                 color="error"
@@ -101,7 +101,7 @@
                 color="error"
                 class="mt-2 mb-6 ml-4"
                 density="compact"
-                style="font-size: 0.7rem; height: 80px; font-weight: bold;"
+                style="font-size: 0.7rem; height: 80px; font-weight: bold"
               >
                 {{ quantityWarnings[index] }}
               </v-alert>
@@ -137,10 +137,11 @@
                   variant="outlined"
                   :rules="requiredField"
                 >
-                <template v-slot:label>
-                  <span>Data Da Entrega</span> <span style="color: red;">*</span>
-                </template>
-              </v-text-field>
+                  <template v-slot:label>
+                    <span>Data Da Entrega</span>
+                    <span style="color: red">*</span>
+                  </template>
+                </v-text-field>
               </template>
               <span>Obs: Utilizar a data de realização da Chamada Pública</span>
             </v-tooltip>
@@ -161,7 +162,6 @@
                 :color="isFormValid ? 'success' : 'grey'"
                 :onConfirm="localOnSubmit"
                 :loading="isSubmitting"
-                
                 >Salvar</ConfirmButton
               >
             </span>
@@ -238,11 +238,12 @@ export default {
 
     "currentItem.produtor": {
       handler() {
-        this.getProducts()
-        this.getProjects()
+        this.getProducts();
+        this.getProofs()
+        this.getProjects();
       },
 
-      deep: true
+      deep: true,
     },
 
     "currentItem.detalhesEntrega": {
@@ -291,10 +292,18 @@ export default {
   },
   methods: {
     validateQuantity() {
-      console.log("Método chamado");
+      if (!this.projects.length) {
+        console.warn(
+          "Tentando validar quantidade antes dos projetos carregarem."
+        );
+        return;
+      }
+
+      this.quantityValid = true;
       this.quantityWarnings = this.currentItem.detalhesEntrega.map(
         (entrega, index) => {
           const produtoId = entrega.produto.id;
+          console.log("PRODUTO ID: ", produtoId)
           const quantity = entrega.quantidade || 0;
 
           if (!produtoId) return null;
@@ -302,19 +311,43 @@ export default {
           const selectedProjetoProduto = this.projects.find(
             (p) => p.produto.id === produtoId
           );
+
+          const quantityDelivered = this.sumQuantity(produtoId)
+          const remainingQuantity = selectedProjetoProduto.quantidade - quantityDelivered
+         
+          if (!selectedProjetoProduto) {
+            console.log(
+              `Produto com ID ${produtoId} não encontrado em projects.`
+            );
+            return `Produto com ID ${produtoId} não encontrado.`;
+          }
           console.log("Pesquisa: ", selectedProjetoProduto);
 
-          if (
-            selectedProjetoProduto &&
-            quantity > selectedProjetoProduto.quantidade 
-          ) {
+          if (quantity > remainingQuantity) {
             this.quantityValid = false;
-            return `A quantidade ${quantity} inserida excede o limite permitido para ${selectedProjetoProduto.produto.descricao} (${selectedProjetoProduto.quantidade}).`;
+            return `A quantidade ${quantity} inserida excede o limite restante permitido para ${selectedProjetoProduto.produto.descricao} (${remainingQuantity}).`;
           }
           this.quantityValid = true;
           return null;
         }
       );
+    },
+
+    sumQuantity(produtoId) {
+      console.log("PROOFS: ", this.proofs);
+      const entregaAnterior = this.proofs.find((e) => e.produto.id === produtoId)
+      console.log("ENTREGA ANTERIOR: ", entregaAnterior)
+      const quantidadeAnterior = entregaAnterior.quantidade
+
+      if (this.proofs.length !== 0) {
+        const quantityDelivered = this.proofs
+          .filter((proof) => proof.produto.id === produtoId)
+          .reduce((soma, proof) => soma + proof.quantidade, 0);
+
+        return quantityDelivered - quantidadeAnterior;
+      } else {
+        return null;
+      }
     },
 
     formatPrice(val) {
@@ -368,7 +401,7 @@ export default {
       try {
         const fields = {
           ...this.currentItem,
-          detalhesEntrega: this.currentItem.detalhesEntrega
+          detalhesEntrega: this.currentItem.detalhesEntrega,
         };
         console.log(fields);
         this.onSubmit(fields);
@@ -379,12 +412,14 @@ export default {
 
     async getProjects() {
       try {
-        const response = await axios.get(`/public/projetos/projeto/${this.currentItem.produtor.id}`);
+        const response = await axios.get(
+          `/public/projetos/projeto/${this.currentItem.produtor.id}`
+        );
         console.log(response.data);
-        
-        const { projetoProdutos } = response.data
-        this.projects = [ ...projetoProdutos ]
-        console.log(this.projects)
+
+        const { projetoProdutos } = response.data;
+        this.projects = [...projetoProdutos];
+        console.log(this.projects);
       } catch (error) {
         console.error("Error: ", error);
         this.projects = [];
@@ -393,16 +428,18 @@ export default {
 
     async getProducts() {
       try {
-        const response = await axios.get(`/public/projetos/projeto/${this.currentItem.produtor.id}`);
+        const response = await axios.get(
+          `/public/projetos/projeto/${this.currentItem.produtor.id}`
+        );
         console.log(response.data);
-        
-        this.products = []
-        const { projetoProdutos } = response.data
+
+        this.products = [];
+        const { projetoProdutos } = response.data;
         projetoProdutos.forEach((p) => {
-          const { produto } = p
-          this.products.push(produto)
-        })
-        console.log(this.products)
+          const { produto } = p;
+          this.products.push(produto);
+        });
+        console.log(this.products);
       } catch (error) {
         console.error("Error: ", error);
         this.products = [];
@@ -411,16 +448,20 @@ export default {
 
     async getProofs() {
       try {
-        if (!this.currentItem?.produtorId) {
+        if (!this.currentItem?.produtor.id) {
           console.log("produtorId é inválido");
           this.proofs = [];
           return;
         }
 
-        const response = await axios.get(`/public/comprovantes/comprovante/${this.currentItem.produtorId}`);
+        const response = await axios.get(
+          `/public/comprovantes/comprovante/${this.currentItem.produtor.id}`
+        );
 
         if (Array.isArray(response.data)) {
-          this.proofs = response.data.flatMap((item) => item.detalhesEntrega || []);
+          this.proofs = response.data.flatMap(
+            (item) => item.detalhesEntrega || []
+          );
         } else {
           console.log("A resposta da API não é um Array");
           this.proofs = [];
@@ -449,8 +490,8 @@ export default {
     this.getProjects(),
       this.getProductors(),
       this.getProducts(),
-      this.getDeliverys()
-      // this.updateTotalGeral();
+      this.getProofs();
+    // this.updateTotalGeral();
   },
 };
 </script>
