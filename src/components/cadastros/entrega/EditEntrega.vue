@@ -206,7 +206,7 @@ export default {
     projects: [],
     products: [],
     producers: [],
-    entregas: [],
+    proofs: [],
     items: {
       itemsProducts: [
         {
@@ -409,14 +409,27 @@ export default {
       }
     },
 
-    async getDeliverys() {
+    async getProofs() {
       try {
-        const response = await axios.get(`/public/comprovantes`);
-        this.entregas = response.data
-        console.log(this.entregas)
+        if (!this.currentItem?.produtorId) {
+          console.log("produtorId é inválido");
+          this.proofs = [];
+          return;
+        }
+
+        const response = await axios.get(`/public/comprovantes/comprovante/${this.currentItem.produtorId}`);
+
+        if (Array.isArray(response.data)) {
+          this.proofs = response.data.flatMap((item) => item.detalhesEntrega || []);
+        } else {
+          console.log("A resposta da API não é um Array");
+          this.proofs = [];
+        }
+
+        console.log(this.proofs);
       } catch (error) {
         console.log("Error: ", error);
-        this.entregas = [];
+        this.proofs = [];
       }
     },
 
