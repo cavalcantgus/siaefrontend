@@ -92,7 +92,7 @@
         </template>
       </v-data-table-virtual>
       <v-dialog v-model="dialog.create">
-        <v-card class="card-form align-self-center" width="65%">
+        <v-card class="card-form align-self-center" width="100%">
           <v-card-title class="sticky-title title-border">
             Gerar Comprovante
             <v-spacer></v-spacer>
@@ -104,7 +104,7 @@
         </v-card>
       </v-dialog>
       <v-dialog v-model="dialog.update">
-        <v-card class="card-form align-self-center" width="65%">
+        <v-card class="card-form align-self-center" width="100%">
           <v-card-title class="sticky-title title-border">
             Editar Comprovante: {{ selectedRow.id }}
             <v-spacer></v-spacer>
