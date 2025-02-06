@@ -225,6 +225,7 @@ export default {
     researchs: [],
     products: [],
     producers: [],
+    projects: [],
     items: {
       itemsProducts: [
         {
@@ -256,7 +257,7 @@ export default {
 
     "currentItem.projetoProdutos": {
       handler(newVal) {
-        this.validateQuantity();
+        this.validateQuantity()
         newVal.forEach((item, index) => {
           if (item && item.produto) {
             // Atualiza os valores do produto associado
@@ -314,17 +315,49 @@ export default {
           );
           console.log("Pesquisa: ", selectedProdutoPesquisa);
 
-          if (
-            selectedProdutoPesquisa &&
-            quantity > selectedProdutoPesquisa.quantidade
-          ) {
-            this.quantityValid = false;
-            return `A quantidade inserida excede o limite permitido para ${selectedProdutoPesquisa.produto.descricao} (${selectedProdutoPesquisa.quantidade}).`;
+          const produtoJaCadastrado = this.projects.find((p) => p.produto.id === produtoId)
+          if(produtoJaCadastrado) {
+            const remainingQuantity = this.sumQuantity(produtoId)
+          
+            console.log("QUANTIDADE RESTANTE: ", remainingQuantity)
+            if (
+              selectedProdutoPesquisa &&
+              quantity > remainingQuantity
+            ) {
+              this.quantityValid = false;
+              return `A quantidade inserida excede o limite permitido para ${selectedProdutoPesquisa.produto.descricao} (${remainingQuantity}).`;
+            }
+          } else {
+            if(selectedProdutoPesquisa && quantity > selectedProdutoPesquisa.quantidade) {
+              this.quantityValid = false;
+              return `A quantidade inserida excede o limite permitido para ${selectedProdutoPesquisa.produto.descricao} (${selectedProdutoPesquisa.quantidade}).`;
+            }
           }
+          
           this.quantityValid = true;
           return null;
         }
       );
+    },
+
+    sumQuantity(produtoId) {
+      const projetoAnterior = this.projects.find((e) => e.produto.id === produtoId)
+      const quantidadeAnterior = projetoAnterior?.quantidade || 0
+    
+      if(this.projects.length !== 0) {
+        const quantityDelivered = this.projects
+          .filter((project) => project.produto.id === produtoId)
+          .reduce((soma, project) => soma + project.quantidade, 0)
+        
+       if((quantityDelivered - quantidadeAnterior) !== 0) {
+        return quantityDelivered - quantidadeAnterior
+       } else {
+        return quantityDelivered
+       }
+      } else {
+        return null
+      }
+
     },
 
     formatPrice(val) {
@@ -360,7 +393,6 @@ export default {
         total: 0,
       });
       this.updateTotalGeral();
-      this.validateQuantity();
     },
     removeItem(index) {
       if (
@@ -438,12 +470,29 @@ export default {
         this.producers = [];
       }
     },
+
+    async getProjects() {
+      try {
+        const response = await axios.get(
+          `/public/projetos/projeto/${this.currentItem.produtor.id}`
+        );
+        console.log(response.data);
+
+        const { projetoProdutos } = response.data;
+        this.projects = [...projetoProdutos];
+        console.log(this.projects);
+      } catch (error) {
+        console.error("Error: ", error);
+        this.projects = [];
+      }
+    },
   },
   mounted() {
     this.getProducts(),
       this.getProductors(),
       this.getResearchs(),
-      this.updateTotalGeral();
+      this.updateTotalGeral(),
+      this.getProjects()
   },
 };
 </script>
