@@ -130,6 +130,7 @@
 <script>
 import axios from "@/services/axios.js";
 import ConfirmButton from "../../template/ConfirmButton.vue";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "NovoProdutor",
@@ -231,6 +232,15 @@ export default {
     },
   },
   methods: {
+    async validateProducerCPF(value) {
+      try {
+        const response = await axios.get("/public/produtores");
+        return !response.data.some((item) => item.cpf=== value)
+      } catch(error) {
+        console.error("Ocorreu um erro: ", error)
+      }
+    },
+
     resetState() {
       for(let i = 0; i < this.files.length; i++) {
         this.files.pop(i)
@@ -240,8 +250,16 @@ export default {
       })
     },
     async localOnSubmit() {
+      const toast = useToast()
       this.format();
       this.currentItem.nome = this.currentItem.nome.toUpperCase()
+
+      const isValidCPF = await this.validateProducerCPF(this.currentItem.cpf)
+      if(!isValidCPF) {
+        toast.warning("CPF já cadastrado anteriormente")
+        return
+      }
+
       try {
         this.currentItem.estado = this.currentItem.estado.nome;
         this.currentItem.municipio = this.currentItem.municipio.nome;
