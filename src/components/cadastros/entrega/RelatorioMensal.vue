@@ -4,7 +4,7 @@
       <v-row class="mt-2 mb-6 mx-3 ga-2" align="center">
         <span style="color: gray; font-weight: bold;">Buscar entregas por:</span>
         <v-col cols="3" class="mt-4">
-          <v-select density="compact" :items="months" item-title="text" item-value="value" variant="outlined" v-model="selectedMonth" clearable>
+          <v-select density="compact" :items="months" item-title="text" item-value="value" return-object variant="outlined" v-model="selectedMonth" clearable>
             <template v-slot:label> <span>Mês</span> <span style="color: red;" >*</span> </template>
           </v-select>
         </v-col>
@@ -91,7 +91,7 @@ export default {
         const yearProof = String(year);
         const monthProof = String(month).padStart(2, "0");
 
-        return String(this.selectedYear) === yearProof && String(this.selectedMonth) === monthProof;
+        return String(this.selectedYear) === yearProof && String(this.selectedMonth.value) === monthProof;
       });
 
       console.log("Filtrados:", this.filteredProofs);
@@ -125,12 +125,12 @@ export default {
       }
 
       if(this.filteredProofs.length <= 0) {
-        toast.warning(`Nenhuma entrega encontrada para o mês ${this.selectedMonth} e ano ${this.selectedYear}`)
+        toast.warning(`Nenhuma entrega encontrada para ${this.selectedMonth.text} de ${this.selectedYear}`)
         return;
       }
       try{
         const fields = {
-         mes: this.selectedMonth,
+         mes: this.selectedMonth.value,
          ano: this.selectedYear
         }
 
