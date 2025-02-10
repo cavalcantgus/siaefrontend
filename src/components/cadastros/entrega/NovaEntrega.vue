@@ -61,9 +61,6 @@
           <v-col align="end" class="align-self-center">
             <h4>Total</h4>
             <span>{{ formatPrice(totalGeral) }}</span>
-            <span v-if="passedOfLimit" style="font-size: 0.8rem; font-weight: bold; width: 100%; margin-top: -25px; margin-bottom: 20px">
-              {{ `Limite máximo atingido. Por favor, reduza a quantidade` }}
-            </span>
           </v-col>
         </v-row>
       </div>
@@ -105,7 +102,6 @@ export default {
     },
   },
   data: () => ({
-    passedOfLimit: false,
     totalGeral: 0,
     isSubmitting: false,
     isDuplicate: false,
@@ -252,9 +248,6 @@ export default {
           return total + precoMedio * quantity;
         }, 0)
         .toFixed(2);
-      if (this.totalGeral > 40000) {
-        this.passedOfLimit;
-      }
     },
 
     addItem() {

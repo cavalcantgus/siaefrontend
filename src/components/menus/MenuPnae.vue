@@ -49,7 +49,7 @@ export default {
        {title: 'PROJETO DE VENDA', route: "/projeto-de-venda"}, 
         {title: 'CRONOGRAMA DE ENTREGA', route: "/cadastro-produtor"}, 
         {title: 'COMPROVANTE DE RECEBIMENTO', route: "/comprovante"}, 
-        {title: 'CONTRATOS', route: "/cadastro-produtor"}
+        {title: 'CONTRATOS', route: "/contrato"}
     ],
   }),
   methods: {

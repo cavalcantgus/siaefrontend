@@ -250,6 +250,7 @@ export default {
 
     "currentItem.detalhesEntrega": {
       handler(newVal) {
+        if (!Array.isArray(newVal)) return; // Garante que newVal é um array antes de iterar
         this.validateQuantity();
         newVal.forEach((item, index) => {
           if (item && item.produto) {
@@ -395,6 +396,7 @@ export default {
     },
 
     resetState() {
+      console.log("Método chamado")
       Object.keys(this.currentItem).forEach((key) => {
         this.currentItem[key] = null;
       });
