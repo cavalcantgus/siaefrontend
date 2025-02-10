@@ -1,10 +1,10 @@
 <template>
   <NavBar></NavBar>
   <BtnComeBack></BtnComeBack>
-  <h1 style="color: #57a340; margin-top: 10px; padding: 30px; font-size: 3rem">Comprovante de Recebimento</h1>
+  <h1 style="color: #57a340; margin-top: 10px; padding: 30px; font-size: 3rem">Contratos</h1>
   <v-row justify="center" class="pr-2">
     <v-col cols="12">
-      <v-data-table-virtual :items="filteredProofs" :headers="headers" :search="search" single-expand show-expand v-model:expanded="expanded" :fixed-header="true" height="700px">
+      <v-data-table-virtual :items="filteredContracts" :headers="headers" :search="search" single-expand v-model:expanded="expanded" :fixed-header="true" height="700px">
         <template v-slot:top>
           <v-row class="mt-2 mb-8 mx-3">
             <v-col cols="5">
@@ -20,32 +20,18 @@
               </v-badge>
             </v-col>
             <v-col class="button-group mr-4" align="end">
-              <v-tooltip location="top">
-                <template #activator="{ props }">
-                  <v-btn color="success" class="elevation-3 compact-btn ml-3" min-width="25%" @click="dialog.create = true" v-bind="props">
+              <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn color="success" class="elevation-3 compact-btn ml-3" min-width="25%" @click="dialog.create = true" v-bind="attrs" v-on="on">
                     <v-icon small class="compact-icon" left>mdi-plus</v-icon>
-                    <div class="d-flex flex-column compact-btn-text" style="font-size: 0.6rem"><span>Gerar</span>Comprovante <span></span></div>
+                    <div class="d-flex flex-column compact-btn-text" style="font-size: 0.6rem"><span>Novo</span> <span>Contrato</span></div>
                   </v-btn>
                 </template>
-                <span>Clique para gerar um comprovante</span>
+                <span>Clique para gerar um Contrato</span>
               </v-tooltip>
             </v-col>
           </v-row>
-          <v-row justify="start" class="ml-0 mb-2" style="margin-top: -20px;">
-          <v-col class="button-group mr-4" align="start" cols="auto">
-              <v-tooltip location="end">
-                <template #activator="{ props }">
-                  <v-btn color="primary" class="elevation-3 compact-btn ml-3" min-width="25%" @click="dialog.download = true" v-bind="props">
-                    <v-icon small class="compact-icon" left>mdi-plus</v-icon>
-                    <div class="d-flex flex-column compact-btn-text" style="font-size: 0.6rem"><span>Relatórios</span></div>
-                  </v-btn>
-                </template>
-                <span>Clique para gerar relatórios</span>
-              </v-tooltip>
-            </v-col>
-        </v-row>
         </template>
-       
         <template v-slot:[`item.edit`]="{ item }">
           <v-tooltip location="top">
             <template #activator="{ props }">
@@ -53,7 +39,7 @@
                 <v-icon color="green">mdi-pencil</v-icon>
               </v-btn>
             </template>
-            <span>Clique para editar um Comprovante</span>
+            <span>Clique para editar um Contrato</span>
           </v-tooltip>
         </template>
         <template v-slot:[`item.delete`]="{ item }">
@@ -63,8 +49,11 @@
                 <v-icon color="red">mdi-delete</v-icon>
               </ConfirmButton>
             </template>
-            <span>Clique para deletar um comprovante</span>
+            <span>Clique para deletar um Contrato</span>
           </v-tooltip>
+        </template>
+        <template v-slot:[`item.dataContratacao`]="{ item }">
+          <span>{{ formatData(item.dataContratacao) }}</span>
         </template>
         <template v-slot:[`item.download`]="{ item }">
           <v-tooltip location="top">
@@ -76,56 +65,37 @@
             <span>Clique para emitir um comprovante</span>
           </v-tooltip>
         </template>
-        <template v-slot:[`item.dataDaEntrega`]="{ item }">
-          <span>{{ formatDate(item.dataDaEntrega) }}</span>
-        </template>
-        <template v-slot:[`item.total`]="{ item }">
-          <span>{{ formatPrice(item.total) }}</span>
-        </template>
-        <template v-slot:expanded-row="{ item }">
-          <tr>
-            <td :colspan="9" style="background-color: #37622a" class="text-white">
-              {{ console.log(item) }}
-              <ProjetoDeVendaExpand :projetoData="item"></ProjetoDeVendaExpand>
-            </td>
-          </tr>
-        </template>
+        <!-- <template v-slot:expanded-row="{ item }">
+            <tr>
+              <td :colspan="9">
+                {{ console.log(item) }}
+                <ProdutorExpand :produtorData="item"></ProdutorExpand>
+              </td>
+            </tr>
+          </template> -->
       </v-data-table-virtual>
       <v-dialog v-model="dialog.create">
-        <v-card class="card-form align-self-center" width="100%">
+        <v-card class="card-form align-self-center" width="60%">
           <v-card-title class="sticky-title title-border">
-            Gerar Comprovante
+            Novo Contrato
             <v-spacer></v-spacer>
             <v-btn icon class="btn-close elevation-0" @click="dialog.create = !dialog.create">
               <v-icon prepend> mdi-close </v-icon>
             </v-btn>
           </v-card-title>
-          <NovaEntrega :currentItem="newItem" :onSubmit="createProof" :dialogAtivo="dialog.create"></NovaEntrega>
+          <NovoContrato :currentItem="newItem" :onSubmit="createContract" :dialogAtivo="dialog.create"></NovoContrato>
         </v-card>
       </v-dialog>
       <v-dialog v-model="dialog.update">
-        <v-card class="card-form align-self-center" width="100%">
+        <v-card class="card-form align-self-center" width="60%">
           <v-card-title class="sticky-title title-border">
-            Editar Comprovante: {{ selectedRow.id }}
+            Editar Contrato: {{ selectedRow.id }}
             <v-spacer></v-spacer>
             <v-btn icon class="btn-close elevation-0" @click="dialog.update = !dialog.update">
               <v-icon prepend> mdi-close </v-icon>
             </v-btn>
           </v-card-title>
-          <EditProjeto :currentItem="selectedRow" :onSubmit="updateProof" :dialogAtivo="dialog.update"></EditProjeto>
-        </v-card>
-      </v-dialog>
-
-      <v-dialog v-model="dialog.download">
-        <v-card class="card-form align-self-center" width="65%">
-          <v-card-title class="sticky-title title-border">
-            <h3 class="report">Relatório de Entregas</h3>
-            <v-spacer></v-spacer>
-            <v-btn icon class="btn-close elevation-0" @click="dialog.download = !dialog.download">
-              <v-icon prepend> mdi-close </v-icon>
-            </v-btn>
-          </v-card-title>
-          <RelatorioMensal :onSubmit="downloadRelatorioMensal"></RelatorioMensal>
+          <EditContrato :currentItem="selectedRow" :onSubmit="updateContract"></EditContrato>
         </v-card>
       </v-dialog>
     </v-col>
@@ -135,45 +105,40 @@
 <script>
 import axios from "@/services/axios.js";
 import NavBar from "../../NavBar.vue";
-import NovaEntrega from "./NovaEntrega.vue";
-import EditProjeto from "./EditEntrega.vue";
-import ProjetoDeVendaExpand from "./ProjetoDeVendaExpand.vue";
+import NovoContrato from "./NovoContrato.vue";
+import EditContrato from "./EditContrato.vue";
+import ProdutorExpand from "./ProdutorExpand.vue";
 import { useToast } from "vue-toastification";
 import UtilsService from "../../../services/utilsService";
 import BtnComeBack from "../../template/BtnComeBack.vue";
 import ConfirmButton from "../../template/ConfirmButton.vue";
-import RelatorioMensal from "./RelatorioMensal.vue";
 
 export default {
   name: "CadastroProdutor",
   components: {
     NavBar,
-    NovaEntrega,
-    ProjetoDeVendaExpand,
-    EditProjeto,
+    NovoContrato,
+    ProdutorExpand,
+    EditContrato,
     BtnComeBack,
     ConfirmButton,
-    RelatorioMensal,
   },
   data: () => ({
     dialog: {
       create: false,
       update: false,
-      download: false,
     },
     search: "",
     singleExpand: false,
     showFilters: false,
-    proofs: [],
+    contracts: [],
     headers: [
       { text: "Editar", align: "center", value: "edit", width: "40px" },
       { text: "Remover", align: "center", value: "delete", width: "40px" },
       { title: "Produtor", align: "center", sortable: true, value: "produtor.nome" },
-      { title: "Endereço", align: "center", sortable: true, value: "produtor.endereco", width: "300px" },
-      { title: "Data Entrega", align: "center", sortable: true, value: "dataDaEntrega" },
-      { title: "Quantidade", align: "center", sortable: true, value: "quantidade" },
-      { title: "Total Geral", align: "center", sortable: true, value: "total" },
-      { title: "Relatório", align: "center", sortable: true, value: "download" },
+      { title: "Contratante", align: "center", sortable: true, value: "contratante" },
+      { title: "Data da Contratação", align: "center", sortable: true, value: "dataContratacao" },
+      { title: "Baixar", align: "center", sortable: true, value: "download" },
     ],
     newItem: {},
     selectedRow: {},
@@ -181,105 +146,92 @@ export default {
     expanded: [],
   }),
   computed: {
-    filteredProofs() {
-      return this.proofs;
+    filteredContracts() {
+      return this.contracts;
     },
   },
   methods: {
-    formatPrice(val) {
-      val = UtilsService.formatReal(val);
-      return val;
+    formatData(val) {
+      return UtilsService.formatData(val)
     },
 
-    formatDate(val) {
-      return UtilsService.formatData(val);
-    },
-
-    downloadRelatorio(item) {
-      console.log("Método chamado");
-      const url = `http://localhost:8080/public/comprovantes/relatorio/generate/${item.id}`;
-      window.location.href = url; // Redireciona o navegador e força o download
-    },
-
-    downloadRelatorioMensal(fields) {
-      console.log(fields)
-      const { mes, ano } = fields 
-      const url = `http://localhost:8080/public/comprovantes/relatorio/mensal/generate/${mes}/${ano}`;
-      window.location.href = url; // Redireciona o navegador e força o download
-    },
-
-    async getProofs() {
+    async getContracts() {
       try {
-        const response = await axios.get("/public/comprovantes");
+        const response = await axios.get("/public/contratos");
         console.log(response.data);
 
         if (Array.isArray(response.data)) {
-          this.proofs = response.data;
+          this.contracts = response.data;
         } else {
           console.log("A resposta da API não é um Array");
-          this.proofs = [];
+          this.contracts = [];
         }
       } catch (error) {
         console.log("Error: ", error);
-        this.proofs = [];
+        this.contracts = [];
       }
     },
-    async createProof(fields) {
+    async createContract(fields) {
       const toast = useToast();
       console.log(fields);
       try {
-        const response = await axios.post("/public/comprovantes/comprovante", fields);
+        const response = await axios.post("/public/contratos/contrato", fields);
         console.log(response.data);
 
         if (response.status !== 201) {
           throw new Error(`Erro: ${response.status}`);
         }
-        toast.success("Entrega cadastrada com sucesso!");
+        toast.success("Contrato cadastrado com sucesso!");
+        this.downloadContrato(response.data.id)
       } catch (error) {
         console.error("Erro: ", error);
-        toast.error("Erro ao cadastrar entrega: ", error);
+        toast.error("Erro ao cadastrar contrato: ", error);
       } finally {
         this.dialog.create = false;
-        this.getProjects();
+        this.getContracts();      
       }
     },
 
-    async updateProof(fields) {
+    async updateContract(fields) {
       const toast = useToast();
 
       try {
-        const response = await axios.put(`/public/comprovantes/comprovante/${fields.id}`, fields);
+        const response = await axios.put(`/public/contratos/contrato/${fields.id}`, fields);
 
         console.log(response.data);
-        console.log(response)
 
         if (response.status !== 200) {
           throw new Error(`Erro: ${response.status}`);
         }
-        toast.success("Entrega atualizado com sucesso!");
+        toast.success("Contrato atualizado com sucesso!");
       } catch (error) {
         console.error("Erro: ", error);
-        toast.error("Erro ao atualizar entrega: ", error);
+        toast.error("Erro ao atualizar Contrato: ", error);
       } finally {
         this.dialog.update = false;
-        this.getProjects();
+        this.getContracts();
       }
     },
 
-    async deleteProof(fields) {
-      const toast = useToast();
-      try {
-        const response = await axios.delete(`/public/projetos/projeto/${fields.id}`, fields);
-        if (response.status !== 204) {
-          throw new Error(`Erro: `, response.status);
-        }
-        toast.success("Projeto removido com sucesso!");
-      } catch (error) {
-        toast.error("Erro ao deletar produto: ", error);
-        console.error("Erro: ", error);
-      } finally {
-        this.getProducts();
-      }
+    // async deleteProduct(fields) {
+    //   const toast = useToast();
+    //   try {
+    //     const response = await axios.delete(`/public/produtos/produto/${fields.id}`, fields);
+    //     if (response.status !== 204) {
+    //       throw new Error(`Erro: `, response.status);
+    //     }
+    //     toast.success("Produto removido com sucesso!");
+    //   } catch (error) {
+    //     toast.error("Erro ao deletar produto: ", error);
+    //     console.error("Erro: ", error);
+    //   } finally {
+    //     this.getProducts();
+    //   }
+    // },
+
+    downloadContrato(produtorId) {
+      const url = `http://localhost:8080/public/contratos/contrato/generate/${produtorId}`;
+      window.location.href = url; // Redireciona o navegador e força o download
     },
 
     onSelectRow(row, dialog) {
@@ -288,19 +240,18 @@ export default {
     },
 
     onDeleteRow(row) {
-      console.log("Método chamado");
-      this.selectedRow = { ...row };
-      this.deleteProject(this.selectedRow);
+      // console.log("Método chamado");
+      // this.deleteRow = { ...row };
+      // this.deleteProduct(this.deleteRow);
     },
 
     onDownloadRow(row) {
-      console.log("Método chamado");
       this.selectedRow = { ...row };
-      this.downloadRelatorio(this.selectedRow);
+      this.downloadContrato(this.selectedRow.id);
     },
   },
   mounted() {
-    this.getProofs();
+    this.getContracts();
   },
 };
 </script>
@@ -310,7 +261,7 @@ export default {
 .sticky-icon {
   display: flex;
   font-weight: bold !important;
-  top: 0 !important; /* Distância do topo da página */
+  top: 0 !important; 
   color: #57a340;
   justify-content: flex-end;
   align-items: flex-end;
@@ -371,13 +322,5 @@ td {
 
 .v-data-table__expand-icon {
   margin-left: 0; /* Remover qualquer margem esquerda */
-}
-
-.report {
-  display: flex;
-  color: gray;
-  width: 100vw;
-  margin-left: 50px;
-  justify-content: center;
 }
 </style>
