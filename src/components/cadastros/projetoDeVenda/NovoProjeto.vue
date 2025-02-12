@@ -56,7 +56,7 @@
                   </template>
                 </v-select>
               </v-col>
-              <v-col cols="1">
+              <v-col cols="1" style="margin-left: -9px;">
                 <v-text-field
                   density="compact"
                   name="unidade"
@@ -66,7 +66,7 @@
                   disabled 
                 ></v-text-field>
               </v-col>
-              <v-col cols="2">
+              <v-col cols="2" lg="1" style="margin-left: -9px;">
                 <v-text-field
                   density="compact"
                   name="precoMedio"
@@ -76,7 +76,7 @@
                   disabled
                 ></v-text-field>
               </v-col>
-              <v-col cols="1">
+              <v-col cols="1" lg="2" style="margin-left: -9px;">
                 <vuetify-money
                   density="compact"
                   name="quantidade"
@@ -123,6 +123,7 @@
                 <v-icon size="20px">mdi-delete</v-icon>
               </v-btn>
               <v-alert
+              max-width="170px"
                 v-if="quantityWarnings[index]"
                 color="error"
                 class="mt-2 mb-6 ml-4"
@@ -331,7 +332,7 @@ export default {
 
           if (selectedPesquisa && quantity > selectedPesquisa.quantidade) {
             this.quantityValid = false;
-            return `A quantidade inserida excede o limite permitido para ${selectedPesquisa.produto.descricao} (${selectedPesquisa.quantidade}).`;
+            return `Limite permitido para ${selectedPesquisa.produto.descricao} (${selectedPesquisa.quantidade}).`;
           }
           this.quantityValid = true;
           return null;
