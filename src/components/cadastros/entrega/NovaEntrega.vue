@@ -217,7 +217,7 @@ export default {
 
         if (quantity > remainingQuantity) {
           this.quantityValid = false;
-          return `A quantidade inserida excede o limite restante de entrega para ${selectedProduto.produto.descricao} (${remainingQuantity}).`;
+          return `Limite máximo de entrega para ${selectedProduto.produto.descricao} (${remainingQuantity}).`;
         }
 
         return null;
