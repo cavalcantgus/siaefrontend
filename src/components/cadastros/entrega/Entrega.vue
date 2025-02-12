@@ -240,7 +240,7 @@ export default {
         toast.error("Erro ao cadastrar entrega: ", error);
       } finally {
         this.dialog.create = false;
-        this.getProjects();
+        this.getProofs();
       }
     },
 
@@ -262,7 +262,7 @@ export default {
         toast.error("Erro ao atualizar entrega: ", error);
       } finally {
         this.dialog.update = false;
-        this.getProjects();
+        this.getProofs();
       }
     },
 
@@ -278,7 +278,7 @@ export default {
         toast.error("Erro ao deletar produto: ", error);
         console.error("Erro: ", error);
       } finally {
-        this.getProducts();
+        this.getProofs();
       }
     },
 
