@@ -197,14 +197,14 @@ export default {
 
     downloadRelatorio(item) {
       console.log("Método chamado");
-      const url = `http://localhost:8080/public/comprovantes/relatorio/generate/${item.id}`;
+      const url = `http://syssiae.ddns.net:8080/public/comprovantes/relatorio/generate/${item.id}`;
       window.location.href = url; // Redireciona o navegador e força o download
     },
 
     downloadRelatorioMensal(fields) {
       console.log(fields)
       const { mes, ano } = fields 
-      const url = `http://localhost:8080/public/comprovantes/relatorio/mensal/generate/${mes}/${ano}`;
+      const url = `http://syssiae.ddns.net:8080/public/comprovantes/relatorio/mensal/generate/${mes}/${ano}`;
       window.location.href = url; // Redireciona o navegador e força o download
     },
 
