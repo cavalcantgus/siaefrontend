@@ -230,7 +230,7 @@ export default {
     // },
 
     downloadContrato(produtorId) {
-      const url = `http://localhost:8080/public/contratos/contrato/generate/${produtorId}`;
+      const url = `https://syssiae.ddns.net:8080/public/contratos/contrato/generate/${produtorId}`;
       window.location.href = url; // Redireciona o navegador e força o download
     },
 

@@ -190,7 +190,7 @@ export default {
     },
 
     downloadFile(item) {
-      const url = `http://localhost:8080/document/download/${item?.fileName}`;
+      const url = `https://syssiae.ddns.net:8080/document/download/${item?.fileName}`;
       const link = document.createElement("a");
       link.href = url;
       link.download = item.fileName;

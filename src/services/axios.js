@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Configurações globais
 const api = axios.create({
-    baseURL: 'http://syssiae.ddns.net:8080', // URL base da API
+    baseURL: 'https://syssiae.ddns.net:8080', // URL base da API
     headers: {
         'Content-Type': 'application/json',
     },

@@ -1,0 +1,15 @@
+
+services:
+  frontend:
+    build:
+      context: ./ # Diretório onde está o código do frontend
+      dockerfile: Dockerfile # Caminho do Dockerfile para o frontend
+    container_name: frontend-app
+    ports:
+      - "5173:5173" # Expondo a porta 3000 do container para a máquina local
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
