@@ -6,7 +6,8 @@ import vuetify from 'vite-plugin-vuetify';
 export default defineConfig({
   server: {
     host: true,
-    base: '/siaefrontend/'
+    base: '/siaefrontend/',
+    allowedHosts: ['www.siaeserver.com']
   },
   plugins: [
     vue(),

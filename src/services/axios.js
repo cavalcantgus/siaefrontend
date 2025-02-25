@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Configurações globais
 const api = axios.create({
-    baseURL: 'https://localhost:8080', // URL base da API
+    baseURL: 'https://siaeserver.com', // URL base da API
     headers: {
         'Content-Type': 'application/json',
     },

@@ -167,7 +167,7 @@ export default {
 
     downloadRelatorio(item) {
       console.log("Método chamado");
-      const url = `http://syssiae.ddns.net:8080/public/projetos/relatorio/generate/${item.id}`;
+      const url = `https://siaeserver.com/public/projetos/relatorio/generate/${item.id}`;
       window.location.href = url; // Redireciona o navegador e força o download
     },
 

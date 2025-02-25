@@ -156,7 +156,7 @@ export default {
     },
 
     downloadFile(item) {
-        const url = `https://localhost:8080/document/download/${item?.fileName}`
+        const url = `https://siaeserver.com/document/download/${item?.fileName}`
         const link = document.createElement('a')
         link.href = url
         link.download = item.fileName
