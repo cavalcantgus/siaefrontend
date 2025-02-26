@@ -134,6 +134,9 @@ export default {
       }
     },
   },
+  mounted() {
+    console.log("TESTANDO")
+  }
 };
 </script>
 
