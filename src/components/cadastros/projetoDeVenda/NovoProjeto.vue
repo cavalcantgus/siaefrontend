@@ -23,7 +23,7 @@
         </v-row>
 
         <v-row class="w-100" style="margin-top: -50px; margin-left: -8px">
-          <v-col cols="12">
+          <v-col cols="11">
             <v-btn
               size="30px"
               icon
@@ -34,6 +34,12 @@
               <v-icon left size="20px">mdi-plus</v-icon>
             </v-btn>
             <div
+              style="
+                border-bottom: 3px solid rgba(0, 100, 0, 0.5);
+                width: 109%;
+                height: 150px;
+                margin-bottom: 10px;
+              "
               v-for="(produtoId, index) in items.itemsProducts"
               :key="index"
               class="grid-second-container"
@@ -56,17 +62,17 @@
                   </template>
                 </v-select>
               </v-col>
-              <v-col cols="1" style="margin-left: -9px;">
+              <v-col cols="2" style="margin-left: -9px">
                 <v-text-field
                   density="compact"
                   name="unidade"
                   label="Unidade"
                   v-model="items.itemsProducts[index].unidade"
                   variant="outlined"
-                  disabled 
+                  disabled
                 ></v-text-field>
               </v-col>
-              <v-col cols="2" lg="1" style="margin-left: -9px;">
+              <v-col cols="2" style="margin-left: -9px">
                 <v-text-field
                   density="compact"
                   name="precoMedio"
@@ -76,7 +82,7 @@
                   disabled
                 ></v-text-field>
               </v-col>
-              <v-col cols="1" lg="2" style="margin-left: -9px;">
+              <v-col cols="1" lg="2" style="margin-left: -9px">
                 <vuetify-money
                   density="compact"
                   name="quantidade"
@@ -87,31 +93,6 @@
                   :disabled="isDuplicate"
                 ></vuetify-money>
               </v-col>
-              <div class="mt-3">
-                <v-text-field
-                density="compact"
-                name="inicioEntrega"
-                label="De"
-                type="date"
-                v-model="items.itemsInicioEntrega[index]"
-                variant="outlined"
-                :rules="requiredField"
-              ></v-text-field>
-              </div>
-
-              <div class="mt-3 ml-3 mr-3">
-                <v-text-field
-                density="compact"
-                name="fimEntrega"
-                label="Até"
-                type="date"
-                v-model="items.itemsFimEntrega[index]"
-                variant="outlined"
-                :rules="requiredField"
-                :hide-details="false"
-              ></v-text-field>
-
-              </div>
               <v-btn
                 v-if="items.itemsProducts.length > 1"
                 size="30px"
@@ -123,12 +104,13 @@
                 <v-icon size="20px">mdi-delete</v-icon>
               </v-btn>
               <v-alert
-              max-width="170px"
-                v-if="quantityWarnings[index]"
+                max-width="170px"
+               v-show="quantityWarnings[index]"
                 color="error"
                 class="mt-2 mb-6 ml-4"
                 density="compact"
-                style="font-size: 0.7rem; height: 80px; font-weight: bold;"
+                style="font-size: 0.7rem; height: 80px; font-weight: bold; position: absolute; z-index: 10; left: 75%"
+
               >
                 {{ quantityWarnings[index] }}
               </v-alert>
@@ -147,9 +129,52 @@
                   `Itens duplicados. Por favor, remova-os, ou escolha outro.`
                 }}
               </span>
+                <span
+                class="text-center"
+                style="
+                  font-size: 0.8rem;
+                  font-weight: bold;
+                  display: inline-block;
+                  text-align: left !important;
+                  width: 100%;
+                  margin-top: 60px;
+                  margin-left: 782px;
+                  position: absolute;
+                "
+            >
+              {{ `Estoque: ${this.estoque}`}}
+            </span>
+
+              <v-row>
+                <div class="mt-1 ml-6 mb-9">
+                  <v-text-field
+                    density="compact"
+                    name="inicioEntrega"
+                    label="De"
+                    type="date"
+                    v-model="items.itemsInicioEntrega[index]"
+                    variant="outlined"
+                    :rules="requiredField"
+                  ></v-text-field>
+                </div>
+
+                <div class="mt-1 ml-3 mr-3">
+                  <v-text-field
+                    density="compact"
+                    name="fimEntrega"
+                    label="Até"
+                    type="date"
+                    v-model="items.itemsFimEntrega[index]"
+                    variant="outlined"
+                    :rules="requiredField"
+                  ></v-text-field>
+                </div>
+              </v-row>
+              
             </div>
           </v-col>
         </v-row>
+
         <v-row class="w-100" style="margin-top: 15px; margin-left: 3px">
           <v-col cols="4">
             <v-tooltip location="end">
@@ -171,8 +196,19 @@
           </v-col>
           <v-col align="end" class="align-self-center">
             <h4>Total</h4>
-            <span>{{ formatPrice(totalGeral) }}</span><br>
-            <span v-if="passedOfLimit" style="color: red; font-size: 0.8rem; font-weight: bold; width: 100%; margin-top: -25px; margin-bottom: 20px">
+            <span>{{ formatPrice(totalGeral) }}</span
+            ><br />
+            <span
+              v-if="passedOfLimit"
+              style="
+                color: red;
+                font-size: 0.8rem;
+                font-weight: bold;
+                width: 100%;
+                margin-top: -25px;
+                margin-bottom: 20px;
+              "
+            >
               {{ `Limite máximo atingido. Por favor, reduza a quantidade` }}
             </span>
           </v-col>
@@ -225,6 +261,7 @@ export default {
     },
   },
   data: () => ({
+    estoque: 0,
     passedOfLimit: false,
     totalGeral: 0,
     unidade: "",
@@ -300,9 +337,11 @@ export default {
   computed: {
     isFormValid() {
       const areItemInicioEntrega = this.items.itemsInicioEntrega.every(
-      (item) => item && item.trim() !== "" && !isNaN(Date.parse(item)))
+        (item) => item && item.trim() !== "" && !isNaN(Date.parse(item))
+      );
       const areItemFimEntrega = this.items.itemsFimEntrega.every(
-      (item) => item && item.trim() !== "" && !isNaN(Date.parse(item)))
+        (item) => item && item.trim() !== "" && !isNaN(Date.parse(item))
+      );
       const areItemsProductsValid = this.items.itemsProducts.every(
         (item) => item.produtoId && item.unidade && item.precoMedio
       );
@@ -330,6 +369,8 @@ export default {
             (p) => p.id === pesquisaId
           );
 
+          this.estoque = selectedPesquisa.quantidade - quantity;
+
           if (selectedPesquisa && quantity > selectedPesquisa.quantidade) {
             this.quantityValid = false;
             return `Limite permitido para ${selectedPesquisa.produto.descricao} (${selectedPesquisa.quantidade}).`;
@@ -353,9 +394,8 @@ export default {
           return total + precoMedio * quantity;
         }, 0)
         .toFixed(2);
-      
-      this.passedOfLimit = this.totalGeral > 40000 ? true : false
-      
+
+      this.passedOfLimit = this.totalGeral > 40000 ? true : false;
     },
     addItem() {
       this.items.itemsProducts.push({
@@ -371,7 +411,7 @@ export default {
       this.items.itemsProducts.splice(index, 1);
       this.items.itemsQuantity.splice(index, 1);
       this.items.itemsInicioEntrega.splice(index, 1);
-      this.items.itemsFimEntrega.splice(index, 1)
+      this.items.itemsFimEntrega.splice(index, 1);
     },
     resetState() {
       Object.keys(this.currentItem).forEach((key) => {
