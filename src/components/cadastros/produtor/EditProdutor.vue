@@ -224,8 +224,6 @@ export default {
       this.format();
       this.currentItem.nome = this.currentItem.nome.toUpperCase()
       try {
-        this.currentItem.estado = this.currentItem.estado.nome;
-        this.currentItem.municipio = this.currentItem.municipio.nome;
         this.onSubmit({
           currentItem: {...this.currentItem},
           files: [...this.files]
