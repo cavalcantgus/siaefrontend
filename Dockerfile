@@ -9,6 +9,9 @@ COPY . .
 
 RUN npm run build
 
+# Instala serve globalmente para garantir que estará disponível no CMD
+RUN npm install -g serve
+
 EXPOSE 5173
 
-CMD ["npx", "serve", "-s", "dist", "-l", "5173"]
+CMD ["serve", "-s", "dist", "-l", "5173"]
