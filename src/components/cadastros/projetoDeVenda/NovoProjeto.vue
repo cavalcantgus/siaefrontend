@@ -142,7 +142,7 @@
                   position: absolute;
                 "
             >
-              {{ `Estoque: ${this.estoque}`}}
+              {{ `Estoque: ${items.estoque[index] || 0}`}}
             </span>
 
               <v-row>
@@ -261,7 +261,6 @@ export default {
     },
   },
   data: () => ({
-    estoque: 0,
     passedOfLimit: false,
     totalGeral: 0,
     unidade: "",
@@ -281,6 +280,7 @@ export default {
       itemsQuantity: [],
       itemsInicioEntrega: [],
       itemsFimEntrega: [],
+      estoque: []
     },
     options: {
       decimal: ",",
@@ -369,7 +369,7 @@ export default {
             (p) => p.id === pesquisaId
           );
 
-          this.estoque = selectedPesquisa.quantidade - quantity;
+          this.items.estoque[index] = selectedPesquisa.quantidade - quantity;
 
           if (selectedPesquisa && quantity > selectedPesquisa.quantidade) {
             this.quantityValid = false;
