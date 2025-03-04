@@ -4,7 +4,7 @@
   <h1 style="color: #57a340; margin-top: 10px; padding: 30px; font-size: 3rem">Comprovante de Recebimento</h1>
   <v-row justify="center" class="pr-2">
     <v-col cols="12">
-      <v-data-table-virtual :items="filteredProofs" :headers="headers" :search="search" single-expand show-expand v-model:expanded="expanded" :fixed-header="true" height="700px">
+      <v-data-table :items="filteredProofs" :headers="headers" :search="search" single-expand show-expand v-model:expanded="expanded" :fixed-header="true" height="700px">
         <template v-slot:top>
           <v-row class="mt-2 mb-8 mx-3">
             <v-col cols="5">
@@ -31,7 +31,7 @@
               </v-tooltip>
             </v-col>
           </v-row>
-          <v-row justify="start" class="ml-0 mb-2" style="margin-top: -20px;">
+          <v-row justify="start" class="ml-0 mb-1" style="margin-top: -20px;">
           <v-col class="button-group mr-4" align="start" cols="auto">
               <v-tooltip location="end">
                 <template #activator="{ props }">
@@ -44,6 +44,26 @@
               </v-tooltip>
             </v-col>
         </v-row>
+        <v-row class="mb-5 pl-1 ml-4">
+            <v-col
+              cols="auto"
+              class="pa-0 mr-4"
+            >
+              <span class="status-text">Entregas</span>
+              <div class="d-flex align-center">
+                <v-icon small color="primary" left>mdi-account-check</v-icon>
+                <div class="d-flex flex-column ml-3 status-text align-start">
+                  <span
+                    
+                    class="text-xs font-weight-medium"
+                  >
+                    {{ this.proofs.length }}
+                    {{ this.proofs.length === 1 ? "Entrega" : "Entregas" }} cadastrada(s)
+                  </span>
+                </div>
+              </div>
+            </v-col>
+          </v-row>
         </template>
        
         <template v-slot:[`item.edit`]="{ item }">
@@ -90,7 +110,7 @@
             </td>
           </tr>
         </template>
-      </v-data-table-virtual>
+      </v-data-table>
       <v-dialog v-model="dialog.create">
         <v-card class="card-form align-self-center" width="100%">
           <v-card-title class="sticky-title title-border">
@@ -215,6 +235,7 @@ export default {
 
         if (Array.isArray(response.data)) {
           this.proofs = response.data;
+          this.proofs.sort((a, b) => a.produtor.nome.localeCompare(b.produtor.nome))
         } else {
           console.log("A resposta da API não é um Array");
           this.proofs = [];

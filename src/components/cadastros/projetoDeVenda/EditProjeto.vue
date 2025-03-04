@@ -32,7 +32,7 @@
                 <v-text-field density="compact" label="Preço Médio" v-model="projeto.produto.precoMedio" variant="outlined" disabled></v-text-field>
               </v-col>
               <v-col cols="1" lg="2" style="margin-left: -9px">
-                <vuetify-money density="compact" label="Quantidade" :options="options" v-model="projeto.quantidade" variant="outlined" :disabled="isDuplicate" @update:model-value="updateEstoque($event, index + 1)"></vuetify-money>
+                <vuetify-money density="compact" label="Quantidade" :options="options" v-model="projeto.quantidade" variant="outlined" :disabled="isDuplicate" @update:model-value="updateEstoque($event, index)"></vuetify-money>
               </v-col>
               <v-btn v-if="currentItem.projetoProdutos.length > 1" size="30px" icon color="error" style="margin-top: 15px" @click="removeItem(index)">
                 <v-icon size="20px">mdi-delete</v-icon>
@@ -44,7 +44,7 @@
                 {{ `Itens duplicados. Por favor, remova-os, ou escolha outro.` }}
               </span>
               <span class="text-center" style="font-size: 0.8rem; font-weight: bold; display: inline-block; text-align: left !important; width: 100%; margin-top: 60px; margin-left: 782px; position: absolute">
-                {{ `Estoque: ${this.copiaEstoque?.produto[index + 1]?.quantidade}` }}
+                {{ "Estoque: " + this.copiaEstoque?.produto[index]?.quantidade }}
               </span>
               <v-row>
                 <div class="mt-1 ml-6 mb-9">
@@ -160,6 +160,7 @@ export default {
     "currentItem.projetoProdutos": {
       handler(newVal) {
         this.validateQuantity();
+        this.getEstoque()
         newVal.forEach((item) => {
           if (item && item.produto) {
             // Atualiza unidade e preço médio do produto
@@ -189,10 +190,10 @@ export default {
   methods: {
     estoque(index, quantidade) {
       // Evita valores nulos ou negativos
-      if (!quantidade || quantidade < 0 || quantidade === "" || quantidade === null) return this.copiaEstoque.produto[index].quantidade = this.estoques.produto[index].quantidade;
+      if (!quantidade || quantidade < 0 || quantidade === "" || quantidade === null) return (this.copiaEstoque.produto[index].quantidade = this.estoques.produto[index].quantidade);
 
-      if(quantidade > this.estoques.produto[index].quantidade) {
-        return this.copiaEstoque.produto[index].quantidade = 0
+      if (quantidade > this.estoques.produto[index].quantidade) {
+        return (this.copiaEstoque.produto[index].quantidade = 0);
       }
 
       // Verifica se o índice é válido antes de modificar
@@ -210,10 +211,9 @@ export default {
         const pesquisaProduto = this.researchs.find((p) => p.produto.id === produtoId);
         const produtoCadastrado = this.projects.find((p) => p.produto.id === produtoId);
 
-
         if (produtoCadastrado) {
           const quantidadeRestante = this.sumQuantity(produtoId) + pesquisaProduto.quantidade;
-          
+
           if (pesquisaProduto && quantidadeSolicitada > quantidadeRestante) {
             return `A quantidade inserida excede o limite permitido para ${pesquisaProduto.produto.descricao} (${quantidadeRestante}).`;
           }
@@ -261,6 +261,7 @@ export default {
         fimEntrega: null,
         total: 0,
       });
+
       this.updateTotalGeral();
     },
     removeItem(index) {
@@ -290,11 +291,14 @@ export default {
     },
 
     async getEstoque() {
-      if (!this.projects?.length || !this.researchs?.length) {
+      if (!this.currentItem.projetoProdutos?.length || !this.researchs?.length) {
         console.warn("Nenhum dado encontrado!");
         return;
       }
-      this.projects.forEach((project) => {
+
+      this.estoques.produto = [];
+      console.log(this.currentItem.projetoProdutos);
+      this.currentItem.projetoProdutos.forEach((project) => {
         const research = this.researchs.find((r) => r.produto.id === project.produto.id);
 
         if (research) {
@@ -304,18 +308,17 @@ export default {
           });
         }
       });
-      this.copiaEstoque = JSON.parse(JSON.stringify(this.estoques));
       console.log(this.estoques);
+      this.copiaEstoque = JSON.parse(JSON.stringify(this.estoques));
     },
 
     updateEstoque(quantidade, index) {
-      console.log("UPDATE CHAMADO");
       this.alterado = true;
 
       // Garante que a quantidade não seja nula antes de atualizar
       if (quantidade !== null && quantidade !== undefined) {
         this.estoque(index, quantidade);
-        return this.estoques.produto[index].quantidade
+        return this.estoques.produto[index].quantidade;
       }
     },
 

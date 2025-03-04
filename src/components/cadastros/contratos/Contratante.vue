@@ -3,7 +3,7 @@
   <h1 style="color: #57a340; margin-top: 10px; padding: 30px; font-size: 3rem">Contratante</h1>
   <v-row justify="center" class="pr-2">
     <v-col cols="12">
-      <v-data-table-virtual :items="contratantes" :headers="headers" :search="search" :fixed-header="true" height="700px">
+      <v-data-table :items="contratantes" :headers="headers" :search="search" :fixed-header="true" height="700px">
         <template v-slot:top>
           <v-row class="mt-2 mb-8 mx-3">
             <v-col cols="5">
@@ -28,6 +28,26 @@
                 </template>
                 <span>Clique para cadastrar um contratante</span>
               </v-tooltip>
+            </v-col>
+          </v-row>
+          <v-row class="mb-5 pl-1 ml-4">
+            <v-col
+              cols="auto"
+              class="pa-0 mr-4"
+            >
+              <span class="status-text">Contratantes</span>
+              <div class="d-flex align-center">
+                <v-icon small color="primary" left>mdi-account-check</v-icon>
+                <div class="d-flex flex-column ml-3 status-text align-start">
+                  <span
+                    
+                    class="text-xs font-weight-medium"
+                  >
+                    {{ this.contratantes.length }}
+                    {{ this.contratantes.length === 1 ? "Contratante" : "Contratantes" }} cadastrado(s)
+                  </span>
+                </div>
+              </div>
             </v-col>
           </v-row>
         </template>
@@ -75,7 +95,7 @@
               </td>
             </tr>
           </template> -->
-      </v-data-table-virtual>
+      </v-data-table>
       <v-dialog v-model="dialog.create">
         <v-card class="card-form align-self-center" width="60%">
           <v-card-title class="sticky-title title-border">
@@ -91,13 +111,13 @@
       <v-dialog v-model="dialog.update">
         <v-card class="card-form align-self-center" width="60%">
           <v-card-title class="sticky-title title-border">
-            Editar Contrato: {{ selectedRow.id }}
+            Editar Contratante: {{ selectedRow.id }}
             <v-spacer></v-spacer>
             <v-btn icon class="btn-close elevation-0" @click="dialog.update = !dialog.update">
               <v-icon prepend> mdi-close </v-icon>
             </v-btn>
           </v-card-title>
-          <EditContrato :currentItem="selectedRow" :onSubmit="updateContract"></EditContrato>
+          <EditContratante :currentItem="selectedRow" :onSubmit="updateContratante"></EditContratante>
         </v-card>
       </v-dialog> 
     </v-col>
@@ -107,6 +127,7 @@
 <script>
 import BtnComeBack from "../../template/BtnComeBack.vue";
 import NovoContratante from './NovoContratante.vue';
+import EditContratante from "./EditContratante.vue";
 import { useToast } from "vue-toastification";
 import axios from "@/services/axios.js";
 
@@ -115,8 +136,10 @@ export default {
   components: {
     BtnComeBack,
     NovoContratante,
+    EditContratante,
   },
   data: () => ({
+    selectedRow: {},
     search: null,
     expanded: false,
     showFilters: false,
@@ -155,6 +178,23 @@ export default {
         }
     },
 
+    async updateContratante(fields) {
+      const toast = useToast()
+      try {
+        const response = await axios.put(`/public/contratantes/contratante/${fields.id}`, fields)
+        if(response.status !== 200) {
+          throw new Error(`Erro: ${response.status}`)
+        }
+
+        toast.success("Contratante atualizado com sucesso!")
+      } catch (error) {
+        console.error("Erro: ", error)
+        toast.error("Erro ao cadastrar contratante: ", error)
+      } finally {
+        this.dialog.update = false
+      }
+    },
+
     async getContratantes() {
         try {
         const response = await axios.get("/public/contratantes");
@@ -162,6 +202,7 @@ export default {
 
         if (Array.isArray(response.data)) {
           this.contratantes = response.data;
+          this.contratantes.sort((a, b) => a.nome.localeCompare(b.nome))
         } else {
           console.log("A resposta da API não é um Array");
           this.contratantes = [];
@@ -170,7 +211,13 @@ export default {
         console.log("Error: ", error);
         this.contratantes = [];
       }
-    }
+    },
+
+    onSelectRow(row, dialog) {
+      this.selectedRow = { ...row };
+      this.dialog[dialog] = true;
+    },
+
   },
   mounted() {
     this.getContratantes()

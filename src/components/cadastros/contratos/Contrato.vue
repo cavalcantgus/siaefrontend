@@ -4,7 +4,7 @@
   <h1 style="color: #57a340; margin-top: 10px; padding: 30px; font-size: 3rem">Contratos</h1>
   <v-row justify="center" class="pr-2">
     <v-col cols="12">
-      <v-data-table-virtual :items="filteredContracts" :headers="headers" :search="search" single-expand v-model:expanded="expanded" :fixed-header="true" height="700px">
+      <v-data-table :items="filteredContracts" :headers="headers" :search="search" single-expand v-model:expanded="expanded" :fixed-header="true" height="700px">
         <template v-slot:top>
           <v-row class="mt-2 mb-8 mx-3">
             <v-col cols="5">
@@ -29,6 +29,26 @@
                 </template>
                 <span>Clique para gerar um Contrato</span>
               </v-tooltip>
+            </v-col>
+          </v-row>
+          <v-row class="mb-5 pl-1 ml-4">
+            <v-col
+              cols="auto"
+              class="pa-0 mr-4"
+            >
+              <span class="status-text">Contratos</span>
+              <div class="d-flex align-center">
+                <v-icon small color="primary" left>mdi-account-check</v-icon>
+                <div class="d-flex flex-column ml-3 status-text align-start">
+                  <span
+                    
+                    class="text-xs font-weight-medium"
+                  >
+                    {{ this.contracts.length }}
+                    {{ this.contracts.length === 1 ? "Contrato" : "Contratos" }} cadastrado(s)
+                  </span>
+                </div>
+              </div>
             </v-col>
           </v-row>
         </template>
@@ -73,7 +93,7 @@
               </td>
             </tr>
           </template> -->
-      </v-data-table-virtual>
+      </v-data-table>
       <v-dialog v-model="dialog.create">
         <v-card class="card-form align-self-center" width="60%">
           <v-card-title class="sticky-title title-border">
@@ -136,7 +156,7 @@ export default {
       { text: "Editar", align: "center", value: "edit", width: "40px" },
       { text: "Remover", align: "center", value: "delete", width: "40px" },
       { title: "Produtor", align: "center", sortable: true, value: "produtor.nome" },
-      { title: "Contratante", align: "center", sortable: true, value: "contratante" },
+      { title: "Contratante", align: "center", sortable: true, value: "contratante.nome" },
       { title: "Data da Contratação", align: "center", sortable: true, value: "dataContratacao" },
       { title: "Baixar", align: "center", sortable: true, value: "download" },
     ],
@@ -162,6 +182,7 @@ export default {
 
         if (Array.isArray(response.data)) {
           this.contracts = response.data;
+          this.contracts.sort((a, b) => a.produtor.nome.localeCompare(b.produtor.nome))
         } else {
           console.log("A resposta da API não é um Array");
           this.contracts = [];

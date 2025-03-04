@@ -6,7 +6,7 @@
   </h1>
   <v-row justify="center">
     <v-col cols="12">
-      <v-data-table-virtual
+      <v-data-table
         :items="filteredProductors"
         :headers="headers"
         :search="search"
@@ -135,6 +135,24 @@
             <v-col
               cols="auto"
               class="pa-0 mr-4"
+            >
+              <span class="status-text">Produtores</span>
+              <div class="d-flex align-center">
+                <v-icon small color="primary" left>mdi-account-check</v-icon>
+                <div class="d-flex flex-column ml-3 status-text align-start">
+                  <span
+                    
+                    class="text-xs font-weight-medium"
+                  >
+                    {{ this.productors.length }}
+                    {{ this.productors.length === 1 ? "Produtor" : "Produtores" }} cadastrado(s)
+                  </span>
+                </div>
+              </div>
+            </v-col>
+            <v-col
+              cols="auto"
+              class="pa-0 mr-4"
               v-if="cafProxVenci > 0 || cafVencida > 0"
             >
               <span class="status-text">CAF</span>
@@ -157,6 +175,16 @@
                     vencimento
                   </span>
                 </div>
+              </div>
+            </v-col>
+            <v-col
+              cols="auto"
+              class="pa-0 mr-4"
+            >
+              <div class="d-flex align-center">
+                <v-btn icon class="elevation-0" @click="downloadRelatorio">
+                  <v-icon color="primary" left>mdi-file-download-outline</v-icon>
+                </v-btn>
               </div>
             </v-col>
           </v-row>
@@ -276,7 +304,7 @@
             </td>
           </tr>
         </template>
-      </v-data-table-virtual>
+      </v-data-table>
       <v-dialog v-model="dialog.create">
         <v-card class="card-form">
           <v-card-title class="sticky-title title-border">
@@ -520,6 +548,7 @@ export default {
         console.log(response.data);
 
         this.productors = response.data;
+        this.productors.sort((a, b) => a.nome.localeCompare(b.nome))
       } catch (error) {
         console.log("Error: ", error);
         this.productors = [];
@@ -652,6 +681,11 @@ export default {
         console.log("Erro: ", error);
       }
     },
+
+    downloadRelatorio() {
+      const url = `https://siaeserver.com/public/produtores/relatorio/generate`;
+      window.location.href = url; // Redireciona o navegador e força o downlo
+    }
   },
   mounted() {
     this.getProductors(), this.getUF(), this.getCd();
@@ -730,7 +764,8 @@ td {
 }
 
 .status-text {
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.1;
+  font-weight: bold;
 }
 </style>
