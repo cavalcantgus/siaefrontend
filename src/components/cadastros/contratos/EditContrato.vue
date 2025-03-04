@@ -7,8 +7,12 @@
             <span>Produtor <span style="color: red">*</span></span>
           </template>
         </v-select>
-        <v-text-field density="compact" name="contratante" label="Contratante" v-model="currentItem.contratante"  variant="outlined"></v-text-field>
-        <v-text-field density="compact" name="cpf_contratante" label="CPF" v-model="currentItem.cpfContratante" v-mask="'###.###.###-##'"  variant="outlined" :rules="cpfRules"></v-text-field>
+        <v-select class="flex-item-nome" :items="contratantes" item-title="nome" item-value="id" return-object density="compact" name="contratante" v-model="currentItem.contratante" variant="outlined" @update:model-value="getCpfContratante($event)" :rules="requiredField">
+          <template v-slot:label>
+            <span>Contratante <span style="color: red">*</span></span>
+          </template>
+        </v-select>
+        <v-text-field density="compact" name="cpf_contratante" label="CPF do Contratante" v-mask="'###.###.###-##'" v-model="cpfContratante" variant="outlined"></v-text-field>
         <v-text-field class="custom-date-field" density="compact" name="data_contratacao" v-model="currentItem.dataContratacao" variant="outlined" type="date" :rules="requiredField">
           <template v-slot:label>
             <span>Data da Contratação<span style="color: red">*</span></span>
@@ -47,6 +51,8 @@ export default {
     },
   },
   data: () => ({
+    cpfContratante: null,
+    contratantes: [],
     isSubmitting: false,
     producers: [],
     requiredField: [(e) => (e !== null && e !== undefined && e !== "") || "Obrigatório"],
@@ -61,6 +67,10 @@ export default {
     },
   },
   methods: {
+    getCpfContratante(contratante) {
+      this.cpfContratante = contratante?.cpf
+    },
+
     validateCpf(cpf) {
       const cpfClean = cpf.replace(/\D/g, "");
       if (cpfClean.length !== 11) return false;
@@ -85,12 +95,11 @@ export default {
     },
 
     async localOnSubmit() {
-      this.currentItem.contratante = this.currentItem.contratante.toUpperCase()
       try {
         const fields = {
-          ...this.currentItem
-        }
-        this.onSubmit(fields)
+          ...this.currentItem,
+        };
+        this.onSubmit(fields);
       } catch (error) {
         console.log("Erro: ", error);
       }
@@ -98,19 +107,27 @@ export default {
 
     async getProducers() {
       try {
-        const response = await axios.get("/public/projetos")
-        this.producers = response.data.flatMap(
-          (item) => item.produtor || []
-        )
-        console.log(this.producers)
-      } catch(error) {
+        const response = await axios.get("/public/projetos");
+        this.producers = response.data.flatMap((item) => item.produtor || []);
+        console.log(this.producers);
+      } catch (error) {
         console.log("Error: ", error);
         this.producers = [];
       }
-    }
+    },
+    async getContratantes() {
+      try {
+        const response = await axios.get("/public/contratantes");
+        this.contratantes = response.data;
+      } catch (error) {
+        console.log("Error: ", error);
+        this.contratantes = [];
+      }
+    },
   },
   mounted() {
-    this.getProducers()
+    this.getProducers(), this.getContratantes();
+    this.cpfContratante = this.currentItem?.contratante?.cpf
   },
 };
 </script>
