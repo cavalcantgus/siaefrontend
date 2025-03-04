@@ -79,7 +79,7 @@
         <v-tooltip location="top" :disabled="isFormValid">
           <template #activator="{ props }">
             <span v-bind="props">
-              <ConfirmButton :color="isFormValid ? 'success' : 'grey'" :onConfirm="getEstoque" :loading="isSubmitting" :disabled="!isFormValid || isSubmitting">Salvar</ConfirmButton>
+              <ConfirmButton :color="isFormValid ? 'success' : 'grey'" :onConfirm="localOnSubmit" :loading="isSubmitting" :disabled="!isFormValid || isSubmitting">Salvar</ConfirmButton>
             </span>
           </template>
           <span>Preencha todos os campos obrigatórios (*) para habilitar o botão</span>
