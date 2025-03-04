@@ -57,6 +57,26 @@
               </v-expand-transition>
             </v-col>
           </v-row>
+          <v-row class="mb-5 pl-1 ml-4">
+            <v-col
+              cols="auto"
+              class="pa-0 mr-4"
+            >
+              <span class="status-text">Pesquisas</span>
+              <div class="d-flex align-center">
+                <v-icon small color="primary" left>mdi-account-check</v-icon>
+                <div class="d-flex flex-column ml-3 status-text align-start">
+                  <span
+                    
+                    class="text-xs font-weight-medium"
+                  >
+                    {{ this.research.length }}
+                    {{ this.research.length === 1 ? "Pesquisa" : "Pesquisas" }} cadastrada(s)
+                  </span>
+                </div>
+              </div>
+            </v-col>
+          </v-row>
         </template>
         <template v-slot:[`item.edit`]="{ item }">
           <v-tooltip location="top">
@@ -282,6 +302,8 @@ export default {
               preco.valor = this.formatPrice(preco.valor);
             });
           });
+
+          this.research.sort((a, b) => a.produto.descricao.localeCompare(b.produto.descricao))
         } else {
           console.log("A resposta da API não é um Array");
           this.research = [];

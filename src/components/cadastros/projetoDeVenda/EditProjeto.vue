@@ -13,11 +13,11 @@
         </v-row>
 
         <v-row class="w-100" style="margin-top: -50px; margin-left: -8px">
-          <v-col cols="12">
+          <v-col cols="11">
             <v-btn size="30px" icon style="margin-left: -26px; margin-bottom: -85px" color="primary" @click="addItem">
               <v-icon left size="20px">mdi-plus</v-icon>
             </v-btn>
-            <div v-for="(projeto, index) in currentItem.projetoProdutos" :key="index" class="grid-second-container">
+            <div style="border-bottom: 3px solid rgba(0, 100, 0, 0.5); width: 109%; height: 150px; margin-bottom: 10px" v-for="(projeto, index) in currentItem.projetoProdutos" :key="index" class="grid-second-container">
               <v-col cols="3" class="">
                 <v-select :color="isDuplicate ? 'error' : ''" density="compact" :items="products" item-title="descricao" item-value="id" return-object v-model="projeto.produto" variant="outlined" :rules="requiredField" clearable>
                   <template v-slot:label>
@@ -25,31 +25,36 @@
                   </template>
                 </v-select>
               </v-col>
-              <v-col cols="1">
+              <v-col cols="2" style="margin-left: -9px">
                 <v-text-field density="compact" label="Unidade" v-model="projeto.produto.unidade" variant="outlined" disabled></v-text-field>
               </v-col>
-              <v-col cols="2">
+              <v-col cols="2" style="margin-left: -9px">
                 <v-text-field density="compact" label="Preço Médio" v-model="projeto.produto.precoMedio" variant="outlined" disabled></v-text-field>
               </v-col>
-              <v-col cols="1">
-                <vuetify-money density="compact" label="Quantidade" :options="options" v-model="projeto.quantidade" variant="outlined" :disabled="isDuplicate"></vuetify-money>
+              <v-col cols="1" lg="2" style="margin-left: -9px">
+                <vuetify-money density="compact" label="Quantidade" :options="options" v-model="projeto.quantidade" variant="outlined" :disabled="isDuplicate" @update:model-value="updateEstoque($event, index)"></vuetify-money>
               </v-col>
-              <div class="mt-3">
-                <v-text-field density="compact" name="inicioEntrega" label="De" type="date" v-model="projeto.inicioEntrega" variant="outlined" :rules="requiredField"></v-text-field>
-              </div>
-
-              <div class="mt-3 ml-3 mr-3">
-                <v-text-field density="compact" name="fimEntrega" label="Até" type="date" v-model="projeto.fimEntrega" variant="outlined" :rules="requiredField" :hide-details="false"></v-text-field>
-              </div>
               <v-btn v-if="currentItem.projetoProdutos.length > 1" size="30px" icon color="error" style="margin-top: 15px" @click="removeItem(index)">
                 <v-icon size="20px">mdi-delete</v-icon>
               </v-btn>
-              <v-alert v-if="quantityWarnings[index]" color="error" class="mt-2 mb-6 ml-4" density="compact" style="font-size: 0.7rem; height: 80px; font-weight: bold">
+              <v-alert max-width="170px" v-show="quantityWarnings[index]" color="error" class="mt-2 mb-6 ml-4" density="compact" style="font-size: 0.7rem; height: 80px; font-weight: bold; position: absolute; z-index: 10; left: 75%">
                 {{ quantityWarnings[index] }}
               </v-alert>
               <span v-if="isDuplicate" class="text-start text-error ml-3" style="font-size: 0.8rem; font-weight: bold; width: 100%; margin-top: -25px; margin-bottom: 20px">
                 {{ `Itens duplicados. Por favor, remova-os, ou escolha outro.` }}
               </span>
+              <span class="text-center" style="font-size: 0.8rem; font-weight: bold; display: inline-block; text-align: left !important; width: 100%; margin-top: 60px; margin-left: 782px; position: absolute">
+                {{ "Estoque: " + this.copiaEstoque?.produto[index]?.quantidade }}
+              </span>
+              <v-row>
+                <div class="mt-1 ml-6 mb-9">
+                  <v-text-field density="compact" name="inicioEntrega" label="De" type="date" v-model="projeto.inicioEntrega" variant="outlined" :rules="requiredField"></v-text-field>
+                </div>
+
+                <div class="mt-1 ml-3 mr-3">
+                  <v-text-field density="compact" name="fimEntrega" label="Até" type="date" v-model="projeto.fimEntrega" variant="outlined" :rules="requiredField" :hide-details="false"></v-text-field>
+                </div>
+              </v-row>
             </div>
           </v-col>
         </v-row>
@@ -74,7 +79,7 @@
         <v-tooltip location="top" :disabled="isFormValid">
           <template #activator="{ props }">
             <span v-bind="props">
-              <ConfirmButton :color="isFormValid ? 'success' : 'grey'" :onConfirm="localOnSubmit" :loading="isSubmitting" :disabled="!isFormValid || isSubmitting">Salvar</ConfirmButton>
+              <ConfirmButton :color="isFormValid ? 'success' : 'grey'" :onConfirm="getEstoque" :loading="isSubmitting" :disabled="!isFormValid || isSubmitting">Salvar</ConfirmButton>
             </span>
           </template>
           <span>Preencha todos os campos obrigatórios (*) para habilitar o botão</span>
@@ -106,6 +111,16 @@ export default {
     },
   },
   data: () => ({
+    copiaEstoque: null,
+    estoques: {
+      produto: [
+        {
+          id: null,
+          quantidade: null,
+        },
+      ],
+    },
+    alterado: false,
     totalGeral: 0,
     unidade: "",
     precoMedio: "",
@@ -145,17 +160,18 @@ export default {
     "currentItem.projetoProdutos": {
       handler(newVal) {
         this.validateQuantity();
-        newVal.forEach((item, index) => {
+        this.getEstoque()
+        newVal.forEach((item) => {
           if (item && item.produto) {
-            // Atualiza os valores do produto associado
+            // Atualiza unidade e preço médio do produto
             const produto = this.products.find((p) => p.id === item.produto.id);
+            console.log("PRODUTO: ", produto);
             if (produto) {
               item.produto.unidade = produto.unidade;
               item.produto.precoMedio = produto.precoMedio;
             }
           }
         });
-
         // Atualiza o total geral após as mudanças
         this.updateTotalGeral();
 
@@ -172,9 +188,21 @@ export default {
     },
   },
   methods: {
-    validateQuantity() {
-      console.log("Método chamado");
+    estoque(index, quantidade) {
+      // Evita valores nulos ou negativos
+      if (!quantidade || quantidade < 0 || quantidade === "" || quantidade === null) return (this.copiaEstoque.produto[index].quantidade = this.estoques.produto[index].quantidade);
 
+      if (quantidade > this.estoques.produto[index].quantidade) {
+        return (this.copiaEstoque.produto[index].quantidade = 0);
+      }
+
+      // Verifica se o índice é válido antes de modificar
+      if (this.copiaEstoque?.produto?.[index] !== undefined) {
+        return (this.copiaEstoque.produto[index].quantidade = this.estoques.produto[index].quantidade - quantidade);
+      }
+    },
+
+    validateQuantity() {
       this.quantityWarnings = this.currentItem.projetoProdutos.map((projeto) => {
         const produtoId = projeto.produto.id;
         if (!produtoId) return null;
@@ -183,11 +211,8 @@ export default {
         const pesquisaProduto = this.researchs.find((p) => p.produto.id === produtoId);
         const produtoCadastrado = this.projects.find((p) => p.produto.id === produtoId);
 
-        console.log("Produto:", produtoId, "Quantidade Solicitada:", quantidadeSolicitada);
-
         if (produtoCadastrado) {
           const quantidadeRestante = this.sumQuantity(produtoId) + pesquisaProduto.quantidade;
-          console.log("Quantidade Restante:", quantidadeRestante);
 
           if (pesquisaProduto && quantidadeSolicitada > quantidadeRestante) {
             return `A quantidade inserida excede o limite permitido para ${pesquisaProduto.produto.descricao} (${quantidadeRestante}).`;
@@ -200,7 +225,6 @@ export default {
 
         return null;
       });
-
       // Definir quantityValid corretamente
       this.quantityValid = this.quantityWarnings.every((warning) => warning === null);
     },
@@ -215,14 +239,10 @@ export default {
     },
 
     updateTotalGeral() {
-      console.log("Método chamado");
       this.totalGeral = this.currentItem.projetoProdutos
         .reduce((total, product) => {
-          console.log("Produto 1: ", product);
           const quantity = parseFloat(product.quantidade) || 0;
-          console.log("Quantidade: ", quantity);
           const precoMedio = parseFloat(product.produto?.precoMedio) || 0; // Verifique se 'produto' existe
-          console.log("Preço Médio: ", precoMedio);
           return total + precoMedio * quantity;
         }, 0)
         .toFixed(2);
@@ -241,6 +261,7 @@ export default {
         fimEntrega: null,
         total: 0,
       });
+
       this.updateTotalGeral();
     },
     removeItem(index) {
@@ -266,6 +287,38 @@ export default {
         this.onSubmit(fields);
       } catch (error) {
         console.log("Erro: ", error);
+      }
+    },
+
+    async getEstoque() {
+      if (!this.currentItem.projetoProdutos?.length || !this.researchs?.length) {
+        console.warn("Nenhum dado encontrado!");
+        return;
+      }
+
+      this.estoques.produto = [];
+      console.log(this.currentItem.projetoProdutos);
+      this.currentItem.projetoProdutos.forEach((project) => {
+        const research = this.researchs.find((r) => r.produto.id === project.produto.id);
+
+        if (research) {
+          this.estoques.produto.push({
+            id: project.produto.id,
+            quantidade: project.quantidade + research.quantidade,
+          });
+        }
+      });
+      console.log(this.estoques);
+      this.copiaEstoque = JSON.parse(JSON.stringify(this.estoques));
+    },
+
+    updateEstoque(quantidade, index) {
+      this.alterado = true;
+
+      // Garante que a quantidade não seja nula antes de atualizar
+      if (quantidade !== null && quantidade !== undefined) {
+        this.estoque(index, quantidade);
+        return this.estoques.produto[index].quantidade;
       }
     },
 
@@ -331,8 +384,24 @@ export default {
       }
     },
   },
-  mounted() {
+  async mounted() {
     this.getProducts(), this.getProductors(), this.getResearchs(), this.updateTotalGeral(), this.getProjects();
+
+    try {
+      await this.getProjects();
+      await this.getResearchs();
+
+      this.getEstoque();
+    } catch (error) {
+      console.error("Erro ao carregar os dados:", error);
+    }
+  },
+
+  updated() {
+    // Chamado sempre que o DOM for atualizado, então verificamos se os dados já existem
+    if (this.projects.length && this.researchs.length) {
+      this.getEstoque();
+    }
   },
 };
 </script>

@@ -1,10 +1,9 @@
 <template>
- 
   <BtnComeBack></BtnComeBack>
-  <h1 style="color: #57a340; margin-top: 10px; padding: 30px; font-size: 3rem">Contratos</h1>
+  <h1 style="color: #57a340; margin-top: 10px; padding: 30px; font-size: 3rem">Contratante</h1>
   <v-row justify="center" class="pr-2">
     <v-col cols="12">
-      <v-data-table :items="filteredContracts" :headers="headers" :search="search" single-expand v-model:expanded="expanded" :fixed-header="true" height="700px">
+      <v-data-table :items="contratantes" :headers="headers" :search="search" :fixed-header="true" height="700px">
         <template v-slot:top>
           <v-row class="mt-2 mb-8 mx-3">
             <v-col cols="5">
@@ -24,10 +23,10 @@
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn color="success" class="elevation-3 compact-btn ml-3" min-width="25%" @click="dialog.create = true" v-bind="attrs" v-on="on">
                     <v-icon small class="compact-icon" left>mdi-plus</v-icon>
-                    <div class="d-flex flex-column compact-btn-text" style="font-size: 0.6rem"><span>Novo</span> <span>Contrato</span></div>
+                    <div class="d-flex flex-column compact-btn-text" style="font-size: 0.6rem"><span>Novo</span> <span>Contratante</span></div>
                   </v-btn>
                 </template>
-                <span>Clique para gerar um Contrato</span>
+                <span>Clique para cadastrar um contratante</span>
               </v-tooltip>
             </v-col>
           </v-row>
@@ -36,7 +35,7 @@
               cols="auto"
               class="pa-0 mr-4"
             >
-              <span class="status-text">Contratos</span>
+              <span class="status-text">Contratantes</span>
               <div class="d-flex align-center">
                 <v-icon small color="primary" left>mdi-account-check</v-icon>
                 <div class="d-flex flex-column ml-3 status-text align-start">
@@ -44,8 +43,8 @@
                     
                     class="text-xs font-weight-medium"
                   >
-                    {{ this.contracts.length }}
-                    {{ this.contracts.length === 1 ? "Contrato" : "Contratos" }} cadastrado(s)
+                    {{ this.contratantes.length }}
+                    {{ this.contratantes.length === 1 ? "Contratante" : "Contratantes" }} cadastrado(s)
                   </span>
                 </div>
               </div>
@@ -59,7 +58,7 @@
                 <v-icon color="green">mdi-pencil</v-icon>
               </v-btn>
             </template>
-            <span>Clique para editar um Contrato</span>
+            <span>Clique para editar um Contratante</span>
           </v-tooltip>
         </template>
         <template v-slot:[`item.delete`]="{ item }">
@@ -69,11 +68,14 @@
                 <v-icon color="red">mdi-delete</v-icon>
               </ConfirmButton>
             </template>
-            <span>Clique para deletar um Contrato</span>
+            <span>Clique para deletar um Contratante</span>
           </v-tooltip>
         </template>
-        <template v-slot:[`item.dataContratacao`]="{ item }">
-          <span>{{ formatData(item.dataContratacao) }}</span>
+        <template v-slot:[`item.nome`]="{ item }">
+          <span>{{ item?.nome }}</span>
+        </template>
+        <template v-slot:[`item.cpf`]="{ item }">
+          <span>{{ item?.cpf}}</span>
         </template>
         <template v-slot:[`item.download`]="{ item }">
           <v-tooltip location="top">
@@ -85,7 +87,7 @@
             <span>Clique para emitir um comprovante</span>
           </v-tooltip>
         </template>
-        <!-- <template v-slot:expanded-row="{ item }">
+         <!-- <template v-slot:expanded-row="{ item }">
             <tr>
               <td :colspan="9">
                 {{ console.log(item) }}
@@ -97,162 +99,118 @@
       <v-dialog v-model="dialog.create">
         <v-card class="card-form align-self-center" width="60%">
           <v-card-title class="sticky-title title-border">
-            Novo Contrato
+            Novo Contratante
             <v-spacer></v-spacer>
             <v-btn icon class="btn-close elevation-0" @click="dialog.create = !dialog.create">
               <v-icon prepend> mdi-close </v-icon>
             </v-btn>
           </v-card-title>
-          <NovoContrato :currentItem="newItem" :onSubmit="createContract" :dialogAtivo="dialog.create"></NovoContrato>
+          <NovoContratante :currentItem="newItem" :onSubmit="createContratante" :dialogAtivo="dialog.create"></NovoContratante>
         </v-card>
       </v-dialog>
       <v-dialog v-model="dialog.update">
         <v-card class="card-form align-self-center" width="60%">
           <v-card-title class="sticky-title title-border">
-            Editar Contrato: {{ selectedRow.id }}
+            Editar Contratante: {{ selectedRow.id }}
             <v-spacer></v-spacer>
             <v-btn icon class="btn-close elevation-0" @click="dialog.update = !dialog.update">
               <v-icon prepend> mdi-close </v-icon>
             </v-btn>
           </v-card-title>
-          <EditContrato :currentItem="selectedRow" :onSubmit="updateContract"></EditContrato>
+          <EditContratante :currentItem="selectedRow" :onSubmit="updateContratante"></EditContratante>
         </v-card>
-      </v-dialog>
+      </v-dialog> 
     </v-col>
   </v-row>
 </template>
 
 <script>
-import axios from "@/services/axios.js";
-import NavBar from "../../NavBar.vue";
-import NovoContrato from "./NovoContrato.vue";
-import EditContrato from "./EditContrato.vue";
-import ProdutorExpand from "./ProdutorExpand.vue";
-import { useToast } from "vue-toastification";
-import UtilsService from "../../../services/utilsService";
 import BtnComeBack from "../../template/BtnComeBack.vue";
-import ConfirmButton from "../../template/ConfirmButton.vue";
+import NovoContratante from './NovoContratante.vue';
+import EditContratante from "./EditContratante.vue";
+import { useToast } from "vue-toastification";
+import axios from "@/services/axios.js";
 
 export default {
-  name: "CadastroProdutor",
+  name: "Contratante",
   components: {
-    NavBar,
-    NovoContrato,
-    ProdutorExpand,
-    EditContrato,
     BtnComeBack,
-    ConfirmButton,
+    NovoContratante,
+    EditContratante,
   },
   data: () => ({
+    selectedRow: {},
+    search: null,
+    expanded: false,
+    showFilters: false,
+    singleExpand: false,
+    newItem: {},
+    contratantes: [],
     dialog: {
       create: false,
       update: false,
     },
-    search: "",
-    singleExpand: false,
-    showFilters: false,
-    contracts: [],
     headers: [
       { text: "Editar", align: "center", value: "edit", width: "40px" },
       { text: "Remover", align: "center", value: "delete", width: "40px" },
-      { title: "Produtor", align: "center", sortable: true, value: "produtor.nome" },
-      { title: "Contratante", align: "center", sortable: true, value: "contratante.nome" },
-      { title: "Data da Contratação", align: "center", sortable: true, value: "dataContratacao" },
+      { title: "Nome", align: "center", sortable: true, value: "nome" },
+      { title: "CPF", align: "center", sortable: true, value: "cpf" },
       { title: "Baixar", align: "center", sortable: true, value: "download" },
     ],
-    newItem: {},
-    selectedRow: {},
-    deleteRow: {},
-    expanded: [],
   }),
-  computed: {
-    filteredContracts() {
-      return this.contracts;
-    },
-  },
   methods: {
-    formatData(val) {
-      return UtilsService.formatData(val)
+    async createContratante(fields) {
+        console.log("FIELDS: ", fields)
+        const toast = useToast()
+        try{
+            const response = await axios.post("/public/contratantes/contratante", fields)
+            console.log("Resposta: ", response)
+            if (response.status !== 201) {
+            throw new Error(`Erro: ${response.status}`);
+            }
+
+            toast.success("Contratante cadastrado com sucesso!");
+        } catch (error) {
+            console.error("Erro: ", error);
+            toast.error("Erro ao cadastrar contratante: ", error);
+        } finally {
+            this.dialog.create = false;  
+        }
     },
 
-    async getContracts() {
+    async updateContratante(fields) {
+      const toast = useToast()
       try {
-        const response = await axios.get("/public/contratos");
+        const response = await axios.put(`/public/contratantes/contratante/${fields.id}`, fields)
+        if(response.status !== 200) {
+          throw new Error(`Erro: ${response.status}`)
+        }
+
+        toast.success("Contratante atualizado com sucesso!")
+      } catch (error) {
+        console.error("Erro: ", error)
+        toast.error("Erro ao cadastrar contratante: ", error)
+      } finally {
+        this.dialog.update = false
+      }
+    },
+
+    async getContratantes() {
+        try {
+        const response = await axios.get("/public/contratantes");
         console.log(response.data);
 
         if (Array.isArray(response.data)) {
-          this.contracts = response.data;
-          this.contracts.sort((a, b) => a.produtor.nome.localeCompare(b.produtor.nome))
+          this.contratantes = response.data;
+          this.contratantes.sort((a, b) => a.nome.localeCompare(b.nome))
         } else {
           console.log("A resposta da API não é um Array");
-          this.contracts = [];
+          this.contratantes = [];
         }
       } catch (error) {
         console.log("Error: ", error);
-        this.contracts = [];
+        this.contratantes = [];
       }
-    },
-    async createContract(fields) {
-      const toast = useToast();
-      console.log(fields);
-      try {
-        const response = await axios.post("/public/contratos/contrato", fields);
-        console.log(response.data);
-
-        if (response.status !== 201) {
-          throw new Error(`Erro: ${response.status}`);
-        }
-        toast.success("Contrato cadastrado com sucesso!");
-        this.downloadContrato(response.data.id)
-      } catch (error) {
-        console.error("Erro: ", error);
-        toast.error("Erro ao cadastrar contrato: ", error);
-      } finally {
-        this.dialog.create = false;
-        this.getContracts();      
-      }
-    },
-
-    async updateContract(fields) {
-      const toast = useToast();
-
-      try {
-        const response = await axios.put(`/public/contratos/contrato/${fields.id}`, fields);
-
-        console.log(response.data);
-
-        if (response.status !== 200) {
-          throw new Error(`Erro: ${response.status}`);
-        }
-        toast.success("Contrato atualizado com sucesso!");
-      } catch (error) {
-        console.error("Erro: ", error);
-        toast.error("Erro ao atualizar Contrato: ", error);
-      } finally {
-        this.dialog.update = false;
-        this.getContracts();
-      }
-    },
-
-    // async deleteProduct(fields) {
-    //   const toast = useToast();
-    //   try {
-    //     const response = await axios.delete(`/public/produtos/produto/${fields.id}`, fields);
-    //     if (response.status !== 204) {
-    //       throw new Error(`Erro: `, response.status);
-    //     }
-    //     toast.success("Produto removido com sucesso!");
-    //   } catch (error) {
-    //     toast.error("Erro ao deletar produto: ", error);
-    //     console.error("Erro: ", error);
-    //   } finally {
-    //     this.getProducts();
-    //   }
-    // },
-
-    downloadContrato(produtorId) {
-      const url = `https://siaeserver.com/public/contratos/contrato/generate/${produtorId}`;
-      window.location.href = url; // Redireciona o navegador e força o download
     },
 
     onSelectRow(row, dialog) {
@@ -260,22 +218,13 @@ export default {
       this.dialog[dialog] = true;
     },
 
-    onDeleteRow(row) {
-      // console.log("Método chamado");
-      // this.deleteRow = { ...row };
-      // this.deleteProduct(this.deleteRow);
-    },
-
-    onDownloadRow(row) {
-      this.selectedRow = { ...row };
-      this.downloadContrato(this.selectedRow.id);
-    },
   },
   mounted() {
-    this.getContracts();
-  },
+    this.getContratantes()
+  }
 };
 </script>
+
 
 <style scoped>
 .sticky-title,

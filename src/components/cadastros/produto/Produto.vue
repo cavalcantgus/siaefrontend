@@ -4,7 +4,7 @@
   <h1 style="color: #57a340; margin-top: 10px; padding: 30px; font-size: 3rem">Cadastro de Produtos</h1>
   <v-row justify="center" class="pr-2">
     <v-col cols="12">
-      <v-data-table-virtual :items="filteredProductors" :headers="headers" :search="search" single-expand v-model:expanded="expanded" :fixed-header="true" height="700px">
+      <v-data-table :items="filteredProductors" :headers="headers" :search="search" single-expand v-model:expanded="expanded" :fixed-header="true" height="700px">
         <template v-slot:top>
           <v-row class="mt-2 mb-8 mx-3">
             <v-col cols="5">
@@ -29,6 +29,36 @@
                 </template>
                 <span>Clique para adicionar um produto</span>
               </v-tooltip>
+            </v-col>
+          </v-row>
+          <v-row class="mb-5 pl-1 ml-4">
+            <v-col
+              cols="auto"
+              class="pa-0 mr-4"
+            >
+              <span class="status-text">Produtos</span>
+              <div class="d-flex align-center">
+                <v-icon small color="primary" left>mdi-account-check</v-icon>
+                <div class="d-flex flex-column ml-3 status-text align-start">
+                  <span
+                    
+                    class="text-xs font-weight-medium"
+                  >
+                    {{ this.products.length }}
+                    {{ this.products.length === 1 ? "Produto" : "Produtos" }} cadastrado(s)
+                  </span>
+                </div>
+              </div>
+            </v-col>
+            <v-col
+              cols="auto"
+              class="pa-0 mr-4"
+            >
+              <div class="d-flex align-center">
+                <v-btn icon class="elevation-0" @click="downloadRelatorio">
+                  <v-icon color="primary" left>mdi-file-download-outline</v-icon>
+                </v-btn>
+              </div>
             </v-col>
           </v-row>
         </template>
@@ -67,7 +97,7 @@
               </td>
             </tr>
           </template> -->
-      </v-data-table-virtual>
+      </v-data-table>
       <v-dialog v-model="dialog.create">
         <v-card class="card-form align-self-center" width="60%">
           <v-card-title class="sticky-title title-border">
@@ -157,6 +187,7 @@ export default {
 
         if (Array.isArray(response.data)) {
           this.products = response.data;
+          this.products.sort((a, b) => a.descricao.localeCompare(b.descricao))
         } else {
           console.log("A resposta da API não é um Array");
           this.products = [];
@@ -233,6 +264,11 @@ export default {
       this.deleteRow = { ...row };
       this.deleteProduct(this.deleteRow);
     },
+
+    downloadRelatorio() {
+      const url = `https://siaeserver.com/public/produtos/relatorio/generate`;
+      window.location.href = url; // Redireciona o navegador e força o downlo
+    }
   },
   mounted() {
     this.getProducts();

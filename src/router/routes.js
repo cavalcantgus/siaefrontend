@@ -12,7 +12,7 @@ const routes = [
     { path: '/pauta-da-chamada', name: 'PautaDaChamada', component: () => import("@/components/cadastros/pautaDaChamada/PautaDaChamada.vue")},
     { path: '/projeto-de-venda', name: 'ProjetoDeVenda', component: () => import("@/components/cadastros/projetoDeVenda/ProjetoDeVenda.vue")},
     { path: '/comprovante', name: 'Entrega', component: () => import("@/components/cadastros/entrega/Entrega.vue")},
-    { path: '/contrato', name: 'Contrato', component: () => import("@/components/cadastros/contratos/Contrato.vue")},
+    { path: '/contrato', name: 'Contrato', component: () => import("@/components/cadastros/contratos/RelacoesContratuais.vue")},
     { path: '/', redirect: '/login'},
 ];
 
