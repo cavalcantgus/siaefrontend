@@ -45,7 +45,7 @@
               class="grid-second-container"
             >
               <v-col cols="3">
-                <v-select
+                <v-select item-color="green"
                   :color="isDuplicate ? 'error' : ''"
                   density="compact"
                   name="product"
@@ -59,6 +59,16 @@
                 >
                   <template v-slot:label>
                     <span>Produto <span style="color: red">*</span></span>
+                  </template>
+
+                  <template v-slot:item="{ props, item }">
+                    <v-list-item v-bind="props">
+                      <v-row class="d-flex justify-space-between align-start">
+                        <v-col class="text-right text-start" >
+                          <strong>{{"Estoque: " + item.raw.quantidade }}</strong>
+                        </v-col>
+                      </v-row>
+                    </v-list-item>
                   </template>
                 </v-select>
               </v-col>
@@ -269,6 +279,7 @@ export default {
     isDuplicate: false,
     products: [],
     producers: [],
+    projects: [],
     items: {
       itemsProducts: [
         {
@@ -446,6 +457,7 @@ export default {
           console.log("A resposta da API não é um Array");
           this.products = [];
         }
+        this.products.sort((a, b) => a.produto.descricao.localeCompare(b.produto.descricao))
       } catch (error) {
         console.log("Error: ", error);
         this.products = [];
@@ -454,18 +466,47 @@ export default {
 
     async getProductors() {
       try {
-        const response = await axios.get("/public/produtores");
-        console.log(response.data);
+        const { data } = await axios.get("/public/produtores");
 
-        this.producers = response.data;
+        if (!this.projects?.length) {
+          console.warn("Nenhum projeto encontrado!");
+          return;
+        }
+
+        // Obtém todos os IDs de produtores que devem ser removidos
+        const excludedProducerIds = this.projects.map(project => project.produtor.id);
+
+        // Filtra os produtores, excluindo os que estão na lista de IDs
+        this.producers = data.filter(prod => !excludedProducerIds.includes(prod.id));
+
+        console.log("PRODUTORES: ", this.producers);
+        this.producers.sort((a, b) => a.nome.localeCompare(b.nome))
       } catch (error) {
-        console.log("Error: ", error);
+        console.error("Error: ", error);
         this.producers = [];
       }
     },
+
+
+    async getProjects() {
+      try {
+        const response = await axios.get(`/public/projetos`);
+        this.projects = response.data;
+      } catch (error) {
+        console.error("Error: ", error);
+        this.projects = [];
+      }
+    },
   },
-  mounted() {
-    this.getResearchs(), this.getProductors();
+  async mounted() {
+    this.getResearchs();
+    try {
+      await this.getProjects()
+
+      this.getProductors()
+    } catch (error) {
+      console.error("Erro: ", error)
+    }
   },
 };
 </script>
@@ -497,4 +538,14 @@ export default {
 .flex-item-especificao {
   flex: 1 1 550px !important;
 }
+
+.v-menu .v-list-item {
+  font-size: 14px;
+  border-bottom: 2px solid #949494; /* Linha entre os itens */
+}
+
+.v-menu .v-list-item:last-child {
+  border-bottom: none; /* Remove a borda do último item */
+}
+
 </style>
