@@ -44,7 +44,7 @@
                 {{ `Itens duplicados. Por favor, remova-os, ou escolha outro.` }}
               </span>
               <span class="text-center" style="font-size: 0.8rem; font-weight: bold; display: inline-block; text-align: left !important; width: 100%; margin-top: 60px; margin-left: 782px; position: absolute">
-                {{ "Estoque: " + this.copiaEstoque?.produto[index]?.quantidade }}
+                {{ "Estoque: " + this.copiaEstoque?.produto[index].quantidade }}
               </span>
               <v-row>
                 <div class="mt-1 ml-6 mb-9">
@@ -160,7 +160,6 @@ export default {
     "currentItem.projetoProdutos": {
       handler(newVal) {
         this.validateQuantity();
-        this.getEstoque()
         newVal.forEach((item) => {
           if (item && item.produto) {
             // Atualiza unidade e preço médio do produto
@@ -190,7 +189,11 @@ export default {
   methods: {
     estoque(index, quantidade) {
       // Evita valores nulos ou negativos
-      if (!quantidade || quantidade < 0 || quantidade === "" || quantidade === null) return (this.copiaEstoque.produto[index].quantidade = this.estoques.produto[index].quantidade);
+      if (!quantidade || quantidade < 0 || quantidade === "" || quantidade === null) {
+        console.log("CAIU NA CONDIÇÂO: ", this.estoques.produto[index].quantidade)
+        this.copiaEstoque.produto[index].quantidade = this.estoques.produto[index].quantidade;
+        console.log("COPIA ESTOQUE: ", this.copiaEstoque.produto[index].quantidade)
+      }
 
       if (quantidade > this.estoques.produto[index].quantidade) {
         return (this.copiaEstoque.produto[index].quantidade = 0);
@@ -308,7 +311,7 @@ export default {
           });
         }
       });
-      console.log(this.estoques);
+      console.log("ESTOQUE : ", this.estoques);
       this.copiaEstoque = JSON.parse(JSON.stringify(this.estoques));
     },
 
@@ -385,10 +388,9 @@ export default {
     },
   },
   async mounted() {
-    this.getProducts(), this.getProductors(), this.getResearchs(), this.updateTotalGeral(), this.getProjects();
+    this.getProducts(), this.getProductors(), this.getResearchs(), this.updateTotalGeral(), this.getProjects(), this.getEstoque();
 
     try {
-      await this.getProjects();
       await this.getResearchs();
 
       this.getEstoque();
@@ -397,12 +399,12 @@ export default {
     }
   },
 
-  updated() {
-    // Chamado sempre que o DOM for atualizado, então verificamos se os dados já existem
-    if (this.projects.length && this.researchs.length) {
-      this.getEstoque();
-    }
-  },
+  // updated() {
+  //   // Chamado sempre que o DOM for atualizado, então verificamos se os dados já existem
+  //   if (this.projects.length && this.researchs.length) {
+  //     this.getEstoque();
+  //   }
+  // },
 };
 </script>
 
