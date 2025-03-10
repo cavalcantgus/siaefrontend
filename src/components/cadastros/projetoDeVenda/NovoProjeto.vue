@@ -65,7 +65,7 @@
                     <v-list-item v-bind="props">
                       <v-row class="d-flex justify-space-between align-start">
                         <v-col class="text-right text-start" >
-                          <strong>{{"Estoque: " + item.raw.quantidade }}</strong>
+                          <strong>{{"Estoque: " + estoque.get(item.raw.produto.id) }}</strong>
                         </v-col>
                       </v-row>
                     </v-list-item>
@@ -254,6 +254,7 @@ import ConfirmButton from "../../template/ConfirmButton.vue";
 import axios from "@/services/axios.js";
 import { useToast } from "vue-toastification";
 import UtilsService from "../../../services/utilsService";
+import { createWebHistory } from "vue-router";
 
 export default {
   name: "NovoProduto",
@@ -271,6 +272,7 @@ export default {
     },
   },
   data: () => ({
+    estoque: new Map(),
     passedOfLimit: false,
     totalGeral: 0,
     unidade: "",
@@ -380,11 +382,29 @@ export default {
             (p) => p.id === pesquisaId
           );
 
-          this.items.estoque[index] = selectedPesquisa.quantidade - quantity;
+          this.getEstoque(index, pesquisaId, selectedPesquisa, quantity)
 
-          if (selectedPesquisa && quantity > selectedPesquisa.quantidade) {
-            this.quantityValid = false;
-            return `Limite permitido para ${selectedPesquisa.produto.descricao} (${selectedPesquisa.quantidade}).`;
+          if(this.projects.length < 1) {
+            console.log("CAIU NA CONDIÇÂO")
+            const quantidadeRestante = selectedPesquisa.quantidade
+              if (selectedPesquisa && quantity > quantidadeRestante) {
+                this.quantityValid = false;
+                return `Limite permitido para ${selectedPesquisa.produto.descricao} (${selectedPesquisa.quantidade}).`;
+            }
+          }
+
+          else {
+            const produtosRelacionados = this.projects
+              .map(project => project.projetoProdutos.find(p => p.produto.id === pesquisaId))
+              .filter(Boolean); 
+
+            const quantidadeCadastrada = produtosRelacionados.reduce((soma, item) => soma + item.quantidade, 0);
+            const quantidadeRestante = selectedPesquisa.quantidade - quantidadeCadastrada
+            if(selectedPesquisa && quantity > quantidadeRestante) {
+              this.quantityValid = false;
+              return `Limite permitido para ${selectedPesquisa.produto.descricao} (${quantidadeRestante}).`;
+            }
+            
           }
           this.quantityValid = true;
           return null;
@@ -417,6 +437,7 @@ export default {
       this.items.itemsQuantity.push(null);
       this.items.itemsInicioEntrega.push(null);
       this.items.itemsFimEntrega.push(null);
+      this.items.estoque.push(null)
     },
     removeItem(index) {
       this.items.itemsProducts.splice(index, 1);
@@ -429,6 +450,39 @@ export default {
         this.currentItem[key] = null;
       });
     },
+
+    estoqueProdutos() {
+      this.products.forEach((research) => {
+        const produtoId = research.produto.id
+        const produtosRelacionados = this.projects
+              .map(project => project.projetoProdutos.find(p => p.produto.id === produtoId))
+              .filter(Boolean); 
+        const quantidadeCadastrada = produtosRelacionados.reduce((soma, item) => soma + item.quantidade, 0)
+        const estoque = research.quantidade - quantidadeCadastrada
+        
+        this.estoque.set(produtoId, estoque)
+      })
+
+      const produtosEliminados = new Map([...this.estoque].filter(([id, qtd]) => qtd === 0))
+      this.products = this.products.filter(p => !produtosEliminados.has(p.produto.id))
+      console.log("MAP ESTOQUE: ", this.estoque)
+    },
+
+    getEstoque(index, pesquisaId, selectedPesquisa, quantity) {
+      const produtosRelacionados = this.projects
+        .map(project => project.projetoProdutos.find(p => p.produto.id === pesquisaId))
+        .filter(Boolean); 
+
+      const quantidadeCadastrada = produtosRelacionados.reduce((soma, item) => soma + item.quantidade, 0);
+      const quantidadeRestante = selectedPesquisa.quantidade - quantidadeCadastrada
+      if(quantity > quantidadeRestante) {
+        this.items.estoque[index] = quantidadeRestante
+      }
+      else {
+        this.items.estoque[index] = quantidadeRestante - quantity
+      }
+    }, 
+
     async localOnSubmit() {
       try {
         const fields = {
@@ -470,6 +524,7 @@ export default {
 
         if (!this.projects?.length) {
           console.warn("Nenhum projeto encontrado!");
+          this.producers = data
           return;
         }
 
@@ -502,7 +557,9 @@ export default {
     this.getResearchs();
     try {
       await this.getProjects()
+      await this.getResearchs()
 
+      this.estoqueProdutos()
       this.getProductors()
     } catch (error) {
       console.error("Erro: ", error)
