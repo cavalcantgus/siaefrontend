@@ -19,9 +19,19 @@
             </v-btn>
             <div style="border-bottom: 3px solid rgba(0, 100, 0, 0.5); width: 109%; height: 150px; margin-bottom: 10px" v-for="(projeto, index) in currentItem.projetoProdutos" :key="index" class="grid-second-container">
               <v-col cols="3" class="">
-                <v-select :color="isDuplicate ? 'error' : ''" density="compact" :items="products" item-title="descricao" item-value="id" return-object v-model="projeto.produto" variant="outlined" :rules="requiredField" clearable>
+                <v-select item-color="green" :color="isDuplicate ? 'error' : ''" density="compact" :items="products" item-title="descricao" item-value="id" return-object v-model="projeto.produto" variant="outlined" :rules="requiredField" clearable>
                   <template v-slot:label>
                     <span>Produto <span style="color: red">*</span></span>
+                  </template>
+
+                  <template v-slot:item="{ props, item }">
+                    <v-list-item v-bind="props">
+                      <v-row class="d-flex justify-space-between align-start">
+                        <v-col class="text-right text-start" >
+                          <strong>{{"Estoque: " + estoque.get(item.raw.id)}}</strong>
+                        </v-col>
+                      </v-row>
+                    </v-list-item>
                   </template>
                 </v-select>
               </v-col>
@@ -43,9 +53,9 @@
               <span v-if="isDuplicate" class="text-start text-error ml-3" style="font-size: 0.8rem; font-weight: bold; width: 100%; margin-top: -25px; margin-bottom: 20px">
                 {{ `Itens duplicados. Por favor, remova-os, ou escolha outro.` }}
               </span>
-              <span class="text-center" style="font-size: 0.8rem; font-weight: bold; display: inline-block; text-align: left !important; width: 100%; margin-top: 60px; margin-left: 782px; position: absolute">
-                {{ "Estoque: " + this.copiaEstoque?.produto[index].quantidade }}
-              </span>
+              <!-- <span class="text-center" style="font-size: 0.8rem; font-weight: bold; display: inline-block; text-align: left !important; width: 100%; margin-top: 60px; margin-left: 782px; position: absolute">
+                {{ "Estoque: " + this.copiaEstoque?.produto[index]?.quantidade }}
+              </span> -->
               <v-row>
                 <div class="mt-1 ml-6 mb-9">
                   <v-text-field density="compact" name="inicioEntrega" label="De" type="date" v-model="projeto.inicioEntrega" variant="outlined" :rules="requiredField"></v-text-field>
@@ -111,15 +121,16 @@ export default {
     },
   },
   data: () => ({
-    copiaEstoque: null,
-    estoques: {
-      produto: [
-        {
-          id: null,
-          quantidade: null,
-        },
-      ],
-    },
+    estoque: new Map(),
+    // copiaEstoque: null,
+    // estoques: {
+    //   produto: [
+    //     {
+    //       id: null,
+    //       quantidade: null,
+    //     },
+    //   ],
+    // },
     alterado: false,
     totalGeral: 0,
     unidade: "",
@@ -130,6 +141,7 @@ export default {
     products: [],
     producers: [],
     projects: [],
+    totalProjects: [],
     items: {
       itemsProducts: [
         {
@@ -159,6 +171,7 @@ export default {
 
     "currentItem.projetoProdutos": {
       handler(newVal) {
+        console.log("WATCH CHAMOU PRIMEIRO")
         this.validateQuantity();
         newVal.forEach((item) => {
           if (item && item.produto) {
@@ -176,6 +189,7 @@ export default {
 
         // Verifica duplicidade após atualização
         this.isDuplicate = newVal.some((item, index) => newVal.some((otherItem, otherIndex) => index !== otherIndex && item.produto && otherItem.produto && item.produto.id === otherItem.produto.id));
+        // this.getEstoque();
       },
       deep: true,
     },
@@ -187,23 +201,29 @@ export default {
     },
   },
   methods: {
-    estoque(index, quantidade) {
-      // Evita valores nulos ou negativos
-      if (!quantidade || quantidade < 0 || quantidade === "" || quantidade === null) {
-        console.log("CAIU NA CONDIÇÂO: ", this.estoques.produto[index].quantidade)
-        this.copiaEstoque.produto[index].quantidade = this.estoques.produto[index].quantidade;
-        console.log("COPIA ESTOQUE: ", this.copiaEstoque.produto[index].quantidade)
-      }
+    // estoque(index, quantidade) {
+      
+    //   console.log("ESTOQUE CHAMOU PRIMEIRO")
+    //   // Evita valores nulos ou negativos
+    //   if (!quantidade || quantidade < 0 || quantidade === "" || quantidade === null || quantidade === 0) {
+    //     console.log("QUANTIDADE: ", quantidade)
+    //     console.log("CAIU NA CONDIÇÂO: ", this.estoques.produto[index].quantidade)
+    //     console.log("COPIA ESTOQUE: ", this.copiaEstoque.produto[index].quantidade)
+    //     return (this.copiaEstoque.produto[index].quantidade = this.estoques.produto[index].quantidade);
+        
+    //   }
 
-      if (quantidade > this.estoques.produto[index].quantidade) {
-        return (this.copiaEstoque.produto[index].quantidade = 0);
-      }
+    //   if (quantidade > this.estoques.produto[index].quantidade) {
+    //     console.log("CAIU NA CONDIÇÂO: 1", this.estoques.produto[index].quantidade)
+    //     return (this.copiaEstoque.produto[index].quantidade = 0);
+    //   }
 
-      // Verifica se o índice é válido antes de modificar
-      if (this.copiaEstoque?.produto?.[index] !== undefined) {
-        return (this.copiaEstoque.produto[index].quantidade = this.estoques.produto[index].quantidade - quantidade);
-      }
-    },
+    //   // Verifica se o índice é válido antes de modificar
+    //   if (this.copiaEstoque?.produto?.[index] !== undefined) {
+    //     console.log("CAIU NA CONDIÇÂO: 2", this.estoques.produto[index].quantidade)
+    //     this.copiaEstoque.produto[index].quantidade = this.estoques.produto[index].quantidade - quantidade;
+    //   }
+    // },
 
     validateQuantity() {
       this.quantityWarnings = this.currentItem.projetoProdutos.map((projeto) => {
@@ -214,15 +234,23 @@ export default {
         const pesquisaProduto = this.researchs.find((p) => p.produto.id === produtoId);
         const produtoCadastrado = this.projects.find((p) => p.produto.id === produtoId);
 
-        if (produtoCadastrado) {
-          const quantidadeRestante = this.sumQuantity(produtoId) + pesquisaProduto.quantidade;
+        const produtosRelacionados = this.totalProjects.filter((project) => project.produto.id === produtoId)
+        console.log("PRODUTOS RELACIONADOS: ", produtosRelacionados)
 
+        const quantidadeCadastrada = produtosRelacionados.reduce((soma, item) => soma + item.quantidade, 0)
+        console.log("QUANTIDADE CADASTRADA: ", quantidadeCadastrada)
+
+        if (produtoCadastrado) {
+          const quantidadeRestante = (pesquisaProduto.quantidade - quantidadeCadastrada) + produtoCadastrado.quantidade
+        
           if (pesquisaProduto && quantidadeSolicitada > quantidadeRestante) {
             return `A quantidade inserida excede o limite permitido para ${pesquisaProduto.produto.descricao} (${quantidadeRestante}).`;
           }
         } else {
-          if (pesquisaProduto && quantidadeSolicitada > pesquisaProduto.quantidade) {
-            return `A quantidade inserida excede o limite permitido para ${pesquisaProduto.produto.descricao} (${pesquisaProduto.quantidade}).`;
+          const quantidadeRestante = (pesquisaProduto.quantidade - quantidadeCadastrada)
+          if (pesquisaProduto && quantidadeSolicitada > quantidadeRestante) {
+            
+            return `A quantidade inserida excede o limite permitido para ${pesquisaProduto.produto.descricao} (${quantidadeRestante}).`;
           }
         }
 
@@ -230,10 +258,6 @@ export default {
       });
       // Definir quantityValid corretamente
       this.quantityValid = this.quantityWarnings.every((warning) => warning === null);
-    },
-
-    sumQuantity(produtoId) {
-      return this.projects.filter((project) => project.produto.id === produtoId).reduce((soma, project) => soma + project.quantidade, 0);
     },
 
     formatPrice(val) {
@@ -254,6 +278,7 @@ export default {
     addItem() {
       this.currentItem.projetoProdutos.push({
         produto: {
+          id: null,
           descricao: "",
           epecificacao: "",
           precoMedio: 0,
@@ -264,8 +289,6 @@ export default {
         fimEntrega: null,
         total: 0,
       });
-
-      this.updateTotalGeral();
     },
     removeItem(index) {
       if (this.currentItem.projetoProdutos && this.currentItem.projetoProdutos.length > index) {
@@ -293,37 +316,63 @@ export default {
       }
     },
 
-    async getEstoque() {
-      if (!this.currentItem.projetoProdutos?.length || !this.researchs?.length) {
-        console.warn("Nenhum dado encontrado!");
-        return;
-      }
+    getEstoque() {
+      this.researchs.forEach((research) => {
+        const produtoId = research.produto.id
+        const produtosRelacionados = this.totalProjects.filter(p => p.produto.id === produtoId)
+        const quantidadeCadastrada = produtosRelacionados.reduce((soma, item) => soma + item.quantidade, 0)
+        const estoque = research.quantidade - quantidadeCadastrada
 
-      this.estoques.produto = [];
-      console.log(this.currentItem.projetoProdutos);
-      this.currentItem.projetoProdutos.forEach((project) => {
-        const research = this.researchs.find((r) => r.produto.id === project.produto.id);
+        this.estoque.set(produtoId, estoque)
+      })
 
-        if (research) {
-          this.estoques.produto.push({
-            id: project.produto.id,
-            quantidade: project.quantidade + research.quantidade,
-          });
-        }
-      });
-      console.log("ESTOQUE : ", this.estoques);
-      this.copiaEstoque = JSON.parse(JSON.stringify(this.estoques));
+      const produtosEliminados = new Map([...this.estoque].filter(([id, qtd]) => qtd === 0))
+      this.products = this.products.filter(p => !produtosEliminados.has(p.id))
+      console.log("MAP ESTOQUE: ", this.estoque)
     },
 
-    updateEstoque(quantidade, index) {
-      this.alterado = true;
+    // async getEstoque() {
 
-      // Garante que a quantidade não seja nula antes de atualizar
-      if (quantidade !== null && quantidade !== undefined) {
-        this.estoque(index, quantidade);
-        return this.estoques.produto[index].quantidade;
-      }
-    },
+
+    //   if (!this.currentItem.projetoProdutos?.length || !this.researchs?.length) {
+    //     console.warn("Nenhum dado encontrado!");
+    //     return;
+    //   }
+
+
+      
+    //   this.currentItem.projetoProdutos.forEach((project) => {
+    //     const produtosRelacionados = this.totalProjects.filter(p => p.produto.id === project.produto.id)
+    //     const quantidadeCadastrada = produtosRelacionados.reduce((soma, item) => soma + item.quantidade, 0)
+    //     const research = this.researchs.find((r) => r.produto.id === project.produto.id);
+    //     console.log("PROJETO PRODUTO: ",  project)
+    //     const existe = this.estoques.produto.some(produto => produto.id === project.produto.id)
+    //     if(!existe) {
+    //       console.log("EXISTE? ", existe)
+    //       console.log("PRODUTO? ", project.produto.id)
+    //       console.log("CAIU NA CONDIÇÃO DO EXISTE")
+    //       this.estoques.produto.push({
+    //         id: project?.produto?.id || null,
+    //         quantidade: research?.quantidade - quantidadeCadastrada || 0,
+    //       });
+    //     }
+          
+        
+    //   });
+    //   this.estoques.produto = this.estoques.produto.filter(produto => produto.id !== null)
+    //   console.log("ESTOQUE : ", this.estoques);
+    //   this.copiaEstoque = JSON.parse(JSON.stringify(this.estoques));
+    // },
+
+    // updateEstoque(quantidade, index) {
+    //   this.alterado = true;
+
+    //   // Garante que a quantidade não seja nula antes de atualizar
+    //   if (quantidade !== null && quantidade !== undefined) {
+    //     this.estoque(index, quantidade);
+    //     return this.estoques.produto[index].quantidade;
+    //   }
+    // },
 
     async getProducts() {
       try {
@@ -386,17 +435,43 @@ export default {
         this.projects = [];
       }
     },
+
+    async getTotalProjects() {
+      try {
+        const response = await axios.get('/public/projetos');
+        console.log(response.data); // Para ver a estrutura da resposta
+
+        // Verifica se response.data é um array
+        if (Array.isArray(response.data)) {
+          // Mapeia e extrai todos os projetoProdutos de cada projeto
+          const produtos = response.data.flatMap(projeto => projeto.projetoProdutos || []);
+
+          // Atualiza a variável reativa corretamente
+          this.totalProjects = produtos;
+          
+          console.log(this.totalProjects);
+        } else {
+          console.error("Formato inesperado da resposta:", response.data);
+          this.totalProjects = [];
+        }
+      } catch (error) {
+        console.error("Error: ", error);
+        this.totalProjects = [];
+      }
+    }
+
   },
   async mounted() {
-    this.getProducts(), this.getProductors(), this.getResearchs(), this.updateTotalGeral(), this.getProjects(), this.getEstoque();
-
+    this.getProducts(), this.getProductors(), this.getResearchs(), this.updateTotalGeral(), this.getProjects(), this.getTotalProjects();
     try {
-      await this.getResearchs();
-
-      this.getEstoque();
+      await this.getTotalProjects()
+      // this.estoques.produto = []
+      this.getEstoque()
+      // this.copiaEstoque = JSON.parse(JSON.stringify(this.estoques))
     } catch (error) {
-      console.error("Erro ao carregar os dados:", error);
+      console.error(error)
     }
+
   },
 
   // updated() {
@@ -434,5 +509,14 @@ export default {
 
 .flex-item-especificao {
   flex: 1 1 550px !important;
+}
+
+.v-menu .v-list-item {
+  font-size: 14px;
+  border-bottom: 2px solid #949494; /* Linha entre os itens */
+}
+
+.v-menu .v-list-item:last-child {
+  border-bottom: none; /* Remove a borda do último item */
 }
 </style>
