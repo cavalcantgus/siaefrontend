@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Configurações globais
 const api = axios.create({
-    baseURL: 'https://siaeserver.com', // URL base da API
+    baseURL: import.meta.env.VITE_API_BASE_URL || 'https://siaeserver.com', // URL base da API
     headers: {
         'Content-Type': 'application/json',
     },
