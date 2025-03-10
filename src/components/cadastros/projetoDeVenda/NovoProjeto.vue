@@ -335,6 +335,7 @@ export default {
             }
           }
         });
+        
       },
       deep: true,
     },
@@ -382,7 +383,7 @@ export default {
             (p) => p.id === pesquisaId
           );
 
-          this.getEstoque(index, pesquisaId, selectedPesquisa, quantity)
+          this.getEstoque(index, selectedPesquisa.produto.id, selectedPesquisa, quantity)
 
           if(this.projects.length < 1) {
             console.log("CAIU NA CONDIÇÂO")
@@ -395,7 +396,7 @@ export default {
 
           else {
             const produtosRelacionados = this.projects
-              .map(project => project.projetoProdutos.find(p => p.produto.id === pesquisaId))
+              .map(project => project.projetoProdutos.find(p => p.produto.id === selectedPesquisa.produto.id))
               .filter(Boolean); 
 
             const quantidadeCadastrada = produtosRelacionados.reduce((soma, item) => soma + item.quantidade, 0);
@@ -469,12 +470,16 @@ export default {
     },
 
     getEstoque(index, pesquisaId, selectedPesquisa, quantity) {
+      console.log("PRODUTO ID: ", pesquisaId)
       const produtosRelacionados = this.projects
         .map(project => project.projetoProdutos.find(p => p.produto.id === pesquisaId))
         .filter(Boolean); 
-
+      
+      console.log("PRODUTOS RELACIONADOS: ", produtosRelacionados)
       const quantidadeCadastrada = produtosRelacionados.reduce((soma, item) => soma + item.quantidade, 0);
+      console.log("QUANTIDADE CADASTRADA: ", quantidadeCadastrada)
       const quantidadeRestante = selectedPesquisa.quantidade - quantidadeCadastrada
+      console.log("QUANTIDADE RESTANTE: ", quantidadeRestante)
       if(quantity > quantidadeRestante) {
         this.items.estoque[index] = quantidadeRestante
       }
