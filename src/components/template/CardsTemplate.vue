@@ -5,6 +5,7 @@
     :color="color"
     :width="width"
     :height="height"
+    @click="onClick"
   >
     <v-card-text>
       <!-- Título principal -->
@@ -90,6 +91,11 @@ export default {
       type: String,
       default: "#57a340",
     },
+
+    onClick: {
+      type: Function,
+      default: null
+    }
   },
 };
 </script>
