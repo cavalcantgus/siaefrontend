@@ -234,21 +234,21 @@ export default {
       }
     },
 
-    // async deleteProduct(fields) {
-    //   const toast = useToast();
-    //   try {
-    //     const response = await axios.delete(`/public/produtos/produto/${fields.id}`, fields);
-    //     if (response.status !== 204) {
-    //       throw new Error(`Erro: `, response.status);
-    //     }
-    //     toast.success("Produto removido com sucesso!");
-    //   } catch (error) {
-    //     toast.error("Erro ao deletar produto: ", error);
-    //     console.error("Erro: ", error);
-    //   } finally {
-    //     this.getProducts();
-    //   }
-    // },
+    async deleteContrato(fields) {
+      const toast = useToast();
+      try {
+        const response = await axios.delete(`/public/contratos/contrato/${fields.id}`, fields);
+        if (response.status !== 204) {
+          throw new Error(`Erro: `, response.status);
+        }
+        toast.success("Contrato removido com sucesso!");
+      } catch (error) {
+        toast.error("Erro ao deletar contrato: ", error);
+        console.error("Erro: ", error);
+      } finally {
+        this.getContracts();
+      }
+    },
 
     downloadContrato(produtorId) {
       const url = `https://siaeserver.com/public/contratos/contrato/generate/${produtorId}`;
@@ -261,9 +261,9 @@ export default {
     },
 
     onDeleteRow(row) {
-      // console.log("Método chamado");
-      // this.deleteRow = { ...row };
-      // this.deleteProduct(this.deleteRow);
+      console.log("Método chamado");
+      this.deleteRow = { ...row };
+      this.deleteContrato(this.deleteRow);
     },
 
     onDownloadRow(row) {

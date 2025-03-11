@@ -68,7 +68,7 @@
                 <v-icon color="red">mdi-delete</v-icon>
               </ConfirmButton>
             </template>
-            <span>Clique para deletar um Contratante</span>
+            <span>Clique para deletar um Contrato</span>
           </v-tooltip>
         </template>
         <template v-slot:[`item.nome`]="{ item }">
@@ -130,6 +130,8 @@ import NovoContratante from './NovoContratante.vue';
 import EditContratante from "./EditContratante.vue";
 import { useToast } from "vue-toastification";
 import axios from "@/services/axios.js";
+import ConfirmButton from "../../template/ConfirmButton.vue";
+
 
 export default {
   name: "Contratante",
@@ -137,6 +139,7 @@ export default {
     BtnComeBack,
     NovoContratante,
     EditContratante,
+    ConfirmButton
   },
   data: () => ({
     selectedRow: {},
@@ -195,6 +198,23 @@ export default {
       }
     },
 
+
+    async deleteContrato(fields) {
+      const toast = useToast();
+      try {
+        const response = await axios.delete(`/public/contratantes/contratante/${fields.id}`, fields);
+        if (response.status !== 204) {
+          throw new Error(`Erro: `, response.status);
+        }
+        toast.success("Contratante removido com sucesso!");
+      } catch (error) {
+        toast.error("Erro ao deletar contratante: ", error);
+        console.error("Erro: ", error);
+      } finally {
+        this.getContratantes();
+      }
+    },
+
     async getContratantes() {
         try {
         const response = await axios.get("/public/contratantes");
@@ -216,6 +236,12 @@ export default {
     onSelectRow(row, dialog) {
       this.selectedRow = { ...row };
       this.dialog[dialog] = true;
+    },
+
+    onDeleteRow(row) {
+      console.log("Método chamado");
+      this.deleteRow = { ...row };
+      this.deleteContrato(this.deleteRow);
     },
 
   },

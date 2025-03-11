@@ -7,13 +7,13 @@
             <span>Produtor <span style="color: red">*</span></span>
           </template>
         </v-select>
-        <v-text-field density="compact" name="numero_contrato" label="N° do Contrato" v-model="currentItem.numeroContrato"  variant="outlined"></v-text-field>
+        <v-text-field density="compact" name="numero_contrato" label="N° do Contrato" v-model="currentItem.numeroContrato" variant="outlined"></v-text-field>
         <v-select class="flex-item-nome" :items="contratantes" item-title="nome" item-value="id" return-object density="compact" name="contratante" v-model="currentItem.contratante" variant="outlined" @update:model-value="getCpfContratante($event)" :rules="requiredField">
           <template v-slot:label>
             <span>Contratante <span style="color: red">*</span></span>
           </template>
-        </v-select>        
-        <v-text-field density="compact" name="cpf_contratante" label="CPF do Contratante" v-mask="'###.###.###-##'" v-model="cpfContratante"  variant="outlined"></v-text-field>
+        </v-select>
+        <v-text-field density="compact" name="cpf_contratante" label="CPF do Contratante" v-mask="'###.###.###-##'" v-model="cpfContratante" variant="outlined"></v-text-field>
         <v-text-field class="custom-date-field" density="compact" name="data_contratacao" v-model="currentItem.dataContratacao" variant="outlined" type="date" :rules="requiredField">
           <template v-slot:label>
             <span>Data da Contratação<span style="color: red">*</span></span>
@@ -58,6 +58,7 @@ export default {
   data: () => ({
     cpfContratante: null,
     contratantes: [],
+    contracts: [],
     isSubmitting: false,
     producers: [],
     requiredField: [(e) => (e !== null && e !== undefined && e !== "") || "Obrigatório"],
@@ -80,7 +81,7 @@ export default {
   },
   methods: {
     getCpfContratante(contratante) {
-      this.cpfContratante = contratante?.cpf
+      this.cpfContratante = contratante?.cpf;
     },
 
     resetState() {
@@ -126,29 +127,59 @@ export default {
 
     async getProducers() {
       try {
-        const response = await axios.get("/public/projetos")
-        this.producers = response.data.flatMap(
-          (item) => item.produtor || []
-        )
-        console.log(this.producers)
-      } catch(error) {
+        const response = await axios.get("/public/projetos");
+        this.producers = response.data.flatMap((item) => item.produtor || []);
+
+        // Obtém os IDs dos produtores que já possuem contratos
+        const contractedProducerIds = new Set(this.contracts.map((contract) => contract.produtor.id));
+
+        // Filtra apenas os produtores que NÃO estão na lista de contratos
+        this.producers = this.producers.filter((produtor) => !contractedProducerIds.has(produtor.id));
+
+        console.log(this.producers);
+      } catch (error) {
         console.log("Error: ", error);
         this.producers = [];
       }
     },
 
+    async getContracts() {
+      try {
+        const response = await axios.get("/public/contratos");
+        console.log(response.data);
+
+        if (Array.isArray(response.data)) {
+          this.contracts = response.data;
+          this.contracts.sort((a, b) => a.produtor.nome.localeCompare(b.produtor.nome));
+        } else {
+          console.log("A resposta da API não é um Array");
+          this.contracts = [];
+        }
+      } catch (error) {
+        console.log("Error: ", error);
+        this.contracts = [];
+      }
+    },
+
     async getContratantes() {
       try {
-        const response = await axios.get("/public/contratantes")
-        this.contratantes = response.data
-      } catch(error) {
+        const response = await axios.get("/public/contratantes");
+        this.contratantes = response.data;
+      } catch (error) {
         console.log("Error: ", error);
         this.contratantes = [];
       }
-    }
+    },
   },
-  mounted() {
-    this.getProducers(), this.getContratantes()
+  async mounted() {
+    this.getContratantes();
+    try {
+      await this.getContracts();
+
+      this.getProducers();
+    } catch (error) {
+      console.error(error);
+    }
   },
 };
 </script>
