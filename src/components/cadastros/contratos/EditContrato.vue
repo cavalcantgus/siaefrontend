@@ -2,19 +2,63 @@
   <div class="pa-4 pr-12 pl-12">
     <v-form @submit.prevent="localOnSubmit" ref="formRef">
       <div class="grid-container">
-        <v-select class="flex-item-nome" :items="producers" item-title="nome" item-value="id" return-object density="compact" name="produtor" v-model="currentItem.produtor" variant="outlined" :rules="requiredField">
+        <v-select
+          class="flex-item-nome"
+          :items="producers"
+          item-title="nome"
+          item-value="id"
+          return-object
+          density="compact"
+          name="produtor"
+          v-model="currentItem.produtor"
+          variant="outlined"
+          :rules="requiredField"
+        >
           <template v-slot:label>
             <span>Produtor <span style="color: red">*</span></span>
           </template>
         </v-select>
-        <v-text-field density="compact" name="numero_contrato" label="N° do Contrato" v-model="currentItem.numeroContrato" variant="outlined"></v-text-field>
-        <v-select class="flex-item-nome" :items="contratantes" item-title="nome" item-value="id" return-object density="compact" name="contratante" v-model="currentItem.contratante" variant="outlined" @update:model-value="getCpfContratante($event)" :rules="requiredField">
+        <v-text-field
+          density="compact"
+          name="numero_contrato"
+          label="N° do Contrato"
+          v-model="currentItem.numeroContrato"
+          variant="outlined"
+        ></v-text-field>
+        <v-select
+          class="flex-item-nome"
+          :items="contratantes"
+          item-title="nome"
+          item-value="id"
+          return-object
+          density="compact"
+          name="contratante"
+          v-model="currentItem.contratante"
+          variant="outlined"
+          @update:model-value="getCpfContratante($event)"
+          :rules="requiredField"
+        >
           <template v-slot:label>
             <span>Contratante <span style="color: red">*</span></span>
           </template>
         </v-select>
-        <v-text-field density="compact" name="cpf_contratante" label="CPF do Contratante" v-mask="'###.###.###-##'" v-model="cpfContratante" variant="outlined"></v-text-field>
-        <v-text-field class="custom-date-field" density="compact" name="data_contratacao" v-model="currentItem.dataContratacao" variant="outlined" type="date" :rules="requiredField">
+        <v-text-field
+          density="compact"
+          name="cpf_contratante"
+          label="CPF do Contratante"
+          v-mask="'###.###.###-##'"
+          v-model="cpfContratante"
+          variant="outlined"
+        ></v-text-field>
+        <v-text-field
+          class="custom-date-field"
+          density="compact"
+          name="data_contratacao"
+          v-model="currentItem.dataContratacao"
+          variant="outlined"
+          type="date"
+          :rules="requiredField"
+        >
           <template v-slot:label>
             <span>Data da Contratação<span style="color: red">*</span></span>
           </template>
@@ -26,10 +70,19 @@
         <v-tooltip location="top" :disabled="isFormValid">
           <template #activator="{ props }">
             <span v-bind="props">
-              <ConfirmButton :color="isFormValid ? 'success' : 'grey'" :onConfirm="localOnSubmit" :loading="isSubmitting" :disabled="!isFormValid || isSubmitting">Salvar</ConfirmButton>
+              <ConfirmButton
+                :color="isFormValid ? 'success' : 'grey'"
+                :onConfirm="localOnSubmit"
+                :loading="isSubmitting"
+                :disabled="!isFormValid || isSubmitting"
+                >Salvar</ConfirmButton
+              >
             </span>
           </template>
-          <span>Preencha todos os campos obrigatórios (*) para habilitar o botão</span>
+          <span
+            >Preencha todos os campos obrigatórios (*) para habilitar o
+            botão</span
+          >
         </v-tooltip>
       </v-col>
     </v-row>
@@ -56,7 +109,9 @@ export default {
     contratantes: [],
     isSubmitting: false,
     producers: [],
-    requiredField: [(e) => (e !== null && e !== undefined && e !== "") || "Obrigatório"],
+    requiredField: [
+      (e) => (e !== null && e !== undefined && e !== "") || "Obrigatório",
+    ],
   }),
   computed: {
     isFormValid() {
@@ -69,7 +124,7 @@ export default {
   },
   methods: {
     getCpfContratante(contratante) {
-      this.cpfContratante = contratante?.cpf
+      this.cpfContratante = contratante?.cpf;
     },
 
     validateCpf(cpf) {
@@ -110,25 +165,64 @@ export default {
       try {
         const response = await axios.get("/public/projetos");
         this.producers = response.data.flatMap((item) => item.produtor || []);
+
+        // Obtém os IDs dos produtores que já possuem contratos
+        const contractedProducerIds = new Set(
+          this.contracts.map((contract) => contract.produtor.id)
+        );
+
+        // Filtra apenas os produtores que NÃO estão na lista de contratos
+        this.producers = this.producers.filter(
+          (produtor) => !contractedProducerIds.has(produtor.id)
+        );
+        this.producers.sort((a, b) => a.nome.localeCompare(b.nome));
         console.log(this.producers);
       } catch (error) {
         console.log("Error: ", error);
         this.producers = [];
       }
     },
+
+    async getContracts() {
+      try {
+        const response = await axios.get("/public/contratos");
+        console.log(response.data);
+
+        if (Array.isArray(response.data)) {
+          this.contracts = response.data;
+        } else {
+          console.log("A resposta da API não é um Array");
+          this.contracts = [];
+        }
+      } catch (error) {
+        console.log("Error: ", error);
+        this.contracts = [];
+      }
+    },
+
     async getContratantes() {
       try {
         const response = await axios.get("/public/contratantes");
         this.contratantes = response.data;
+        this.contratantes.sort((a, b) =>
+          a.produtor.nome.localeCompare(b.produtor.nome)
+        );
       } catch (error) {
         console.log("Error: ", error);
         this.contratantes = [];
       }
     },
   },
-  mounted() {
+  async mounted() {
     this.getProducers(), this.getContratantes();
-    this.cpfContratante = this.currentItem?.contratante?.cpf
+    try {
+      await this.getContracts();
+
+      this.getProducers();
+    } catch (error) {
+      console.error(error);
+    }
+    this.cpfContratante = this.currentItem?.contratante?.cpf;
   },
 };
 </script>
@@ -158,7 +252,9 @@ export default {
   max-width: 200px !important;
 }
 
-:deep(.custom-date-field input[type="date"]::-webkit-calendar-picker-indicator) {
+:deep(
+    .custom-date-field input[type="date"]::-webkit-calendar-picker-indicator
+  ) {
   position: absolute;
   right: 10px;
   z-index: 1;

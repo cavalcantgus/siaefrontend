@@ -150,7 +150,6 @@ export default {
 
         if (Array.isArray(response.data)) {
           this.contracts = response.data;
-          this.contracts.sort((a, b) => a.produtor.nome.localeCompare(b.produtor.nome));
         } else {
           console.log("A resposta da API não é um Array");
           this.contracts = [];
