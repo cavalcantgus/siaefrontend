@@ -7,6 +7,7 @@
             <span>Produtor <span style="color: red">*</span></span>
           </template>
         </v-select>
+        <v-text-field density="compact" name="numero_contrato" label="N° do Contrato" v-model="currentItem.numeroContrato" variant="outlined"></v-text-field>
         <v-select class="flex-item-nome" :items="contratantes" item-title="nome" item-value="id" return-object density="compact" name="contratante" v-model="currentItem.contratante" variant="outlined" @update:model-value="getCpfContratante($event)" :rules="requiredField">
           <template v-slot:label>
             <span>Contratante <span style="color: red">*</span></span>

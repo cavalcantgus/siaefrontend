@@ -135,7 +135,7 @@ export default {
 
         // Filtra apenas os produtores que NÃO estão na lista de contratos
         this.producers = this.producers.filter((produtor) => !contractedProducerIds.has(produtor.id));
-
+        this.producers.sort((a, b) => a.nome.localeCompare(b.nome))
         console.log(this.producers);
       } catch (error) {
         console.log("Error: ", error);
@@ -165,6 +165,7 @@ export default {
       try {
         const response = await axios.get("/public/contratantes");
         this.contratantes = response.data;
+        this.contratantes.sort((a, b) => a.nome.localeCompare(b.nome))
       } catch (error) {
         console.log("Error: ", error);
         this.contratantes = [];
