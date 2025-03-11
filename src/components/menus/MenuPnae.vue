@@ -1,28 +1,25 @@
 <template>
   <div class="main">
     <NavBar class="navbar"></NavBar>
-    <BtnComeBack ></BtnComeBack>
+    <BtnComeBack></BtnComeBack>
     <div class="container">
-      <v-row dense class="justify-center" align="center" wrap>
-        <v-col
-          v-for="(card, index) in cardTitles"
-          :key="index"
-          cols="12" sm="6" md="3" lg="3" xl="3"
-        >
+      <v-row dense class="justify-start" align="center" wrap>
+        <v-col v-for="(card, index) in cardTitles" :key="index" cols="12" sm="6" md="3" lg="3" xl="3">
           <CardsTemplate
-          class="txt_program"
-          :key="index"
-          :title="card.title"
-          :route="card.route"
-          width="250px"
-          height="150px"
-          :customClass="{
-            card: 'card',
-            sysName: 'sys-name',
-            programName: 'program-name',
-            accessCard: 'access-card',
-          }"
-        ></CardsTemplate>
+            class="txt_program"
+            :key="index"
+            :title="card.title"
+            route="/menu-pnae"
+            width="250px"
+            height="150px"
+            :customClass="{
+              card: 'card',
+              sysName: 'sys-name',
+              programName: 'program-name',
+              accessCard: 'access-card',
+            }"
+            :onClick="() => route(card.route)"
+          ></CardsTemplate>
         </v-col>
       </v-row>
     </div>
@@ -30,32 +27,112 @@
 </template>
 
 <script>
-import NavBar from '../NavBar.vue';
-import CardsTemplate from '../template/CardsTemplate.vue';
-import BtnComeBack from '../template/BtnComeBack.vue';
+import NavBar from "../NavBar.vue";
+import CardsTemplate from "../template/CardsTemplate.vue";
+import BtnComeBack from "../template/BtnComeBack.vue";
+import services from "@/services/utilsFunc.js";
+import { useToast } from "vue-toastification";
+
 export default {
-  name: 'MenuPnae.vue',
+  name: "MenuPnae.vue",
   components: {
-    NavBar, CardsTemplate, BtnComeBack
+    NavBar,
+    CardsTemplate,
+    BtnComeBack,
   },
   data: () => ({
     pendingUsers: 3,
-    items: [],  
+    items: [],
     cardTitles: [
-        {title: 'PRODUTORES', route: "/cadastro-produtor"}, 
-        {title: 'PRODUTOS', route: "/cadastro-produto"}, 
-        {title: 'PESQUISA DE PREÇO', route: "/pesquisa-de-preco"}, 
-        {title: 'PAUTA DA CHAMADA', route: "/pauta-da-chamada"}, 
-       {title: 'PROJETO DE VENDA', route: "/projeto-de-venda"}, 
-        {title: 'CRONOGRAMA DE ENTREGA', route: "/cadastro-produtor"}, 
-        {title: 'COMPROVANTE DE RECEBIMENTO', route: "/comprovante"}, 
-        {title: 'CONTRATOS', route: "/contrato"}
+      { title: "PRODUTORES", route: "/cadastro-produtor" },
+      { title: "PRODUTOS", route: "/cadastro-produto" },
+      { title: "PESQUISA DE PREÇO", route: "/pesquisa-de-preco" },
+      { title: "PAUTA DA CHAMADA", route: "/pauta-da-chamada" },
+      { title: "PROJETO DE VENDA", route: "/projeto-de-venda" },
+      { title: "CRONOGRAMA DE ENTREGA", route: "/cadastro-produtor" },
+      { title: "COMPROVANTE DE RECEBIMENTO", route: "/comprovante" },
+      { title: "CONTRATOS", route: "/contrato" },
+      { title: "RELATÓRIOS", route: "/relatorio" },
     ],
+    role: services.getRoleFromToken(),
   }),
   methods: {
-    
+    route(route) {
+      console.log("Chamou o método");
+      const toast = useToast();
+      console.log(this.role);
+
+      switch (route) {
+        case "/cadastro-produtor":
+          if (this.role.toLowerCase() === "admin") {
+            this.$router.push("/cadastro-produtor");
+          } else {
+            toast.error("Você precisa de permissão de Administrador para acessar essa página.");
+          }
+          break;
+
+        case "/cadastro-produto":
+          if (this.role.toLowerCase() === "admin") {
+            this.$router.push("/cadastro-produto");
+          } else {
+            toast.error("Você precisa de permissão de Administrador para acessar essa página.");
+          }
+          break;
+
+        case "/pesquisa-de-preco":
+          if (this.role.toLowerCase() === "admin") {
+            this.$router.push("/pesquisa-de-preco");
+          } else {
+            toast.error("Você precisa de permissão de Administrador para acessar essa página.");
+          }
+          break;
+
+        case "/pauta-da-chamada":
+          if (this.role.toLowerCase() === "admin") {
+            this.$router.push("/pauta-da-chamada");
+          } else {
+            toast.error("Você precisa de permissão de Administrador para acessar essa página.");
+          }
+          break;
+
+        case "/projeto-de-venda":
+          if (this.role.toLowerCase() === "admin") {
+            this.$router.push("/projeto-de-venda");
+          } else {
+            toast.error("Você precisa de permissão de Administrador para acessar essa página.");
+          }
+          break;
+
+        case "/comprovante":
+          if (this.role.toLowerCase() === "admin") {
+            this.$router.push("/comprovante");
+          } else {
+            toast.error("Você precisa de permissão de Administrador para acessar essa página.");
+          }
+          break;
+
+        case "/contrato":
+          if (this.role.toLowerCase() === "admin" || this.role.toLowerCase() === "cpl") {
+            this.$router.push("/contrato");
+          } else {
+            toast.error("Você precisa de permissão de Administrador para acessar essa página.");
+          }
+          break;
+
+        case "/relatorio":
+          if (this.role.toLowerCase() === "admin") {
+            this.$router.push("/relatorio");
+          } else {
+            toast.error("Você precisa de permissão de Administrador para acessar essa página.");
+          }
+          break;
+
+        default:
+          toast.error("Rota inválida.");
+      }
+    },
   },
-}
+};
 </script>
 
 <style scoped>
@@ -65,7 +142,7 @@ export default {
   justify-content: flex-start;
 }
 
-:deep(.container ){
+:deep(.container) {
   display: flex;
   flex-direction: row;
   margin-top: 10;
@@ -109,7 +186,7 @@ export default {
   font-weight: bold;
   width: 100%;
   max-height: 30px;
-  justify-self:center;
+  justify-self: center;
   margin-top: 30px;
   margin-right: 0;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
@@ -120,5 +197,4 @@ export default {
 .access-program:hover {
   transform: scale(0.9);
 }
-
 </style>

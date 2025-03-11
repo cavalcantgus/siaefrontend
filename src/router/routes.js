@@ -13,6 +13,7 @@ const routes = [
     { path: '/projeto-de-venda', name: 'ProjetoDeVenda', component: () => import("@/components/cadastros/projetoDeVenda/ProjetoDeVenda.vue")},
     { path: '/comprovante', name: 'Entrega', component: () => import("@/components/cadastros/entrega/Entrega.vue")},
     { path: '/contrato', name: 'Contrato', component: () => import("@/components/cadastros/contratos/RelacoesContratuais.vue")},
+    { path: '/relatorio', name: 'Relatorio', component: () => import("@/components/cadastros/relatorios/Relatorios.vue")},
     { path: '/', redirect: '/login'},
 ];
 

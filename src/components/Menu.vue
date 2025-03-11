@@ -14,12 +14,13 @@
           program: 'program',
           accessProgram: 'access-program',
         }"
+        @click="route"
       >
       </CardsTemplate>
       <CardsTemplate
         main-title="Sistema Integrado de Alimentação Escolar"
         sysTitle="PNAE"
-        route="/menu-pnae"
+        route="/menu"
         width="350px"
         height="250px"
         :customClass="{
@@ -28,6 +29,7 @@
           program: 'program',
           accessProgram: 'access-program',
         }"
+        :onClick="route"
       >
       </CardsTemplate>
     </div>
@@ -55,9 +57,10 @@ export default {
   }),
   methods: {
     route() {
+      console.log("Chamou o método")
       const toast = useToast()
       console.log(this.role)
-      if(this.role.toLowerCase() === "admin") {
+      if(this.role.toLowerCase() === "admin" || this.role.toLowerCase() === "cpl") {
         this.$router.push("/menu-pnae");
       } else {
         toast.error("Você não tem permissões para acessar esta página.")
