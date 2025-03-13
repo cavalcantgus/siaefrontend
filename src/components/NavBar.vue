@@ -36,11 +36,18 @@ export default {
                 ],
             },
 
+            cpl: {
+                notifications: [],
+                profileItems: [
+                    { title: "Meu Perfil", icon: "mdi-account-outline", to: "/profile" },
+                    { title: "Sair", icon: "mdi-logout", action: "logout" },
+                ],
+            },
+
             pendente: {
                 notifications: [],
                 profileItems: [
                     { title: "Meu Perfil", icon: "mdi-account-outline", to: "/profile" },
-                    { title: "Dashboard", icon: "mdi-view-dashboard", to: "/admin" },
                     { title: "Sair", icon: "mdi-logout", action: "logout" },
                 ],
             }
