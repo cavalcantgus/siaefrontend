@@ -20,7 +20,7 @@
       <CardsTemplate
         main-title="Sistema Integrado de Alimentação Escolar"
         sysTitle="PNAE"
-        route="/menu"
+        route="/menu-pnae"
         width="350px"
         height="250px"
         :customClass="{
@@ -29,7 +29,6 @@
           program: 'program',
           accessProgram: 'access-program',
         }"
-        :onClick="route"
       >
       </CardsTemplate>
     </div>
