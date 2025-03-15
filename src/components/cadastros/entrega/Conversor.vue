@@ -51,8 +51,8 @@ export default {
     },
     methods: {
         converter() { 
-            const multi = this.produto1.precoMedio * this.quantidade
-            this.result = (multi / this.produto2.precoMedio).toFixed(2)
+            const multi = this.produto2.precoMedio * this.quantidade
+            this.result = (multi / this.produto1.precoMedio).toFixed(2)
         },
 
         async getProducts() {
@@ -60,6 +60,7 @@ export default {
                 const { data } = await axios.get("public/pesquisas")
                 this.products = data
                 console.log("Pesquisas: ", this.products)
+                this.products.sort((a, b) => a.produto.descricao.localeCompare(b.produto.descricao))
             } catch (error) {
                 console.error("Erro: ", error)
             }
