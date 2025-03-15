@@ -607,7 +607,7 @@ export default {
 }
 
 .v-menu .v-list-item:last-child {
-  border-bottom: none; /* Remove a borda do último item */
+  border-bottom: none !important; /* Remove a borda do último item */
 }
 
 </style>

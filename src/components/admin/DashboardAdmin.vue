@@ -19,58 +19,59 @@
 
     <!-- Conteúdo Principal -->
     <v-main class="pa-5">
-      <v-container >
+      <v-container>
         <h1 class="dashboard-title">Dashboard de Administrador</h1>
         <v-row justify="center mt-5">
-            <v-col cols="5">
-                <v-text-field
-                class=""
-                density="compact"
-                variant="outlined"
-                hide-details
-                rounded
-                label="Pesquisar"
-                :append-inner-icon="'mdi-magnify'"
-                clearable
-              />
-            </v-col>
+          <v-col cols="5">
+            <v-text-field class="" density="compact" variant="outlined" hide-details rounded label="Pesquisar" :append-inner-icon="'mdi-magnify'" clearable />
+          </v-col>
         </v-row>
         <v-row justify="start">
-            <v-col
-              cols="auto"
-              class="pa-0 mr-4"
-            >
-              <span class="status-text">Usuários</span>
-              <div class="d-flex align-center">
-                <v-icon small color="primary" left>mdi-account-check</v-icon>
-                <div class="d-flex flex-column ml-3 status-text align-start">
-                  <span
-                    
-                    class="text-xs font-weight-medium"
-                  >
-                    {{ this.users.length }}
-                    {{ this.users.length === 1 ? "Usuário" : "Usuários" }} cadastrado(s)
-                  </span>
-                </div>
+          <v-col cols="auto" class="pa-0 mr-4">
+            <span class="status-text">Usuários</span>
+            <div class="d-flex align-center">
+              <v-icon small color="primary" left>mdi-account-check</v-icon>
+              <div class="d-flex flex-column ml-3 status-text align-start">
+                <span class="text-xs font-weight-medium">
+                  {{ this.users.length }}
+                  {{ this.users.length === 1 ? "Usuário" : "Usuários" }} cadastrado(s)
+                </span>
               </div>
-            </v-col>
+            </div>
+          </v-col>
         </v-row>
         <v-data-table :items="filteredUsers" :headers="headers" class="fill-height d-flex flex-column mt-9" fixed-header :items-per-page="-1" mobile-breakpoint="600">
-            <template v-slot:[`item.options`]="{ index}">
-                <v-select 
-                style="position: absolute; margin-top: -15px; margin-bottom: -10px;" 
-                placeholder="Selecione algo" max-width="160px" 
-                v-model="this.pendingUsersList[index].selectedRole"
-                min-width="160px" bg-color="blue" :items="options" 
-                item-title="title" item-value="value" density="compact" 
-                variant="outlined" 
-                rounded 
-                class="elevation-0" 
-                item-color="green"
-                @update:model-value="handleSelectionChange(index, $event)">
-                <v-btn v-if="selectedRow === index" color="green" class="mt-2">Salvar</v-btn>
+          <template v-slot:[`item.options`]="{ index }">
+            <v-select
+              style="position: absolute; margin-top: -20px"
+              placeholder="Selecione algo"
+              max-width="160px"
+              v-model="this.pendingUsersList[index].selectedRole"
+              min-width="160px"
+              bg-color="blue"
+              :items="options"
+              item-title="title"
+              item-value="value"
+              density="compact"
+              variant="outlined"
+              rounded
+              class="elevation-0"
+              item-color="green"
+              @update:model-value="handleSelectionChange(index, $event)"
+            >
             </v-select>
-            </template>
+
+          </template>
+          <template v-slot:[`item.save`]="{item, index }">
+            <v-tooltip location="top">
+              <template #activator="{ props }">
+                <v-btn icon size="x-small" :color="selectedRow === index ? 'green':'grey'" v-bind="props" style="align-items: center;" @click="onSelectRow(item)">
+                    <v-icon>mdi-check-bold</v-icon>
+                </v-btn>
+              </template>
+              <span>Clique para salvar a alteração</span>
+            </v-tooltip>
+          </template>
         </v-data-table>
       </v-container>
     </v-main>
@@ -89,6 +90,7 @@ export default {
   data: () => ({
     selectedRow: null,
     selectedValue: null,
+    selectedItem: {},
     drawer: true,
     users: [],
     pendingUsersList: [],
@@ -96,15 +98,16 @@ export default {
       { title: "Nome do Usuário", align: "center", sortable: true, value: "username" },
       { title: "Email do Usuário", align: "center", sortable: true, value: "email" },
       { title: "Status", align: "center", sortable: true, value: "roles" },
-      { title: "Atualizar", align: "center", sortable: true, value: "options"}
+      { title: "Atualizar", align: "center", sortable: true, value: "options" },
+      { text: "Salvar", align: "center", value: "save", width: "50px" },
     ],
     options: [
-        {title: "PENDENTE", value: "PENDENTE"},
-        {title: "ADMIN", value: "ADMIN"},
-        {title: "CPL", value: "CPL"},
-        {title: "PRODUTOR", value: "PRODUTOR"},
-        {title: "SECRETÁRIO", value: "SECRETÁRIO"},
-    ]
+      { title: "PENDENTE", value: "PENDENTE" },
+      { title: "ADMIN", value: "ADMIN" },
+      { title: "CPL", value: "CPL" },
+      { title: "PRODUTOR", value: "PRODUTOR" },
+      { title: "SECRETÁRIO", value: "SECRETÁRIO" },
+    ],
   }),
   computed: {
     filteredUsers() {
@@ -112,26 +115,27 @@ export default {
         ...user,
         roles: user.roles.map((role) => role.name).join(),
         selected: false,
-        selectedRole: ""
+        selectedRole: "",
       }));
     },
   },
   methods: {
     handleSelectionChange(index, value) {
-        console.log(value)
-        if(this.selectedRow !== null && this.selectedRow !== index) {
-            console.log("Caiu na condição")
-            this.pendingUsersList[this.selectedRow].selected = false
-            this.pendingUsersList[this.selectedRow].selectedRole = "Selecione algo"
-            console.log(this.selectedRow)
-            console.log(this.pendingUsersList[this.selectedRow].selected)
-        }
+      console.log(value);
+      if (this.selectedRow !== null && this.selectedRow !== index) {
+        console.log("Caiu na condição");
+        this.pendingUsersList[this.selectedRow].selected = false;
+        this.pendingUsersList[this.selectedRow].selectedRole = "Selecione algo";
+        console.log(this.selectedRow);
+        console.log(this.pendingUsersList[this.selectedRow].selected);
+      }
 
-        this.selectedRow = index
-        this.pendingUsersList[this.selectedRow].selected = true
-        this.pendingUsersList[this.selectedRow].selectedRole = value
-        console.log(index)
-        console.log(this.pendingUsersList[index].selected)
+      this.selectedRow = index;
+      this.pendingUsersList[this.selectedRow].selected = true;
+      this.pendingUsersList[this.selectedRow].selectedRole = value;
+      this.selectedValue = value
+      console.log(index);
+      console.log(this.pendingUsersList[index].selected);
     },
 
     async getPendingUsers() {
@@ -146,14 +150,35 @@ export default {
         console.error("Error: ", error);
       }
     },
-    
+
     async getUsers() {
+      try {
+        const { data } = await axios.get("public/users");
+        this.users = data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async updateUser(fields) {
+        console.log("ID: ", fields.user.id)
         try {
-            const { data } = await axios.get("public/users")
-            this.users = data
+            const response = await axios.put(`public/users/${fields.user.id}`, fields)
+            if(response !== 200) {
+                throw new Error("Aconteceu um erro")
+            }
         } catch (error) {
-            console.error(error)
+            console.error("Erro: ", error)
         }
+    },
+    
+    onSelectRow(row) {
+        this.selectedItem = JSON.parse(JSON.stringify({...row}))
+        const fields = {
+            user: this.selectedItem,
+            role: this.selectedValue
+        }
+        this.updateUser(fields)
     }
   },
   mounted() {
@@ -196,5 +221,4 @@ export default {
   line-height: 1.1;
   font-weight: bold;
 }
-
 </style>

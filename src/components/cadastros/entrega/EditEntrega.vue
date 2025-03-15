@@ -4,18 +4,17 @@
       <div class="grid-container">
         <v-row class="ml-1 w-100">
           <v-col cols="12" sm="6" md="4" lg="11" xl="12">
-            <v-select
-              density="compact"
-              name="producer"
-              :items="producers"
-              item-title="nome"
-              item-value="id"
-              return-object
-              v-model="currentItem.produtor"
-              variant="outlined"
-              :rules="requiredField"
-              clearable
-            >
+            <v-select 
+            density="compact" 
+            name="producer" 
+            :items="producers" 
+            item-title="nome" 
+            item-value="id" 
+            return-object 
+            v-model="currentItem.produtor" 
+            variant="outlined" 
+            :rules="requiredField" 
+            clearable>
               <template v-slot:label>
                 <span>Produtor <span style="color: red">*</span></span>
               </template>
@@ -25,101 +24,62 @@
 
         <v-row class="w-100" style="margin-top: -50px; margin-left: -8px">
           <v-col cols="11">
-            <v-btn
-              size="30px"
-              icon
-              style="margin-left: -26px; margin-bottom: -85px"
-              color="primary"
-              @click="addItem"
+            <v-btn 
+            size="30px" 
+            icon style="margin-left: -26px; margin-bottom: -85px" 
+            color="primary" 
+            @click="addItem"
             >
               <v-icon left size="20px">mdi-plus</v-icon>
             </v-btn>
-            <div
-              v-for="(entrega, index) in currentItem.detalhesEntrega"
-              :key="index"
-              class="grid-second-container"
-            >
-              <v-col cols="4" class="">
-                <v-select
-                  :color="isDuplicate ? 'error' : ''"
-                  density="compact"
-                  :items="products"
-                  item-title="descricao"
-                  item-value="id"
-                  return-object
-                  v-model="entrega.produto"
-                  variant="outlined"
-                  :rules="requiredField"
-                  clearable
-                >
+            <div v-for="(entrega, index) in currentItem.detalhesEntrega" :key="index" 
+            class="grid-second-container
+            ">
+              <v-col cols="3">
+                <v-select item-color="green" 
+                :color="isDuplicate ? 'error' : ''" 
+                density="compact" 
+                :items="products" 
+                item-title="descricao" 
+                item-value="id" 
+                return-object 
+                v-model="entrega.produto" 
+                variant="outlined" 
+                :rules="requiredField" 
+                clearable>
                   <template v-slot:label>
                     <span>Produto <span style="color: red">*</span></span>
+                  </template>
+
+                  <template v-slot:item="{ props, item }">
+                    <v-list-item v-bind="props">
+                      <v-row class="d-flex justify-space-between align-start">
+                        <v-col class="text-right text-start" >
+                          <strong>{{"Estoque: " + estoque.get(item.raw.id)}}</strong>
+                        </v-col>
+                      </v-row>
+                    </v-list-item>
                   </template>
                 </v-select>
               </v-col>
               <v-col cols="2">
-                <v-text-field
-                  density="compact"
-                  label="Unidade"
-                  v-model="entrega.produto.unidade"
-                  variant="outlined"
-                  disabled
-                ></v-text-field>
+                <v-text-field density="compact" label="Unidade" v-model="entrega.produto.unidade" variant="outlined" disabled></v-text-field>
               </v-col>
               <v-col cols="2">
-                <v-text-field
-                  density="compact"
-                  label="Preço Médio"
-                  v-model="entrega.produto.precoMedio"
-                  variant="outlined"
-                  disabled
-                ></v-text-field>
+                <v-text-field density="compact" label="Preço Médio" v-model="entrega.produto.precoMedio" variant="outlined" disabled></v-text-field>
               </v-col>
               <v-col cols="2">
-                <vuetify-money
-                  density="compact"
-                  label="Quantidade"
-                  :options="options"
-                  v-model="entrega.quantidade"
-                  variant="outlined"
-                  :disabled="isDuplicate"
-                ></vuetify-money>
+                <vuetify-money density="compact" label="Quantidade" :options="options" v-model="entrega.quantidade" variant="outlined" :disabled="isDuplicate"></vuetify-money>
               </v-col>
 
-              <v-btn
-                v-if="currentItem.detalhesEntrega.length > 1"
-                size="30px"
-                icon
-                color="error"
-                style="margin-top: 15px"
-                @click="removeItem(index)"
-              >
+              <v-btn v-if="currentItem.detalhesEntrega.length > 1" size="30px" icon color="error" style="margin-top: 15px" @click="removeItem(index)">
                 <v-icon size="20px">mdi-delete</v-icon>
               </v-btn>
-              <v-alert
-                v-if="quantityWarnings[index]"
-                color="error"
-                class="mt-2 mb-6 ml-4"
-                density="compact"
-                min-width="50px"
-                style="font-size: 0.6rem; height: 80px; font-weight: bold;"
-              >
+              <v-alert v-if="quantityWarnings[index]" color="error" class="mt-2 mb-6 ml-4" density="compact" min-width="50px" style="font-size: 0.6rem; height: 80px; font-weight: bold">
                 {{ quantityWarnings[index] }}
               </v-alert>
-              <span
-                v-if="isDuplicate"
-                class="text-start text-error ml-3"
-                style="
-                  font-size: 0.8rem;
-                  font-weight: bold;
-                  width: 100%;
-                  margin-top: -25px;
-                  margin-bottom: 20px;
-                "
-              >
-                {{
-                  `Itens duplicados. Por favor, remova-os, ou escolha outro.`
-                }}
+              <span v-if="isDuplicate" class="text-start text-error ml-3" style="font-size: 0.8rem; font-weight: bold; width: 100%; margin-top: -25px; margin-bottom: 20px">
+                {{ `Itens duplicados. Por favor, remova-os, ou escolha outro.` }}
               </span>
             </div>
           </v-col>
@@ -128,16 +88,7 @@
           <v-col cols="4">
             <v-tooltip location="end">
               <template #activator="{ props }">
-                <v-text-field
-                  v-bind="props"
-                  max-width="170px"
-                  density="compact"
-                  name="dataDaEntrega"
-                  type="date"
-                  v-model="currentItem.dataDaEntrega"
-                  variant="outlined"
-                  :rules="requiredField"
-                >
+                <v-text-field v-bind="props" max-width="170px" density="compact" name="dataDaEntrega" type="date" v-model="currentItem.dataDaEntrega" variant="outlined" :rules="requiredField">
                   <template v-slot:label>
                     <span>Data Da Entrega</span>
                     <span style="color: red">*</span>
@@ -159,19 +110,10 @@
         <v-tooltip location="top" :disabled="isFormValid">
           <template #activator="{ props }">
             <span v-bind="props">
-              <ConfirmButton
-                :color="isFormValid ? 'success' : 'grey'"
-                :onConfirm="localOnSubmit"
-                :loading="isSubmitting"
-                :disabled="!isFormValid || isSubmitting"
-                >Salvar</ConfirmButton
-              >
+              <ConfirmButton :color="isFormValid ? 'success' : 'grey'" :onConfirm="localOnSubmit" :loading="isSubmitting" :disabled="!isFormValid || isSubmitting">Salvar</ConfirmButton>
             </span>
           </template>
-          <span
-            >Preencha todos os campos obrigatórios (*) para habilitar o
-            botão</span
-          >
+          <span>Preencha todos os campos obrigatórios (*) para habilitar o botão</span>
         </v-tooltip>
       </v-col>
     </v-row>
@@ -183,6 +125,7 @@ import ConfirmButton from "../../template/ConfirmButton.vue";
 import axios from "@/services/axios.js";
 import { useToast } from "vue-toastification";
 import UtilsService from "../../../services/utilsService";
+import { id } from "vuetify/locale";
 
 export default {
   name: "NovoProduto",
@@ -200,6 +143,7 @@ export default {
     },
   },
   data: () => ({
+    estoque: new Map(),
     totalGeral: 0,
     unidade: "",
     precoMedio: "",
@@ -227,9 +171,7 @@ export default {
     },
     quantityWarnings: [],
     quantityValid: true,
-    requiredField: [
-      (e) => (e !== null && e !== undefined && e !== "") || "Obrigatório",
-    ],
+    requiredField: [(e) => (e !== null && e !== undefined && e !== "") || "Obrigatório"],
   }),
   watch: {
     dialogAtivo(newValue) {
@@ -239,10 +181,16 @@ export default {
     },
 
     "currentItem.produtor": {
-      handler() {
-        this.getProducts();
-        this.getProofs()
-        this.getProjects();
+      async handler() {
+       try {
+        await this.getProducts();
+        await this.getProofs();
+        await this.getProjects();
+
+        this.estoqueProdutos();
+       } catch (error) {
+        console.error(error)
+       }
       },
 
       deep: true,
@@ -267,86 +215,82 @@ export default {
         this.updateTotalGeral();
 
         // Verifica duplicidade após atualização
-        this.isDuplicate = newVal.some((item, index) =>
-          newVal.some(
-            (otherItem, otherIndex) =>
-              index !== otherIndex &&
-              item.produto &&
-              otherItem.produto &&
-              item.produto.id === otherItem.produto.id
-          )
-        );
+        this.isDuplicate = newVal.some((item, index) => newVal.some((otherItem, otherIndex) => index !== otherIndex && item.produto && otherItem.produto && item.produto.id === otherItem.produto.id));
       },
       deep: true,
     },
   },
   computed: {
     isFormValid() {
-      const areItemsProductsValid = this.currentItem.detalhesEntrega.every(
-        (item) => item.produto
-      );
-      return !!(
-        this.currentItem.produtor &&
-        areItemsProductsValid &&
-        this.quantityValid &&
-        !this.isDuplicate
-      );
+      const areItemsProductsValid = this.currentItem.detalhesEntrega.every((item) => item.produto);
+      return !!(this.currentItem.produtor && areItemsProductsValid && this.quantityValid && !this.isDuplicate);
     },
   },
   methods: {
     validateQuantity() {
       if (!this.projects.length) {
-        console.warn(
-          "Tentando validar quantidade antes dos projetos carregarem."
-        );
+        console.warn("Tentando validar quantidade antes dos projetos carregarem.");
         return;
       }
 
       this.quantityValid = true;
-      this.quantityWarnings = this.currentItem.detalhesEntrega.map(
-        (entrega, index) => {
-          const produtoId = entrega.produto.id;
-          console.log("PRODUTO ID: ", produtoId)
-          const quantity = entrega.quantidade || 0;
+      this.quantityWarnings = this.currentItem.detalhesEntrega.map((entrega, index) => {
+        const produtoId = entrega.produto.id;
+        console.log("PRODUTO ID: ", produtoId);
+        const quantity = entrega.quantidade || 0;
 
-          if (!produtoId) return null;
+        if (!produtoId) return null;
 
-          const selectedProjetoProduto = this.projects.find(
-            (p) => p.produto.id === produtoId
-          );
+        const selectedProjetoProduto = this.projects.find((p) => p.produto.id === produtoId);
 
-          const quantityDelivered = this.sumQuantity(produtoId)
-          const remainingQuantity = selectedProjetoProduto.quantidade - quantityDelivered
-         
+        const produtoCadastrado = this.proofs.find((proof) => proof.produto.id === produtoId);
+
+        if (produtoCadastrado) {
           if (!selectedProjetoProduto) {
-            console.log(
-              `Produto com ID ${produtoId} não encontrado em projects.`
-            );
+            console.log(`Produto com ID ${produtoId} não encontrado em projects.`);
             return `Produto com ID ${produtoId} não encontrado.`;
           }
+
+          const quantityDelivered = this.sumQuantity(produtoId);
+          const remainingQuantity = selectedProjetoProduto.quantidade - quantityDelivered;
+
           console.log("Pesquisa: ", selectedProjetoProduto);
 
           if (quantity > remainingQuantity) {
             this.quantityValid = false;
-            return `A quantidade inserida excede o limite restante permitido para ${selectedProjetoProduto.produto.descricao} (${remainingQuantity}).`;
+            return `Limite máximo de entrega para ${selectedProjetoProduto.produto.descricao} (${remainingQuantity}).`;
           }
-          this.quantityValid = true;
-          return null;
+        } else {
+          if (!selectedProjetoProduto) {
+            console.log(`Produto com ID ${produtoId} não encontrado em projects.`);
+            return `Produto com ID ${produtoId} não encontrado.`;
+          }
+
+          const quantityDelivered = selectedProjetoProduto.quantidade;
+          
+          console.log("Pesquisa: ", selectedProjetoProduto);
+
+          if (quantity > quantityDelivered) {
+            this.quantityValid = false;
+            return `Limite máximo de entrega para ${selectedProjetoProduto.produto.descricao} (${quantityDelivered}).`;
+          }
         }
-      );
+
+        this.quantityValid = true;
+        return null;
+      });
     },
 
     sumQuantity(produtoId) {
       console.log("PROOFS: ", this.proofs);
-      const entregaAnterior = this.proofs.find((e) => e.produto.id === produtoId)
-      console.log("ENTREGA ANTERIOR: ", entregaAnterior)
-      const quantidadeAnterior = entregaAnterior.quantidade
+      const entregaAnterior = this.proofs.find((e) => e.produto.id === produtoId);
+      console.log("ENTREGA ANTERIOR: ", entregaAnterior);
 
       if (this.proofs.length !== 0) {
-        const quantityDelivered = this.proofs
-          .filter((proof) => proof.produto.id === produtoId)
-          .reduce((soma, proof) => soma + proof.quantidade, 0);
+        const quantidadeAnterior = entregaAnterior?.quantidade;
+        const quantityDelivered = this.proofs.filter((proof) => proof.produto.id === produtoId).reduce((soma, proof) => soma + proof.quantidade, 0);
 
+        console.log("Quantidade Entregue: ", quantityDelivered);
         return quantityDelivered - quantidadeAnterior;
       } else {
         return null;
@@ -385,10 +329,7 @@ export default {
       // this.validateQuantity();
     },
     removeItem(index) {
-      if (
-        this.currentItem.detalhesEntrega &&
-        this.currentItem.detalhesEntrega.length > index
-      ) {
+      if (this.currentItem.detalhesEntrega && this.currentItem.detalhesEntrega.length > index) {
         this.currentItem.detalhesEntrega.splice(index, 1);
         // this.updateTotalGeral(); // Atualiza o total geral após remoção
         // this.validateQuantity(); // Revalida as quantidades
@@ -396,11 +337,31 @@ export default {
     },
 
     resetState() {
-      console.log("Método chamado")
+      console.log("Método chamado");
       Object.keys(this.currentItem).forEach((key) => {
         this.currentItem[key] = null;
       });
     },
+
+    estoqueProdutos() {
+      this.projects.forEach((project) => {
+        const produtoId = project.produto.id
+        const produtosRelacionados = this.proofs.filter((proof) => proof.produto.id === produtoId)
+        if(!produtosRelacionados) {
+          const estoque = project.quantidade
+          this.estoque.set(produtoId, estoque)
+        }
+
+        const quantidadeCadastrada = produtosRelacionados.reduce((soma, item) => soma + item.quantidade, 0)
+        const estoque = project.quantidade - quantidadeCadastrada
+
+        this.estoque.set(produtoId, estoque)
+      });
+
+      const produtosEliminados = new Map([...this.estoque].filter(([id, qtd]) => qtd === 0))
+      this.products = this.products.filter(p => !produtosEliminados.has(p.id))
+    },
+
     async localOnSubmit() {
       try {
         const fields = {
@@ -416,9 +377,7 @@ export default {
 
     async getProjects() {
       try {
-        const response = await axios.get(
-          `/public/projetos/projeto/${this.currentItem.produtor.id}`
-        );
+        const response = await axios.get(`/public/projetos/projeto/${this.currentItem.produtor.id}`);
         console.log(response.data);
 
         const { projetoProdutos } = response.data;
@@ -432,9 +391,7 @@ export default {
 
     async getProducts() {
       try {
-        const response = await axios.get(
-          `/public/projetos/projeto/${this.currentItem.produtor.id}`
-        );
+        const response = await axios.get(`/public/projetos/projeto/${this.currentItem.produtor.id}`);
         console.log(response.data);
 
         this.products = [];
@@ -458,14 +415,10 @@ export default {
           return;
         }
 
-        const response = await axios.get(
-          `/public/comprovantes/comprovante/${this.currentItem.produtor.id}`
-        );
+        const response = await axios.get(`/public/comprovantes/comprovante/${this.currentItem.produtor.id}`);
 
         if (Array.isArray(response.data)) {
-          this.proofs = response.data.flatMap(
-            (item) => item.detalhesEntrega || []
-          );
+          this.proofs = response.data.flatMap((item) => item.detalhesEntrega || []);
         } else {
           console.log("A resposta da API não é um Array");
           this.proofs = [];
@@ -490,12 +443,18 @@ export default {
       }
     },
   },
-  mounted() {
-    this.getProjects(),
-      this.getProductors(),
-      this.getProducts(),
-      this.getProofs();
-    // this.updateTotalGeral();
+  async mounted() {
+    this.getProjects(), this.getProductors(), this.getProducts(), this.getProofs();
+
+    try {
+        await this.getProducts();
+        await this.getProofs();
+        await this.getProjects();
+
+        this.estoqueProdutos();
+       } catch (error) {
+        console.error(error)
+       }
   },
 };
 </script>
@@ -526,5 +485,14 @@ export default {
 
 .flex-item-especificao {
   flex: 1 1 550px !important;
+}
+
+.v-menu .v-list-item {
+  font-size: 14px;
+  border-bottom: 2px solid #949494; /* Linha entre os itens */
+}
+
+.v-menu .v-list-item:last-child {
+  border-bottom: none; /* Remove a borda do último item */
 }
 </style>
