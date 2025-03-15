@@ -69,7 +69,7 @@
                 <v-text-field density="compact" label="Preço Médio" v-model="entrega.produto.precoMedio" variant="outlined" disabled></v-text-field>
               </v-col>
               <v-col cols="2">
-                <vuetify-money density="compact" label="Quantidade" :options="options" v-model="entrega.quantidade" variant="outlined" :disabled="isDuplicate"></vuetify-money>
+                <vuetify-money density="compact" label="Quantidade" :options="options" v-model="entrega.quantidade" variant="outlined" :disabled="isDuplicate" :rules="requiredField"></vuetify-money>
               </v-col>
 
               <v-btn v-if="currentItem.detalhesEntrega.length > 1" size="30px" icon color="error" style="margin-top: 15px" @click="removeItem(index)">
@@ -223,7 +223,8 @@ export default {
   computed: {
     isFormValid() {
       const areItemsProductsValid = this.currentItem.detalhesEntrega.every((item) => item.produto);
-      return !!(this.currentItem.produtor && areItemsProductsValid && this.quantityValid && !this.isDuplicate);
+      const areItemsProductsQuantityValid = this.currentItem.detalhesEntrega.every((item) => item.quantidade);
+      return !!(this.currentItem.produtor && areItemsProductsValid && this.quantityValid && !this.isDuplicate && areItemsProductsQuantityValid);
     },
   },
   methods: {

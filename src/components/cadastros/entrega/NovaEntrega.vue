@@ -66,7 +66,7 @@
                 <v-text-field density="compact" name="precoMedio" label="Preço Médio" v-model="items.itemsProducts[index].precoMedio" variant="outlined" disabled></v-text-field>
               </v-col>
               <v-col cols="2">
-                <vuetify-money density="compact" name="quantidade" label="Quantidade" :options="options" v-model="items.itemsQuantity[index]" variant="outlined" :disabled="isDuplicate"></vuetify-money>
+                <vuetify-money density="compact" name="quantidade" label="Quantidade" :options="options" v-model="items.itemsQuantity[index]" variant="outlined" :disabled="isDuplicate" :rules="requiredField"></vuetify-money>
               </v-col>
 
               <v-btn v-if="items.itemsProducts.length > 1" size="30px" icon color="error" style="margin-top: 15px" @click="removeItem(index)">
