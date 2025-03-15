@@ -3,8 +3,16 @@
     <v-form @submit.prevent="localOnSubmit" ref="formRef">
       <div class="grid-container">
         <v-row class="ml-1 w-100">
-          <v-col cols="11">
-            <v-select density="compact" name="producer" :items="producers" item-title="nome" item-value="id" v-model="currentItem.produtorId" variant="outlined" :rules="requiredField" clearable>
+          <v-col cols="12" sm="6" md="4" lg="11" xl="12">
+            <v-select density="compact" 
+            name="producer" 
+            :items="producers" 
+            item-title="nome" 
+            item-value="id" 
+            v-model="currentItem.produtorId" 
+            variant="outlined" 
+            :rules="requiredField" 
+            clearable>
               <template v-slot:label>
                 <span>Produtor <span style="color: red">*</span></span>
               </template>
@@ -14,14 +22,40 @@
 
         <v-row class="w-100" style="margin-top: -50px; margin-left: -8px">
           <v-col cols="11">
-            <v-btn size="30px" icon style="margin-left: -26px; margin-bottom: -85px" color="primary" @click="addItem">
+            <v-btn size="30px" 
+            icon 
+            style="margin-left: -26px; margin-bottom: -85px" 
+            color="primary" 
+            @click="addItem">
               <v-icon left size="20px">mdi-plus</v-icon>
             </v-btn>
-            <div v-for="(produtoId, index) in items.itemsProducts" :key="index" class="grid-second-container">
-              <v-col cols="4">
-                <v-select :color="isDuplicate ? 'error' : ''" density="compact" name="product" :items="products" item-title="descricao" item-value="id" v-model="items.itemsProducts[index].produtoId" variant="outlined" :rules="requiredField" clearable>
+            <div 
+            v-for="(produtoId, index) in items.itemsProducts" :key="index" 
+            class="grid-second-container"
+            >
+              <v-col cols="3">
+                <v-select item-color="green"
+                :color="isDuplicate ? 'error' : ''" 
+                density="compact" 
+                name="product" 
+                :items="products" 
+                item-title="descricao" 
+                item-value="id" 
+                v-model="items.itemsProducts[index].produtoId" 
+                variant="outlined" :rules="requiredField" 
+                clearable>
                   <template v-slot:label>
                     <span>Produto <span style="color: red">*</span></span>
+                  </template>
+
+                  <template v-slot:item="{ props, item }">
+                    <v-list-item v-bind="props">
+                      <v-row class="d-flex justify-space-between align-start">
+                        <v-col class="text-right text-start">
+                          <strong>{{ "Estoque: " + estoque.get(item.raw.id) }}</strong>
+                        </v-col>
+                      </v-row>
+                    </v-list-item>
                   </template>
                 </v-select>
               </v-col>
@@ -32,7 +66,7 @@
                 <v-text-field density="compact" name="precoMedio" label="Preço Médio" v-model="items.itemsProducts[index].precoMedio" variant="outlined" disabled></v-text-field>
               </v-col>
               <v-col cols="2">
-                <vuetify-money density="compact" name="quantidade" label="Quantidade" :options="options" v-model="items.itemsQuantity[index]" variant="outlined" :disabled="isDuplicate"></vuetify-money>
+                <vuetify-money density="compact" name="quantidade" label="Quantidade" :options="options" v-model="items.itemsQuantity[index]" variant="outlined" :disabled="isDuplicate" :rules="requiredField"></vuetify-money>
               </v-col>
 
               <v-btn v-if="items.itemsProducts.length > 1" size="30px" icon color="error" style="margin-top: 15px" @click="removeItem(index)">
@@ -43,6 +77,9 @@
               </v-alert>
               <span v-if="isDuplicate" class="text-start text-error ml-3" style="font-size: 0.8rem; font-weight: bold; width: 100%; margin-top: -25px; margin-bottom: 20px">
                 {{ `Itens duplicados. Por favor, remova-os, ou escolha outro.` }}
+              </span>
+              <span class="text-center" style="font-size: 0.8rem; font-weight: bold; display: inline-block; text-align: left !important; width: 100%; margin-top: 60px; margin-left: 743px; position: absolute">
+                {{ `Estoque: ${items.estoque[index] || 0}` }}
               </span>
             </div>
           </v-col>
@@ -102,6 +139,7 @@ export default {
     },
   },
   data: () => ({
+    estoque: new Map(),
     totalGeral: 0,
     isSubmitting: false,
     isDuplicate: false,
@@ -118,6 +156,7 @@ export default {
         },
       ],
       itemsQuantity: [],
+      estoque: [],
     },
     options: {
       decimal: ",",
@@ -143,17 +182,23 @@ export default {
           item.produtoId = null;
         });
 
-        await this.getProducts();
-        await this.getProjects();
-        await this.getProofs()
+        try {
+          await this.getProducts();
+          await this.getProjects();
+          await this.getProofs();
 
+          this.estoqueProdutos();
+
+        } catch (error) {
+          console.error(error);
+        }
       },
       deep: true,
     },
 
     "items.itemsProducts": {
       handler(newVal) {
-        // this.validateQuantity();
+        this.validateQuantity();
         this.updateTotalGeral();
         newVal.forEach((item, index) => {
           if (item && item.produtoId) {
@@ -185,7 +230,10 @@ export default {
   computed: {
     isFormValid() {
       const areItemsProductsValid = this.items.itemsProducts.every((item) => item.produtoId && item.unidade && item.precoMedio);
-      return !!(this.currentItem.produtorId && areItemsProductsValid && this.quantityValid && !this.isDuplicate && this.currentItem.dataEntrega);
+      const areItemsQuantityValid = this.items.itemsQuantity.every(
+        (item) => item !== null && item !== undefined && item !== 0 && item !== "" && item !== "0" && item !== "0.00" && parseFloat(item) > 0 // Garante que valores numéricos positivos sejam aceitos
+      );
+      return !!(this.currentItem.produtorId && areItemsProductsValid && areItemsQuantityValid && this.quantityValid && !this.isDuplicate && this.currentItem.dataEntrega);
     },
   },
   methods: {
@@ -201,10 +249,12 @@ export default {
         const produtoId = projeto.produtoId;
 
         const quantity = this.items.itemsQuantity[index] || 0;
-      
+
         if (!produtoId) return null;
 
         const selectedProduto = this.projects.find((p) => p.produto.id === produtoId);
+
+        this.getEstoque(produtoId, selectedProduto, index, quantity);
 
         if (!selectedProduto) {
           console.log(`Produto com ID ${produtoId} não encontrado em projects.`);
@@ -212,7 +262,8 @@ export default {
         }
 
         const quantityDelivered = this.sumQuantity(produtoId);
-
+        console.log("Quantidade: ", quantityDelivered);
+        console.log("PROJETO QUANTIDADE: ", selectedProduto);
         const remainingQuantity = selectedProduto.quantidade - quantityDelivered;
 
         if (quantity > remainingQuantity) {
@@ -225,7 +276,7 @@ export default {
     },
 
     sumQuantity(produtoId) {
-      console.log("PROOFS: ", this.proofs)
+      console.log("PROOFS: ", this.proofs);
       if (this.proofs.length !== 0) {
         const quantityDelivered = this.proofs.filter((proof) => proof.produto.id === produtoId).reduce((soma, proof) => soma + proof.quantidade, 0);
 
@@ -266,6 +317,45 @@ export default {
       Object.keys(this.currentItem).forEach((key) => {
         this.currentItem[key] = null;
       });
+    },
+
+    estoqueProdutos() {
+      if(!this.products) {
+        console.warn("Nenhum projeto encontrado")
+      }
+      this.projects.forEach((project) => {
+        const produtoId = project.produto.id;
+        console.log("PRODUTO ID: ", produtoId)
+        const produtosRelacionados = this.proofs.filter((proof) => proof.produto.id === produtoId);
+        console.log("PRODUTOS RELACIONADOS: ", produtosRelacionados)
+        if (!produtosRelacionados) {
+          const estoque = project.quantidade;
+          this.estoque.set(produtoId, estoque);
+        }
+
+        const quantidadeCadastrada = produtosRelacionados.reduce((soma, item) => soma + item.quantidade, 0);
+        const estoque = project.quantidade - quantidadeCadastrada;
+
+        this.estoque.set(produtoId, estoque);
+      });
+
+      const produtosEliminados = new Map([...this.estoque].filter(([id, qtd]) => qtd === 0))
+      this.products = this.products.filter(p => !produtosEliminados.has(p.id))
+    },
+
+    getEstoque(produtoId, selectedProjetoProduto, index, quantity) {
+      const produtosRelacionados = this.proofs.filter((proof) => proof.produto.id === produtoId);
+      console.log("PRODUTOS RELACIONADOS: ", produtosRelacionados);
+      const quantidadeCadastrada = produtosRelacionados.reduce((soma, item) => soma + item.quantidade, 0);
+      console.log("QUANTIDADE CADASTRADA: ", quantidadeCadastrada);
+      const quantidadeRestante = selectedProjetoProduto.quantidade - quantidadeCadastrada;
+      console.log("QUANTIDADE RESTANTE: ", quantidadeRestante);
+
+      if (quantity > quantidadeRestante) {
+        this.items.estoque[index] = quantidadeRestante;
+      } else {
+        this.items.estoque[index] = quantidadeRestante - quantity;
+      }
     },
 
     async localOnSubmit() {
@@ -368,8 +458,8 @@ export default {
     this.getProjects(), this.getProductors(), this.getProducts(), this.getProofs();
   },
   onUpdated() {
-    this.validateQuantity()
-  }
+    this.validateQuantity();
+  },
 };
 </script>
 
@@ -399,5 +489,14 @@ export default {
 
 .flex-item-especificao {
   flex: 1 1 550px !important;
+}
+
+.v-menu .v-list-item {
+  font-size: 14px;
+  border-bottom: 2px solid #949494; /* Linha entre os itens */
+}
+
+.v-menu .v-list-item:last-child {
+  border-bottom: none; /* Remove a borda do último item */
 }
 </style>
