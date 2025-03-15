@@ -361,6 +361,7 @@ export default {
 
       const produtosEliminados = new Map([...this.estoque].filter(([id, qtd]) => qtd === 0))
       this.products = this.products.filter(p => !produtosEliminados.has(p.id))
+      this.products.sort((a, b) => a.descricao.localeCompare(b.descricao))
     },
 
     async localOnSubmit() {
@@ -438,6 +439,7 @@ export default {
         console.log(response.data);
 
         this.producers = response.data;
+        this.producers.sort((a, b) => a.nome.localeCompare(b.nome))
       } catch (error) {
         console.log("Error: ", error);
         this.producers = [];

@@ -104,7 +104,7 @@ export default {
           break;
 
         case "/comprovante":
-          if (this.role.toLowerCase() === "admin") {
+          if (this.role.toLowerCase() === "admin" || this.role.toLowerCase() === "central") {
             this.$router.push("/comprovante");
           } else {
             toast.error("Você precisa de permissão de Administrador para acessar essa página.");
