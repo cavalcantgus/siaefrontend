@@ -31,9 +31,9 @@
               </v-tooltip>
             </v-col>
           </v-row>
-          <v-row justify="start" class="ml-0 mb-1" style="margin-top: -20px;">
-          <v-col class="button-group mr-4" align="start" cols="auto">
-              <v-tooltip location="end">
+          <v-row justify="start" class="ml-0 mb-1" style="margin-top: -20px">
+            <v-col class="button-group mr-4" align="start" cols="auto">
+              <v-tooltip location="top">
                 <template #activator="{ props }">
                   <v-btn color="primary" class="elevation-3 compact-btn ml-3" min-width="25%" @click="dialog.download = true" v-bind="props">
                     <v-icon small class="compact-icon" left>mdi-plus</v-icon>
@@ -43,20 +43,25 @@
                 <span>Clique para gerar relatórios</span>
               </v-tooltip>
             </v-col>
-        </v-row>
-        <v-row class="mb-5 pl-1 ml-4">
-            <v-col
-              cols="auto"
-              class="pa-0 mr-4"
-            >
+            <v-col class="button-group mr-4" align="start" cols="auto">
+              <v-tooltip location="top">
+                <template #activator="{ props }">
+                  <v-btn color="primary" class="elevation-3 compact-btn ml-3" min-width="25%" @click="dialog.converter = true" v-bind="props">
+                    <v-icon small class="compact-icon" left>mdi-swap-horizontal</v-icon>
+                    <div class="d-flex flex-column compact-btn-text" style="font-size: 0.6rem"><span>Calculadora</span></div>
+                  </v-btn>
+                </template>
+                <span>Clique para gerar relatórios</span>
+              </v-tooltip>
+            </v-col>
+          </v-row>
+          <v-row class="mb-5 pl-1 ml-4">
+            <v-col cols="auto" class="pa-0 mr-4">
               <span class="status-text">Entregas</span>
               <div class="d-flex align-center">
                 <v-icon small color="primary" left>mdi-account-check</v-icon>
                 <div class="d-flex flex-column ml-3 status-text align-start">
-                  <span
-                    
-                    class="text-xs font-weight-medium"
-                  >
+                  <span class="text-xs font-weight-medium">
                     {{ this.proofs.length }}
                     {{ this.proofs.length === 1 ? "Entrega" : "Entregas" }} cadastrada(s)
                   </span>
@@ -65,7 +70,7 @@
             </v-col>
           </v-row>
         </template>
-       
+
         <template v-slot:[`item.edit`]="{ item }">
           <v-tooltip location="top">
             <template #activator="{ props }">
@@ -148,6 +153,19 @@
           <RelatorioMensal :onSubmit="downloadRelatorioMensal"></RelatorioMensal>
         </v-card>
       </v-dialog>
+
+      <v-dialog v-model="dialog.converter">
+        <v-card class="card-form align-self-center" width="65%">
+          <v-card-title class="sticky-title title-border">
+            <h3 class="report">Conversor</h3>
+            <v-spacer></v-spacer>
+            <v-btn icon class="btn-close elevation-0" @click="dialog.converter = !dialog.converter">
+              <v-icon prepend> mdi-close </v-icon>
+            </v-btn>
+          </v-card-title>
+          <Conversor :onSubmit="downloadRelatorioMensal"></Conversor>
+        </v-card>
+      </v-dialog>
     </v-col>
   </v-row>
 </template>
@@ -163,6 +181,7 @@ import UtilsService from "../../../services/utilsService";
 import BtnComeBack from "../../template/BtnComeBack.vue";
 import ConfirmButton from "../../template/ConfirmButton.vue";
 import RelatorioMensal from "./RelatorioMensal.vue";
+import Conversor from "./Conversor.vue";
 
 export default {
   name: "CadastroProdutor",
@@ -174,12 +193,14 @@ export default {
     BtnComeBack,
     ConfirmButton,
     RelatorioMensal,
+    Conversor,
   },
   data: () => ({
     dialog: {
       create: false,
       update: false,
       download: false,
+      converter: false,
     },
     search: "",
     singleExpand: false,
@@ -222,8 +243,8 @@ export default {
     },
 
     downloadRelatorioMensal(fields) {
-      console.log(fields)
-      const { mes, ano } = fields 
+      console.log(fields);
+      const { mes, ano } = fields;
       const url = `https://siaeserver.com/public/comprovantes/relatorio/mensal/generate/${mes}/${ano}`;
       window.location.href = url; // Redireciona o navegador e força o download
     },
@@ -235,7 +256,7 @@ export default {
 
         if (Array.isArray(response.data)) {
           this.proofs = response.data;
-          this.proofs.sort((a, b) => a.produtor.nome.localeCompare(b.produtor.nome))
+          this.proofs.sort((a, b) => a.produtor.nome.localeCompare(b.produtor.nome));
         } else {
           console.log("A resposta da API não é um Array");
           this.proofs = [];
@@ -272,7 +293,7 @@ export default {
         const response = await axios.put(`/public/comprovantes/comprovante/${fields.id}`, fields);
 
         console.log(response.data);
-        console.log(response)
+        console.log(response);
 
         if (response.status !== 200) {
           throw new Error(`Erro: ${response.status}`);
@@ -290,13 +311,13 @@ export default {
     async deleteProof(fields) {
       const toast = useToast();
       try {
-        const response = await axios.delete(`/public/projetos/projeto/${fields.id}`, fields);
+        const response = await axios.delete(`/public/comprovantes/comprovante/${fields.id}`, fields);
         if (response.status !== 204) {
           throw new Error(`Erro: `, response.status);
         }
-        toast.success("Projeto removido com sucesso!");
+        toast.success("Comprovante removido com sucesso!");
       } catch (error) {
-        toast.error("Erro ao deletar produto: ", error);
+        toast.error("Erro ao deletar comprovante: ", error);
         console.error("Erro: ", error);
       } finally {
         this.getProofs();
@@ -311,7 +332,7 @@ export default {
     onDeleteRow(row) {
       console.log("Método chamado");
       this.selectedRow = { ...row };
-      this.deleteProject(this.selectedRow);
+      this.deleteProof(this.selectedRow);
     },
 
     onDownloadRow(row) {
