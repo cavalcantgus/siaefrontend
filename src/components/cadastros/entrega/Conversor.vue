@@ -1,12 +1,12 @@
 <template>
   <div class="pa-4 pr-12 pl-12">
     <div class="grid-container">
-      <v-select density="compact" name="produtoA" :items="products" item-title="produto.descricao" item-value="produto.id" v-model="produto1" return-object variant="outlined" :rules="requiredField" clearable>
+      <v-select max-width="250" min-width="250" density="compact" name="produtoA" :items="products" item-title="produto.descricao" item-value="produto.id" v-model="produto1" return-object variant="outlined" :rules="requiredField" clearable>
         <template v-slot:label>
           <span>Produto Cadastrado <span style="color: red">*</span></span>
         </template>
       </v-select>
-      <v-select density="compact" name="produtoB" :items="products" item-title="produto.descricao" item-value="produto.id" v-model="produto2" return-object variant="outlined" :rules="requiredField" clearable>
+      <v-select max-width="250" min-width="250" density="compact" name="produtoB" :items="products" item-title="produto.descricao" item-value="produto.id" v-model="produto2" return-object variant="outlined" :rules="requiredField" clearable>
         <template v-slot:label>
           <span>Produto A Ser Entregue <span style="color: red">*</span></span>
         </template>
@@ -15,11 +15,14 @@
     </div>
     <span class="font-weight-bold">Resultado: {{ result }}</span>
     <v-row class="justify-end dense pt-6">
+      <v-col class="text-start">
+        <v-btn color="error" @click="clear">Limpar</v-btn>
+      </v-col>
       <v-col class="text-end">
         <v-tooltip location="top" :disabled="isFormValid">
           <template #activator="{ props }">
             <span v-bind="props">
-              <v-btn :color="isValid ? 'green':'grey'" @click="converter" :disabled="!isValid">Converter</v-btn>
+              <v-btn :color="isValid ? 'green' : 'grey'" @click="converter" :disabled="!isValid">Converter</v-btn>
             </span>
           </template>
           <span>Preencha todos os campos obrigatórios (*) para habilitar o botão</span>
@@ -33,48 +36,51 @@
 import axios from "@/services/axios.js";
 
 export default {
-    name: 'Conversor',
-    data: () => ({
-        produto1: null,
-        produto2: null,
-        quantidade: null,
-        products: [],
-        result: 0,
+  name: "Conversor",
+  data: () => ({
+    produto1: null,
+    produto2: null,
+    quantidade: null,
+    products: [],
+    result: 0,
 
-        requiredField: [(e) => (e !== null && e !== undefined && e !== "") || "Obrigatório"],
-
-    }),
-    computed: {
-        isValid() {
-            return !!(this.produto1 && this.produto2 && this.quantidade)
-        }
+    requiredField: [(e) => (e !== null && e !== undefined && e !== "") || "Obrigatório"],
+  }),
+  computed: {
+    isValid() {
+      return !!(this.produto1 && this.produto2 && this.quantidade);
     },
-    methods: {
-        converter() { 
-            const multi = this.produto2.precoMedio * this.quantidade
-            this.result = (multi / this.produto1.precoMedio).toFixed(2)
-        },
-
-        async getProducts() {
-            try {
-                const { data } = await axios.get("public/pesquisas")
-                this.products = data
-                console.log("Pesquisas: ", this.products)
-                this.products.sort((a, b) => a.produto.descricao.localeCompare(b.produto.descricao))
-            } catch (error) {
-                console.error("Erro: ", error)
-            }
-        }
+  },
+  methods: {
+    clear() {
+      this.produto1 = null
+      this.produto2 = null
+      this.quantidade = null
     },
-    mounted() {
-        this.getProducts()
-    }
-}
 
+    converter() {
+      const multi = this.produto2.precoMedio * this.quantidade;
+      this.result = (multi / this.produto1.precoMedio).toFixed(2);
+    },
+
+    async getProducts() {
+      try {
+        const { data } = await axios.get("public/pesquisas");
+        this.products = data;
+        console.log("Pesquisas: ", this.products);
+        this.products.sort((a, b) => a.produto.descricao.localeCompare(b.produto.descricao));
+      } catch (error) {
+        console.error("Erro: ", error);
+      }
+    },
+  },
+  mounted() {
+    this.getProducts();
+  },
+};
 </script>
 
 <style scoped>
-
 .grid-container {
   display: flex;
   flex-wrap: wrap;
