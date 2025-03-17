@@ -96,7 +96,7 @@ export default {
           break;
 
         case "/projeto-de-venda":
-          if (this.role.toLowerCase() === "admin") {
+          if (this.role.toLowerCase() === "admin" || this.role.toLowerCase() === "cpl") {
             this.$router.push("/projeto-de-venda");
           } else {
             toast.error("Você precisa de permissão de Administrador para acessar essa página.");
