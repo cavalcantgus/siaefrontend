@@ -22,28 +22,24 @@
             <v-col class="button-group mr-4" align="end">
               <v-tooltip top>
                 <template v-slot:activator="{ on, attrs }">
-                  <v-btn color="success" class="elevation-3 compact-btn ml-3" min-width="25%" @click="dialog.create = true" v-bind="attrs" v-on="on">
+                  <v-btn color="success" class="elevation-3 compact-btn ml-3" min-width="25%" @click="dialog.create = true" v-bind="attrs" v-on="on" :disabled="!isAllowed">
                     <v-icon small class="compact-icon" left>mdi-plus</v-icon>
                     <div class="d-flex flex-column compact-btn-text" style="font-size: 0.6rem"><span>Novo</span> <span>Projeto</span></div>
                   </v-btn>
                 </template>
-                <span>Clique para adicionar um projeto</span>
+                <template v-slot:default>
+                  <span>{{ isAllowed ? "Clique para adicionar um projeto" : "Você não tem permissões para executar esta ação" }}</span>
+                </template>
               </v-tooltip>
             </v-col>
           </v-row>
           <v-row class="mb-5 pl-1 ml-4">
-            <v-col
-              cols="auto"
-              class="pa-0 mr-4"
-            >
+            <v-col cols="auto" class="pa-0 mr-4">
               <span class="status-text">Projetos</span>
               <div class="d-flex align-center">
                 <v-icon small color="primary" left>mdi-account-check</v-icon>
                 <div class="d-flex flex-column ml-3 status-text align-start">
-                  <span
-                    
-                    class="text-xs font-weight-medium"
-                  >
+                  <span class="text-xs font-weight-medium">
                     {{ this.projects.length }}
                     {{ this.projects.length === 1 ? "Projeto" : "Projetos" }} cadastrado(s)
                   </span>
@@ -55,7 +51,7 @@
         <template v-slot:[`item.edit`]="{ item }">
           <v-tooltip location="top">
             <template #activator="{ props }">
-              <v-btn icon v-bind="props" @click="onSelectRow(item, 'update')" class="elevation-0">
+              <v-btn icon v-bind="props" @click="onSelectRow(item, 'update')" class="elevation-0" :disabled="!isAllowed">
                 <v-icon color="green">mdi-pencil</v-icon>
               </v-btn>
             </template>
@@ -65,7 +61,7 @@
         <template v-slot:[`item.delete`]="{ item }">
           <v-tooltip location="top">
             <template #activator="{ props }">
-              <ConfirmButton icon v-bind="props" :onConfirm="() => onDeleteRow(item)" class="elevation-0">
+              <ConfirmButton icon v-bind="props" :onConfirm="() => onDeleteRow(item)" class="elevation-0" :disabled="!isAllowed">
                 <v-icon color="red">mdi-delete</v-icon>
               </ConfirmButton>
             </template>
@@ -79,7 +75,7 @@
                 <v-icon color="primary">mdi-download</v-icon>
               </ConfirmButton>
             </template>
-            <span>Clique para deletar um Projeto</span>
+            <span>Clique para baixar um Projeto</span>
           </v-tooltip>
         </template>
         <template v-slot:[`item.dataProjeto`]="{ item }">
@@ -135,6 +131,7 @@ import { useToast } from "vue-toastification";
 import UtilsService from "../../../services/utilsService";
 import BtnComeBack from "../../template/BtnComeBack.vue";
 import ConfirmButton from "../../template/ConfirmButton.vue";
+import services from "@/services/utilsFunc.js";
 
 export default {
   name: "CadastroProdutor",
@@ -147,6 +144,7 @@ export default {
     ConfirmButton,
   },
   data: () => ({
+    role: services.getRoleFromToken(),
     dialog: {
       create: false,
       update: false,
@@ -169,6 +167,7 @@ export default {
     selectedRow: {},
     deleteRow: {},
     expanded: [],
+    isAllowed: false,
   }),
   computed: {
     filteredProjects() {
@@ -198,7 +197,7 @@ export default {
 
         if (Array.isArray(response.data)) {
           this.projects = response.data;
-          this.projects.sort((a, b) => a.produtor.nome.localeCompare(b.produtor.nome))
+          this.projects.sort((a, b) => a.produtor.nome.localeCompare(b.produtor.nome));
         } else {
           console.log("A resposta da API não é um Array");
           this.projects = [];
@@ -235,7 +234,7 @@ export default {
         const response = await axios.put(`/public/projetos/projeto/${fields.id}`, fields);
 
         console.log(response.data);
-        console.log(response)
+        console.log(response);
 
         if (response.status !== 200) {
           throw new Error(`Erro: ${response.status}`);
@@ -285,6 +284,14 @@ export default {
   },
   mounted() {
     this.getProjects();
+    try {
+      console.log("ROLE: ", this.role);
+      if (this.role.toLowerCase() === "admin") {
+        this.isAllowed = true;
+      }
+    } catch (error) {
+      console.error(error);
+    }
   },
 };
 </script>
