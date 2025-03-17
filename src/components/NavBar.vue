@@ -50,6 +50,14 @@ export default {
                     { title: "Meu Perfil", icon: "mdi-account-outline", to: "/profile" },
                     { title: "Sair", icon: "mdi-logout", action: "logout" },
                 ],
+            },
+
+            central: {
+                notifications: [],
+                profileItems: [
+                    { title: "Meu Perfil", icon: "mdi-account-outline", to: "/profile" },
+                    { title: "Sair", icon: "mdi-logout", action: "logout" },
+                ],
             }
         },
 

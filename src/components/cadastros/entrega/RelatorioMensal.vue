@@ -15,6 +15,9 @@
         </v-col>
       </v-row>
     </template>
+    <template v-slot:[`item.dataDaEntrega`]="{ item }">
+      <span>{{ formatData(item.dataDaEntrega) }}</span>
+    </template>
   </v-data-table-virtual>
   <v-row class="justify-end dense mt-2 mb-3">
     <v-col class="button-group mr-9" align="end" cols="2">
@@ -38,6 +41,7 @@
 <script>
 import axios from "@/services/axios.js";
 import { useToast } from "vue-toastification";
+import UtilsService from "../../../services/utilsService";
 
 export default {
   name: "RelatorioMensal",
@@ -101,6 +105,10 @@ export default {
   },
 
   methods: {
+    formatData(item) {
+      return UtilsService.formatData(item);
+    },
+
     async getProofs() {
       try {
         const response = await axios.get("/public/comprovantes");

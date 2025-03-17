@@ -155,7 +155,7 @@
       </v-dialog>
 
       <v-dialog v-model="dialog.converter">
-        <v-card class="card-form align-self-center" width="65%">
+        <v-card class="card-form align-self-center" width="50%">
           <v-card-title class="sticky-title title-border">
             <h3 class="report">Conversor</h3>
             <v-spacer></v-spacer>
@@ -212,7 +212,6 @@ export default {
       { title: "Produtor", align: "center", sortable: true, value: "produtor.nome" },
       { title: "Endereço", align: "center", sortable: true, value: "produtor.endereco", width: "300px" },
       { title: "Data Entrega", align: "center", sortable: true, value: "dataDaEntrega" },
-      { title: "Quantidade", align: "center", sortable: true, value: "quantidade" },
       { title: "Total Geral", align: "center", sortable: true, value: "total" },
       { title: "Relatório", align: "center", sortable: true, value: "download" },
     ],
