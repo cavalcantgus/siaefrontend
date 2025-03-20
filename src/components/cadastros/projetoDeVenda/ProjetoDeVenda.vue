@@ -32,6 +32,26 @@
                 </template>
               </v-tooltip>
             </v-col>
+
+            <v-col cols="12">
+              <v-expand-transition>
+                <v-card v-show="showFilters" variant="outlined" height="150px">
+                  <h4 class="ml-4 mt-4" align="start">Filtrar por</h4>
+                  <v-row dense class="py-2 px-4">
+                    <v-col cols="12" md="6" lg="4">
+                      <v-autocomplete density="compact" variant="outlined" :items="products" label="Produto" item-title="descricao" item-value="descricao" v-model="filters.produto.value" outlined dense clearable></v-autocomplete>
+                    </v-col>
+                  </v-row>
+                  <v-card-actions>
+                    <v-row dense>
+                      <v-col class="text-end" height="200">
+                        <v-btn align="start" justify="center" class="pb-8" color="error" text elevation="0" @click="clearFilters"> Limpar filtros </v-btn>
+                      </v-col>
+                    </v-row>
+                  </v-card-actions>
+                </v-card>
+              </v-expand-transition>
+            </v-col>
           </v-row>
           <v-row class="mb-5 pl-1 ml-4">
             <v-col cols="auto" class="pa-0 mr-4">
@@ -153,6 +173,7 @@ export default {
     singleExpand: false,
     showFilters: false,
     projects: [],
+    products: [],
     headers: [
       { text: "Editar", align: "center", value: "edit", width: "40px" },
       { text: "Remover", align: "center", value: "delete", width: "40px" },
@@ -168,13 +189,31 @@ export default {
     deleteRow: {},
     expanded: [],
     isAllowed: false,
+    filters: {
+      produto: { value: null, compareType: "equal", prop: "produto.descricao" },
+    },
   }),
   computed: {
     filteredProjects() {
-      return this.projects;
+      return this.projects.filter((projeto) => {
+        return projeto.projetoProdutos.some((projetoProduto) => {
+          const produto = projetoProduto.produto;
+
+          // Verifica se a descrição (nome) do produto corresponde ao filtro
+          const descricaoProdutoFiltro = this.filters.produto.value ? produto.descricao === this.filters.produto.value : true;
+
+          return descricaoProdutoFiltro;
+        });
+      });
     },
   },
   methods: {
+    clearFilters() {
+      Object.keys(this.filters).forEach((key) => {
+        this.filters[key].value = null;
+      });
+    },
+
     formatPrice(val) {
       val = UtilsService.formatReal(val);
       return val;
@@ -188,6 +227,15 @@ export default {
       console.log("Método chamado");
       const url = `https://siaeserver.com/public/projetos/relatorio/generate/${item.id}`;
       window.location.href = url; // Redireciona o navegador e força o download
+    },
+
+    async getProducts() {
+      try {
+        const { data } = await axios.get("public/produtos");
+        this.products = data;
+      } catch (error) {
+        console.error(error);
+      }
     },
 
     async getProjects() {
@@ -283,6 +331,7 @@ export default {
     },
   },
   mounted() {
+    this.getProducts();
     this.getProjects();
     try {
       console.log("ROLE: ", this.role);

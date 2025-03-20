@@ -107,14 +107,14 @@
         <template v-slot:[`item.total`]="{ item }">
           <span>{{ formatPrice(item.total) }}</span>
         </template>
-        <template v-slot:expanded-row="{ item }">
+        <!-- <template v-slot:expanded-row="{ item }">
           <tr>
             <td :colspan="9" style="background-color: #37622a" class="text-white">
               {{ console.log(item) }}
               <ProjetoDeVendaExpand :projetoData="item"></ProjetoDeVendaExpand>
             </td>
           </tr>
-        </template>
+        </template> -->
       </v-data-table>
       <v-dialog v-model="dialog.create">
         <v-card class="card-form align-self-center" width="100%">
