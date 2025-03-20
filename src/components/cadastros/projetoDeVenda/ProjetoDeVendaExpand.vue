@@ -38,27 +38,27 @@
     <v-icon>mdi-file-account</v-icon>
   </h4>
   <v-row dense style="height: 150px" class="border-md pa-2">
-    <v-col cols="12" md="3" lg="2" align="start" class="h-50">
+    <v-col cols="12" md="5" lg="3" align="start" class="h-50">
       <h4>Nome:</h4>
       <p>{{ projetoData.produtor.nome }}</p>
     </v-col>
-    <v-col cols="12" md="3" lg="2" align="start" class="h-50">
+    <v-col cols="12" md="3" lg="1" align="start" class="h-50">
       <h4>Idade:</h4>
       <p>{{ age(projetoData.produtor.dataNascimento) }}</p>
     </v-col>
-    <v-col cols="12" md="3" lg="2" align="start" class="h-50">
+    <v-col cols="12" md="5" lg="3" align="start" class="h-50">
       <h4>Email:</h4>
       <p>{{ projetoData.produtor.email }}</p>
     </v-col>
-    <v-col cols="12" md="3" lg="2" align="start" class="h-50">
+    <v-col cols="12" md="4" lg="2" align="start" class="h-50">
       <h4>Contato:</h4>
       <p>{{ projetoData.produtor.contato }}</p>
     </v-col>
-    <v-col cols="12" md="3" lg="2" align="start" class="h-50">
+    <v-col cols="12" md="4" lg="2" align="start" class="h-50">
       <h4>CPF:</h4>
       <p>{{ projetoData.produtor.cpf }}</p>
     </v-col>
-    <v-col cols="12" md="3" lg="2" align="start" class="h-50">
+    <v-col cols="12" md="4" lg="2" align="start" class="h-50">
       <h4>RG:</h4>
       <p>{{ projetoData.produtor.rg }}</p>
     </v-col>
@@ -68,19 +68,19 @@
     <v-icon>mdi-home</v-icon>
   </h4>
   <v-row dense class="border-md pa-2">
-    <v-col cols="12" md="2" lg="2" align="start" class="h-75">
+    <v-col cols="12" md="4" lg="2" align="start" class="h-75">
       <h4>Estado:</h4>
       <p>{{ projetoData.produtor.estado }}</p>
     </v-col>
-    <v-col cols="12" md="2" lg="2" align="start" class="h-75">
+    <v-col cols="12" md="4" lg="2" align="start" class="h-75">
       <h4>Município:</h4>
       <p>{{ projetoData.produtor.municipio }}</p>
     </v-col>
-    <v-col cols="12" md="2" lg="2" align="start" class="h-75">
+    <v-col cols="12" md="5" lg="3" align="start" class="h-75">
       <h4>Endereço:</h4>
       <p>{{ projetoData.produtor.endereco }}</p>
     </v-col>
-    <v-col cols="12" md="2" lg="2" align="start" class="h-75">
+    <v-col cols="12" md="4" lg="2" align="start" class="h-75">
       <h4>CEP:</h4>
       <p>{{ projetoData.produtor.cep }}</p>
     </v-col>

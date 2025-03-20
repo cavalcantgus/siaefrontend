@@ -447,7 +447,7 @@ export default {
     },
   },
   async mounted() {
-    this.getProjects(), this.getProductors(), this.getProducts(), this.getProofs();
+    this.getProjects(), this.getProductors(), this.getProducts(), this.getProofs(), this.updateTotalGeral();
 
     try {
         await this.getProducts();

@@ -56,6 +56,7 @@ export default {
       this.produto1 = null
       this.produto2 = null
       this.quantidade = null
+      this.result = 0
     },
 
     converter() {
