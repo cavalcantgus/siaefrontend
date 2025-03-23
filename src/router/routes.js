@@ -14,6 +14,7 @@ const routes = [
     { path: '/comprovante', name: 'Entrega', component: () => import("@/components/cadastros/entrega/Entrega.vue")},
     { path: '/contrato', name: 'Contrato', component: () => import("@/components/cadastros/contratos/RelacoesContratuais.vue")},
     { path: '/relatorio', name: 'Relatorio', component: () => import("@/components/cadastros/relatorios/Relatorios.vue")},
+    { path: '/ata', name: 'Ata', component: () => import("@/components/cadastros/ata/Ata.vue")},
     { path: '/', redirect: '/login'},
 ];
 
