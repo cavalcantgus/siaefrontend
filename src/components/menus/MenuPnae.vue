@@ -53,6 +53,7 @@ export default {
       { title: "COMPROVANTE DE RECEBIMENTO", route: "/comprovante" },
       { title: "CONTRATOS", route: "/contrato" },
       { title: "RELATÓRIOS", route: "/relatorio" },
+      { title: "ATAS", route: "/ata" },
     ],
     role: services.getRoleFromToken(),
   }),
@@ -122,6 +123,14 @@ export default {
         case "/relatorio":
           if (this.role.toLowerCase() === "admin") {
             this.$router.push("/relatorio");
+          } else {
+            toast.error("Você precisa de permissão de Administrador para acessar essa página.");
+          }
+          break;
+
+        case "/ata":
+          if (this.role.toLowerCase() === "admin") {
+            this.$router.push("/ata");
           } else {
             toast.error("Você precisa de permissão de Administrador para acessar essa página.");
           }
