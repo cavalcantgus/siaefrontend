@@ -43,19 +43,6 @@
           </v-card-text>
         </v-card>
       </v-col>
-      <v-btn @click="dialog.download = true">Ata Da Chamada</v-btn>
-      <v-dialog v-model="dialog.download" height="72%">
-        <v-card class="card-form align-self-center" width="80%" height="200px">
-          <v-card-title class="sticky-title title-border">
-            Ata Da Chamada
-            <v-spacer></v-spacer>
-            <v-btn icon class="btn-close elevation-0" @click="dialog.download = !dialog.dowload">
-              <v-icon prepend> mdi-close </v-icon>
-            </v-btn>
-          </v-card-title>
-          <AtaDaChamada :onSubmit="createAta" :currentItem="newItem"></AtaDaChamada>
-        </v-card>
-      </v-dialog>
     </v-row>
   </div>
 </template>
@@ -64,7 +51,6 @@
 import NavBar from "../../NavBar.vue";
 import axios from "@/services/axios.js";
 import AtaDaChamada from "./AtaDaChamada.vue";
-import { useToast } from "vue-toastification";
 
 export default {
   name: "Relatorios",
@@ -90,25 +76,6 @@ export default {
             console.error("Erro: ", error)
         }   
     },
-
-    async createAta(fields) {
-      const toast = useToast()
-      try {
-        const response = await axios.post("public/atas/ata", fields)
-
-        console.log(response.data);
-
-        if (response.status !== 201) {
-          throw new Error(`Erro: ${response.status}`);
-        }
-        toast.success("Entrega cadastrada com sucesso!");
-      } catch (error) {
-        console.error("Erro: ", error);
-        toast.error("Erro ao cadastrar entrega: ", error);
-      } finally {
-        this.dialog.download = false;
-      }
-    }
   },
   mounted() {
     this.getProducers()
