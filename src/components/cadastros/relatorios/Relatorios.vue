@@ -50,7 +50,6 @@
 <script>
 import NavBar from "../../NavBar.vue";
 import axios from "@/services/axios.js";
-import AtaDaChamada from "./AtaDaChamada.vue";
 
 export default {
   name: "Relatorios",
