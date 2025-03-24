@@ -129,7 +129,7 @@ export default {
           break;
 
         case "/ata":
-          if (this.role.toLowerCase() === "admin") {
+          if (this.role.toLowerCase() === "admin" || this.role.toLowerCase() === "cpl") {
             this.$router.push("/ata");
           } else {
             toast.error("Você precisa de permissão de Administrador para acessar essa página.");

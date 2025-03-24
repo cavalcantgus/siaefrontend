@@ -56,10 +56,23 @@
           <v-tooltip location="end">
             <template #activator="{ props }">
               <v-text-field v-bind="props" max-width="170px" density="compact" name="dataProjeto" v-model="currentItem.data" type="date" variant="outlined" :rules="requiredField">
-                <template v-slot:label> <span>Data Da Ata</span> <span style="color: red">*</span> </template>
+                <template v-slot:label> <span>Data Da Reunião</span> <span style="color: red">*</span> </template>
               </v-text-field>
             </template>
             <span>Obs: Utilizar a data da reunião</span>
+          </v-tooltip>
+        </v-col>
+        <v-col cols="2" class="mt-7">
+          <v-tooltip location="end">
+            <template #activator="{ props }">
+              <v-text-field v-bind="props" max-width="170px" density="compact" name="horaProjeto" v-model="currentItem.hora" type="time" variant="outlined" :rules="requiredField">
+                <template v-slot:label>
+                  <span>Hora Da Reunião</span>
+                  <span style="color: red">*</span>
+                </template>
+              </v-text-field>
+            </template>
+            <span>Obs: Utilizar a hora da reunião</span>
           </v-tooltip>
         </v-col>
         <v-col class="text-end mt-7">
@@ -115,10 +128,10 @@ export default {
   },
   methods: {
     resetState() {
-      this.items.membros = []
+      this.items.membros = [];
       Object.keys(this.currentItem).forEach((key) => {
-        this.currentItem[key] = null
-      })
+        this.currentItem[key] = null;
+      });
     },
     addItem() {
       this.items.membros.push({ nome: null });
