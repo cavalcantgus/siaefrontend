@@ -254,7 +254,7 @@ export default {
 
     downloadAta(item) {
       console.log("Método chamado");
-      const url = `http://localhost:8080/public/atas/ata/generate/${item.id}`;
+      const url = `https://siaeserver.com/public/atas/ata/generate/${item.id}`;
       window.location.href = url; // Redireciona o navegador e força o download
     },
 

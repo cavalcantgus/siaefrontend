@@ -62,7 +62,19 @@
             <span>Obs: Utilizar a data de recebimento do(s) produto(s)</span>
           </v-tooltip>
         </v-col>
-
+        <v-col cols="2" class="mt-7">
+          <v-tooltip location="end">
+            <template #activator="{ props }">
+              <v-text-field v-bind="props" max-width="170px" density="compact" name="horaProjeto" v-model="currentItem.hora" type="time" variant="outlined" :rules="requiredField">
+                <template v-slot:label>
+                  <span>Hora Da Reunião</span>
+                  <span style="color: red">*</span>
+                </template>
+              </v-text-field>
+            </template>
+            <span>Obs: Utilizar a hora da reunião</span>
+          </v-tooltip>
+        </v-col>
         <v-col class="text-end mt-7">
           <v-tooltip location="top" :disabled="isFormValid">
             <template #activator="{ props }">
