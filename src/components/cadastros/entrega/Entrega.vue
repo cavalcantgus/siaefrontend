@@ -54,6 +54,17 @@
                 <span>Clique para gerar relatórios</span>
               </v-tooltip>
             </v-col>
+            <v-col class="button-group mr-4" align="start" cols="auto">
+              <v-tooltip location="top">
+                <template #activator="{ props }">
+                  <v-btn color="warning" class="elevation-3 compact-btn ml-3" min-width="25%" @click="dialog.payment = true" v-bind="props">
+                    <v-icon small class="compact-icon" left>mdi-plus</v-icon>
+                    <div class="d-flex flex-column compact-btn-text" style="font-size: 0.6rem"><span>Enviar P/</span><span>Pagamento</span></div>
+                  </v-btn>
+                </template>
+                <span>Clique para enviar para o pagamento</span>
+              </v-tooltip>
+            </v-col>
           </v-row>
           <v-row class="mb-5 pl-1 ml-4">
             <v-col cols="auto" class="pa-0 mr-4">
@@ -166,6 +177,19 @@
           <Conversor :onSubmit="downloadRelatorioMensal"></Conversor>
         </v-card>
       </v-dialog>
+
+      <v-dialog v-model="dialog.payment">
+        <v-card class="card-form align-self-center" width="65%">
+          <v-card-title class="sticky-title title-border">
+            <h3 class="report">Entregas</h3>
+            <v-spacer></v-spacer>
+            <v-btn icon class="btn-close elevation-0" @click="dialog.payment = !dialog.payment">
+              <v-icon prepend> mdi-close </v-icon>
+            </v-btn>
+          </v-card-title>
+          <RelacaoPagamento :onSubmit="sendToPayment"></RelacaoPagamento>
+        </v-card>
+      </v-dialog>
     </v-col>
   </v-row>
 </template>
@@ -181,6 +205,7 @@ import UtilsService from "../../../services/utilsService";
 import BtnComeBack from "../../template/BtnComeBack.vue";
 import ConfirmButton from "../../template/ConfirmButton.vue";
 import RelatorioMensal from "./RelatorioMensal.vue";
+import RelacaoPagamento from "./RelacaoPagamento.vue";
 import Conversor from "./Conversor.vue";
 
 export default {
@@ -193,6 +218,7 @@ export default {
     BtnComeBack,
     ConfirmButton,
     RelatorioMensal,
+    RelacaoPagamento,
     Conversor,
   },
   data: () => ({
@@ -201,6 +227,7 @@ export default {
       update: false,
       download: false,
       converter: false,
+      payment: false,
     },
     search: "",
     singleExpand: false,
@@ -246,6 +273,19 @@ export default {
       const { mes, ano } = fields;
       const url = `https://siaeserver.com/public/comprovantes/relatorio/mensal/generate/${mes}/${ano}`;
       window.location.href = url; // Redireciona o navegador e força o download
+    },
+
+    async sendToPayment(fields) {
+      try {
+        const response = await axios.post("/public/pagamentos/pagamento", fields)
+
+        if(response.status !== 204) {
+          throw new Error("Erro com a requisição")
+        }
+        console.log(response)
+      } catch (error) {
+        console.error(error)
+      }
     },
 
     async getProofs() {

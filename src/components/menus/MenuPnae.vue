@@ -54,6 +54,7 @@ export default {
       { title: "CONTRATOS", route: "/contrato" },
       { title: "RELATÓRIOS", route: "/relatorio" },
       { title: "ATAS", route: "/ata" },
+      { title: "PAGAMENTOS", route: "/pagamento" },
     ],
     role: services.getRoleFromToken(),
   }),
@@ -131,6 +132,14 @@ export default {
         case "/ata":
           if (this.role.toLowerCase() === "admin" || this.role.toLowerCase() === "cpl") {
             this.$router.push("/ata");
+          } else {
+            toast.error("Você precisa de permissão de Administrador para acessar essa página.");
+          }
+          break;
+
+        case "/pagamento":
+          if (this.role.toLowerCase() === "admin" || this.role.toLowerCase() === "central") {
+            this.$router.push("/pagamento");
           } else {
             toast.error("Você precisa de permissão de Administrador para acessar essa página.");
           }
