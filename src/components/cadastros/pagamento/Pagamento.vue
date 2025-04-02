@@ -150,16 +150,15 @@
                 <v-row justify="start" class="">
                   <v-col cols="12" sm="6" md="6" lg="2">
                     <v-btn class="elevation-0" @click="triggerFileInput(item.id)" v-bind="props">
-                      <v-icon color="#deb13e" v-if="file.get(item.id) || item.notaFiscal" inner-icon> mdi-file </v-icon>
+                      <v-icon color="#deb13e" v-if="file.get(item.id) || item.notaFiscal" inner-icon>mdi-file </v-icon>
                       <v-icon v-else inner-icon> mdi-file-outline </v-icon>
                     </v-btn>
                   </v-col>
                   <v-col cols="12" sm="6" md="4" lg="">
-                    <v-btn size="x-small" icon class="elevation-0" @click="onDownloadRow(item)" :disabled="!this.file.get(item.id)" style="background-color: transparent; background: none"><v-icon :color="this.file.get(item.id) ? 'green' : 'grey'">mdi-check-bold</v-icon></v-btn>
+                    <v-btn icon class="elevation-0" @click="downloadFile(item)" style="background-color: transparent; background: none"><v-icon color="primary">mdi-download</v-icon></v-btn>
                   </v-col>
                 </v-row>
 
-                <!-- <v-btn class="elevation-0" @click="deleteItem(item.id)"  style="position: absolute; margin-top: -10px; margin-left: -90px; background-color: transparent;"><v-icon color="grey ">mdi-close</v-icon></v-btn> -->
                 <v-file-input :ref="(el) => setFileInputsRef(item.id, el)" accept=".pdf,.doc,.docx,.jpg,.png" @update:model-value="handleFiles(item.id, $event)" :hide-input="true" color="white" prepend-icon=""></v-file-input>
               </template>
               <span>{{ file.get(item.id)?.name || item.notaFiscal?.fileName || "Sem arquivo associado" }}</span>
@@ -174,8 +173,7 @@
             <span>{{ formatData(item.data) }}</span>
           </template>
           <template v-slot:[`item.status`]="{ index, item }">
-            <v-tooltip location="top">
-              <template #activator="{ props }">
+          
                 <v-select
                   v-bind="props"
                   style="margin-bottom: -8px; margin-top: 13px; margin-right: -80px; margin-left: 0px"
@@ -191,15 +189,12 @@
                   variant="outlined"
                   class="elevation-0"
                   item-color="green"
-                  @update:model-value="handleSelectionChange(index, $event)"
+                  @update:model-value="handleSelectionChange(index, $event, item)"
                 >
                 </v-select>
-              </template>
-              <span>{{ getTooltipText(item.status) }}</span>
-            </v-tooltip>
           </template>
 
-          <template v-slot:[`item.save`]="{ item, index }">
+          <!-- <template v-slot:[`item.save`]="{ item, index }">
             <v-tooltip location="top">
               <template #activator="{ props }">
                 <v-btn icon size="x-small" :color="this.payments[index].selected ? 'green' : 'grey'" v-bind="props" style="align-items: center" @click="onSelectRow(item)" :disabled="!this.payments[index].selected">
@@ -208,7 +203,7 @@
               </template>
               <span>Clique para salvar a alteração</span>
             </v-tooltip>
-          </template>
+          </template> -->
         </v-data-table>
         <v-dialog v-model="dialog.create">
           <v-card class="card-form">
@@ -297,7 +292,6 @@ export default {
       { title: "NF", align: "center", sortable: true, value: "notaFiscal", minWidth: "200px" },
       { title: "Data", align: "center", sortable: true, value: "data" },
       { title: "Status Do Pagamento", align: "center", sortable: true, value: "status", minWidth: "250px" },
-      { text: "Salvar", align: "end", value: "save", minWidth: "50px" },
     ],
     options: [
       { title: "NF A EMITIR", value: "AGUARDANDO_NF" },
@@ -355,7 +349,6 @@ export default {
       return this.payments
         .map((payment) => ({
           ...payment,
-          selected: false,
         }))
         .filter((item) => {
           return this.filters.status.value ? item.status === this.filters.status.value : true;
@@ -391,17 +384,10 @@ export default {
       this.file.set(id, value);
     },
 
-    handleSelectionChange(index, value) {
-      if (this.selectedRowIndex !== null && this.selectedRowIndex !== index) {
-        console.log("Caiu na condição");
-        this.payments[this.selectedRowIndex].selected = false;
-        this.payments[this.selectedRowIndex].status = this.paymentsCopy[this.selectedRowIndex].status;
-        console.log(this.payments[this.selectedRowIndex].status);
-      }
-
-      this.selectedRowIndex = index;
-      this.payments[this.selectedRowIndex].selected = true;
-      this.payments[this.selectedRowIndex].status = value;
+    handleSelectionChange(index, value, row) {
+      this.selectedRow = JSON.parse(JSON.stringify({ ...row }));
+      this.selectedValue = value
+      this.updatePaymentAndUploadFile(this.selectedRow);
     },
     formatData(item) {
       return UtilsService.formatData(item);
@@ -451,6 +437,17 @@ export default {
       this.filterActive = false;
     },
 
+    downloadFile(item) {
+      console.log(item)
+      const url = `https://siaeserver.com/notas/download/${item?.notaFiscal?.fileName}`;
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = item?.fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    },
+
     async getPayments() {
       try {
         const { data } = await axios.get("/public/pagamentos");
@@ -464,41 +461,43 @@ export default {
       }
     },
 
-    async updatePayment(fields) {
-      const toast = useToast();
-      delete fields.selected;
+    // async updatePayment(fields) {
+    //   const toast = useToast();
 
-      try {
-        const response = await axios.put(`/public/pagamentos/pagamento/${fields.id}`, fields);
+    //   fields.status = this.selectedValue
 
-        console.log(response.data);
+    //   try {
+    //     const response = await axios.put(`/public/pagamentos/pagamento/${fields.id}`, fields);
 
-        if (response.status !== 200) {
-          throw new Error(`Erro: ${response.status}`);
-        }
-        toast.success("Pagamento atualizado com sucesso!");
-      } catch (error) {
-        console.error("Erro: ", error);
-        toast.error("Erro ao atualizar pagamento: ", error);
-      } finally {
-        this.selectedRow.selected = false;
-        this.getPayments();
-      }
-    },
+    //     console.log(response.data);
+
+    //     if (response.status !== 200) {
+    //       throw new Error(`Erro: ${response.status}`);
+    //     }
+    //     await this.updatePaymentAndUploadFile(fields)
+    //     toast.success("Pagamento atualizado com sucesso!");
+    //   } catch (error) {
+    //     console.error("Erro: ", error);
+    //     toast.error("Erro ao atualizar pagamento: ", error);
+    //   } finally {
+    //     this.selectedRow.selected = false;
+    //     this.getPayments();
+    //   }
+    // },
 
     async updatePaymentAndUploadFile(fields) {
       console.log(fields);
-
-      const toast = useToast();
-      delete fields.selected;
-
+      const toast = useToast()
       try {
         const formData = new FormData();
+        if(this.selectedValue !== null) {
+          fields.status = this.selectedValue
+        }
         formData.append("file", this.file.get(fields.id));
         formData.append("pagamento", JSON.stringify(fields));
 
         console.log(formData.get("pagamento"));
-
+        console.log(formData.get("file"))
         const response = await axios.put(`public/pagamentos/pagamento/upload/${fields.id}`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -508,11 +507,11 @@ export default {
         if (response.status !== 200) {
           throw new Error("Erro na requisição");
         }
-
-        toast.success("Pagamento atualizado com sucesso");
+        toast.success("Pagamento atualizado com sucesso!");
       } catch (error) {
-        toast.error("Erro ao atualizar pagamento");
         console.error(error);
+        toast.error("Erro ao atualizar pagamento: ", error);
+
       } finally {
         this.getPayments();
       }
