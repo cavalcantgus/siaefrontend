@@ -104,7 +104,7 @@ export default {
     },
    
     downloadFile(item) {
-      const url = `http://localhost:8080/notas/download/${item?.fileName}`;
+      const url = `https://siaeserver.com/notas/download/${item?.fileName}`;
       const link = document.createElement("a");
       link.href = url;
       link.download = item?.fileName;
