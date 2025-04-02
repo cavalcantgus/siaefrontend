@@ -120,6 +120,8 @@ export default {
           console.log("A resposta da API não é um Array");
           this.proofs = [];
         }
+        this.proofs.sort((a, b) => a.produtor.nome.localeCompare(b.produtor.nome))
+
       } catch (error) {
         console.log("Error: ", error);
         this.proofs = [];

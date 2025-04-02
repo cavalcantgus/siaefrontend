@@ -10,7 +10,7 @@
             <v-col cols="5">
               <v-text-field class="border rounded" dense outlined hide-details v-model="search" label="Pesquisar" :append-inner-icon="'mdi-magnify'" clearable />
             </v-col>
-            <v-col class="text-end" cols="2">
+            <v-col class="text-end" >
               <v-badge location="top start" bordered overlap>
                 <v-btn class="elevation-0" @click="showFilters = !showFilters">
                   <v-icon v-if="!showFilters" size="25px" left>mdi-filter</v-icon>
@@ -19,7 +19,7 @@
                 </v-btn>
               </v-badge>
             </v-col>
-            <v-col class="button-group mr-4" align="end">
+            <v-col  class="button-group mr-4" align="end">
               <v-tooltip location="top">
                 <template #activator="{ props }">
                   <v-btn color="success" class="elevation-3 compact-btn ml-3" min-width="25%" @click="dialog.create = true" v-bind="props">
@@ -31,11 +31,11 @@
               </v-tooltip>
             </v-col>
           </v-row>
-          <v-row justify="start" class="ml-0 mb-1" style="margin-top: -20px">
-            <v-col class="button-group mr-4" align="start" cols="auto">
+          <v-row justify="start" class="ml-0 mb-1 " style="margin-top: -20px">
+            <v-col class="" align="start" cols="12" sm="6" md="4" lg="auto">
               <v-tooltip location="top">
                 <template #activator="{ props }">
-                  <v-btn color="primary" class="elevation-3 compact-btn ml-3" min-width="25%" @click="dialog.download = true" v-bind="props">
+                  <v-btn color="#376EA1" class="elevation-3 compact-btn ml-3" @click="dialog.download = true" v-bind="props">
                     <v-icon small class="compact-icon" left>mdi-plus</v-icon>
                     <div class="d-flex flex-column compact-btn-text" style="font-size: 0.6rem"><span>Relatórios</span></div>
                   </v-btn>
@@ -43,21 +43,21 @@
                 <span>Clique para gerar relatórios</span>
               </v-tooltip>
             </v-col>
-            <v-col class="button-group mr-4" align="start" cols="auto">
+            <v-col class="" align="start" cols="12" sm="6" md="4" lg="auto">
               <v-tooltip location="top">
                 <template #activator="{ props }">
-                  <v-btn color="primary" class="elevation-3 compact-btn ml-3" min-width="25%" @click="dialog.converter = true" v-bind="props">
+                  <v-btn color="#4A90E2" class="elevation-3 compact-btn "  @click="dialog.converter = true" v-bind="props">
                     <v-icon small class="compact-icon" left>mdi-swap-horizontal</v-icon>
                     <div class="d-flex flex-column compact-btn-text" style="font-size: 0.6rem"><span>Calculadora</span></div>
                   </v-btn>
                 </template>
-                <span>Clique para gerar relatórios</span>
+                <span>Clique para abrir a calculadora de conversão</span>
               </v-tooltip>
             </v-col>
-            <v-col class="button-group mr-4" align="start" cols="auto">
+            <v-col class="" align="start" cols="12" sm="6" md="4" lg="auto">
               <v-tooltip location="top">
                 <template #activator="{ props }">
-                  <v-btn color="warning" class="elevation-3 compact-btn ml-3" min-width="25%" @click="dialog.payment = true" v-bind="props">
+                  <v-btn color="#FABC4A" class="elevation-3 compact-btn text-grey-lighten-5" @click="dialog.payment = true" v-bind="props" >
                     <v-icon small class="compact-icon" left>mdi-plus</v-icon>
                     <div class="d-flex flex-column compact-btn-text" style="font-size: 0.6rem"><span>Enviar P/</span><span>Pagamento</span></div>
                   </v-btn>
@@ -276,15 +276,20 @@ export default {
     },
 
     async sendToPayment(fields) {
+      const toast = useToast();
       try {
         const response = await axios.post("/public/pagamentos/pagamento", fields)
 
-        if(response.status !== 204) {
+        if(response.status !== 200) {
           throw new Error("Erro com a requisição")
         }
+        toast.success("Entregas enviadas para o pagamento com sucesso")
         console.log(response)
       } catch (error) {
+        toast.error("Ocorreu um erro ao enviar as entregas para o pagamento com sucesso")
         console.error(error)
+      } finally {
+        this.dialog.payment = false
       }
     },
 

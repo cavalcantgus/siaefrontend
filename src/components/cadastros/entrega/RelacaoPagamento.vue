@@ -24,12 +24,12 @@
       <v-tooltip location="start" :disabled="this.selectedMonth && this.selectedYear">
         <template #activator="{ props }">
           <div v-bind="props" class="d-inline-block">
-            <v-btn color="primary" class="elevation-3 compact-btn ml-3" min-width="25%" @click="localOnSubmit" :disabled="!selectedMonth || !selectedYear">
+            <ConfirmButton color="primary" class="elevation-3 compact-btn ml-3" min-width="25%" :onConfirm="localOnSubmit" :disabled="!selectedMonth || !selectedYear">
               <template v-slot:append>
                 <v-icon small class="compact-icon" start>mdi-download</v-icon>
               </template>
               <div class="d-flex flex-column compact-btn-text"><span>Enviar</span></div>
-            </v-btn>
+            </ConfirmButton>
           </div>
         </template>
         <span>Selecione um mês e ano</span>
@@ -42,9 +42,13 @@
 import axios from "@/services/axios.js";
 import { useToast } from "vue-toastification";
 import UtilsService from "../../../services/utilsService";
+import ConfirmButton from "../../template/ConfirmButton.vue";
 
 export default {
   name: "RelacaoPagamento",
+  components: {
+    ConfirmButton
+  },
   props: {
     onSubmit: Function
   },
@@ -115,11 +119,12 @@ export default {
         console.log(response.data);
 
         if (Array.isArray(response.data)) {
-          this.proofs = response.data;
+          this.proofs = response.data.filter(proof => proof.enviadoParaPagamento === false);
         } else {
           console.log("A resposta da API não é um Array");
           this.proofs = [];
         }
+        this.proofs.sort((a, b) => a.produtor.nome.localeCompare(b.produtor.nome))
       } catch (error) {
         console.log("Error: ", error);
         this.proofs = [];
