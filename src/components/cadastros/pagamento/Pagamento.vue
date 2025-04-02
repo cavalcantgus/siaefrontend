@@ -2,25 +2,26 @@
   <NavBar></NavBar>
   <BtnComeBack></BtnComeBack>
   <h1 style="color: #57a340; margin-top: 10px; padding: 30px; font-size: 3rem">Pagamentos</h1>
-  <v-row justify="center">
-    <v-col cols="12">
-      <v-data-table :items="filteredUsers" :headers="headers" :search="search" show-expand :single-expand="true" v-model:expanded="expanded" :fixed-header="true" height="700px" @update:expanded="onExpand">
-        <template v-slot:top>
-          <v-row class="mt-2 mb-8 mx-3">
-            <v-col cols="5">
-              <v-text-field class="border rounded" dense outlined hide-details v-model="search" label="Pesquisar" :append-inner-icon="'mdi-magnify'" clearable />
-            </v-col>
-            <v-col class="text-end" cols="2">
-              <v-badge location="top start" bordered overlap>
-                <v-btn class="elevation-0" @click="showFilters = !showFilters">
-                  <v-icon v-if="!showFilters" size="25px" left>mdi-filter</v-icon>
-                  <v-icon v-else left size="25px">mdi-filter-off</v-icon>
-                  FILTROS
-                </v-btn>
-              </v-badge>
-            </v-col>
+  <v-container fluid>
+    <v-row justify="center">
+      <v-col cols="12">
+        <v-data-table class="custom-table" :items="filteredUsers" :headers="headers" :search="search" show-expand :single-expand="true" v-model:expanded="expanded" :fixed-header="true" height="700px" @update:expanded="onExpand">
+          <template v-slot:top>
+            <v-row class="mt-2 mb-8 mx-3">
+              <v-col cols="5">
+                <v-text-field class="border rounded" dense outlined hide-details v-model="search" label="Pesquisar" :append-inner-icon="'mdi-magnify'" clearable />
+              </v-col>
+              <v-col class="text-end" cols="2">
+                <v-badge location="top start" bordered overlap>
+                  <v-btn class="elevation-0" @click="showFilters = !showFilters">
+                    <v-icon v-if="!showFilters" size="25px" left>mdi-filter</v-icon>
+                    <v-icon v-else left size="25px">mdi-filter-off</v-icon>
+                    FILTROS
+                  </v-btn>
+                </v-badge>
+              </v-col>
 
-            <!-- <v-col cols="12">
+              <v-col cols="12">
               <v-expand-transition>
                 <v-card v-show="showFilters" variant="outlined" height="150px">
                   <h4 class="ml-4 mt-4" align="start">Filtrar por</h4>
@@ -29,40 +30,15 @@
                       <v-autocomplete
                         density="compact"
                         variant="outlined"
-                        :items="uf"
-                        label="Estado"
-                        item-title="nome"
-                        item-value="nome"
-                        v-model="filters.estado.value"
+                        :items="options"
+                        label="Status de Pagamento"
+                        item-title="title"
+                        item-value="value"
+                        v-model="filters.status.value"
                         outlined
                         dense
                         clearable
                       ></v-autocomplete>
-                    </v-col>
-                    <v-col :cols="2">
-                      <v-autocomplete
-                        density="compact"
-                        variant="outlined"
-                        :items="municipios"
-                        label="Município"
-                        item-title="nome"
-                        item-value="nome"
-                        v-model="filters.municipio.value"
-                        clearable
-                      ></v-autocomplete>
-                    </v-col>
-                    <v-col :cols="1">
-                      <v-select
-                        density="compact"
-                        :items="sexoOptions"
-                        label="Sexo"
-                        item-title="label"
-                        item-value="value"
-                        v-model="filters.sexo.value"
-                        variant="outlined"
-                        dense
-                        clearable
-                      ></v-select>
                     </v-col>
                   </v-row>
                   <v-card-actions>
@@ -84,46 +60,46 @@
                   </v-card-actions>
                 </v-card>
               </v-expand-transition>
-            </v-col> -->
-          </v-row>
-          <v-row class="mb-5 pl-1 ml-4">
-            <v-col cols="auto" class="pa-0 mr-4">
-              <span class="status-text">Pagamentos</span>
-              <div class="d-flex align-center">
-                <v-icon small color="primary" left>mdi-account-check</v-icon>
-                <div class="d-flex flex-column ml-3 status-text align-start">
-                  <span class="text-xs font-weight-medium">
-                    {{ this.payments.length }}
-                    {{ this.payments.length === 1 ? "Pagamento" : "Pagamentos" }} cadastrado(s)
-                  </span>
-                </div>
-              </div>
             </v-col>
-            <v-col cols="auto" class="pa-0 mr-4" v-if="aguardando_nf > 0 || nf_emitida > 0 || env_empenho > 0 || efetuado > 0">
-              <span class="status-text">Status</span>
-              <div class="d-flex align-start">
-                <v-icon small color="primary" left>mdi-information-variant-circle-outline</v-icon>
-                <div class="d-flex flex-column ml-3 status-text align-start">
-                  <span v-if="aguardando_nf > 0" class="text-error text-xs font-weight-medium">
-                    {{ aguardando_nf }}
-                    {{ aguardando_nf === 1 ? "Pagamento" : "Pagamentos" }} aguardando NF(s)
-                  </span>
-                  <span v-if="nf_emitida > 0" class="text-primary text-xs font-weight-medium">
-                    {{ nf_emitida }}
-                    {{ nf_emitida === 1 ? "Pagamento" : "Pagamentos" }} com NF(s) emitida(s)
-                  </span>
-                  <span v-if="env_empenho > 0" class="text-purple text-xs font-weight-medium">
-                    {{ env_empenho }}
-                    {{ env_empenho === 1 ? "Pagamento" : "Pagamentos" }} enviado(s) para empenho
-                  </span>
-                  <span v-if="efetuado > 0" class="text-success text-xs font-weight-medium">
-                    {{ efetuado }}
-                    {{ efetuado === 1 ? "Pagamento" : "Pagamentos" }} efetuado(s)
-                  </span>
+            </v-row>
+            <v-row class="mb-5 pl-1 ml-4">
+              <v-col cols="auto" class="pa-0 mr-4">
+                <span class="status-text">Pagamentos</span>
+                <div class="d-flex align-center">
+                  <v-icon small color="primary" left>mdi-account-check</v-icon>
+                  <div class="d-flex flex-column ml-3 status-text align-start">
+                    <span class="text-xs font-weight-medium">
+                      {{ this.payments.length }}
+                      {{ this.payments.length === 1 ? "Pagamento" : "Pagamentos" }} cadastrado(s)
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </v-col>
-            <!-- <v-col
+              </v-col>
+              <v-col cols="auto" class="pa-0 mr-4" v-if="aguardando_nf > 0 || nf_emitida > 0 || env_empenho > 0 || efetuado > 0">
+                <span class="status-text">Status</span>
+                <div class="d-flex align-start">
+                  <v-icon small color="primary" left>mdi-information-variant-circle-outline</v-icon>
+                  <div class="d-flex flex-column ml-3 status-text align-start">
+                    <span v-if="aguardando_nf > 0" class="text-error text-xs font-weight-medium">
+                      {{ aguardando_nf }}
+                      {{ aguardando_nf === 1 ? "Pagamento" : "Pagamentos" }} aguardando NF(s)
+                    </span>
+                    <span v-if="nf_emitida > 0" class="text-primary text-xs font-weight-medium">
+                      {{ nf_emitida }}
+                      {{ nf_emitida === 1 ? "Pagamento" : "Pagamentos" }} com NF(s) emitida(s)
+                    </span>
+                    <span v-if="env_empenho > 0" class="text-purple text-xs font-weight-medium">
+                      {{ env_empenho }}
+                      {{ env_empenho === 1 ? "Pagamento" : "Pagamentos" }} enviado(s) para empenho
+                    </span>
+                    <span v-if="efetuado > 0" class="text-success text-xs font-weight-medium">
+                      {{ efetuado }}
+                      {{ efetuado === 1 ? "Pagamento" : "Pagamentos" }} efetuado(s)
+                    </span>
+                  </div>
+                </div>
+              </v-col>
+              <!-- <v-col
               cols="auto"
               class="pa-0 mr-4"
             >
@@ -133,145 +109,143 @@
                 </v-btn>
               </div>
             </v-col> -->
-          </v-row>
-        </template>
-        <template v-slot:[`item.edit`]="{ item }">
-          <v-tooltip location="top">
-            <template #activator="{ props }">
-              <v-btn icon v-bind="props" @click="onSelectRow(item, 'update')" class="elevation-0">
-                <v-icon color="green">mdi-pencil</v-icon>
-              </v-btn>
-            </template>
-            <span>Clique para editar um Produtor</span>
-          </v-tooltip>
-        </template>
+            </v-row>
+          </template>
+          <template v-slot:[`item.edit`]="{ item }">
+            <v-tooltip location="top">
+              <template #activator="{ props }">
+                <v-btn icon v-bind="props" @click="onSelectRow(item, 'update')" class="elevation-0">
+                  <v-icon color="green">mdi-pencil</v-icon>
+                </v-btn>
+              </template>
+              <span>Clique para editar um Produtor</span>
+            </v-tooltip>
+          </template>
 
-        <template v-slot:[`item.delete`]="{ item }">
-          <v-tooltip location="top">
-            <template #activator="{ props }">
-              <ConfirmButton icon v-bind="props" :onConfirm="() => onDeleteRow(item)" class="elevation-0">
-                <v-icon color="red">mdi-delete</v-icon>
-              </ConfirmButton>
-            </template>
-            <span>Clique para deletar um Produtor</span>
-          </v-tooltip>
-        </template>
-        <!-- <template v-slot:[`item.status`]="{ item }">
-          <v-tooltip location="top">
-            <template #activator="{ props }">
-              <v-chip class="custom-chip elevation-4" :color="getStatusColor(item.status)" variant="flat" v-bind="props">
-                {{ statusLabels[item.status] || "Desconhecido" }}
-              </v-chip>
-            </template>
-            <span>{{ getTooltipText(item.status) }}</span>
-          </v-tooltip>
-        </template> -->
-        <!-- <template v-slot:expanded-row="{ item }">
-          <tr>
-            <td :colspan="10" style="background-color: #37622a; padding: 0">
-              <div style="max-height: 400px; /* Ajuste conforme necessário */ overflow-y: auto; background-color: #37622a; padding: 16px" class="text-white expand">
-                <ProdutorExpand :produtorData="JSON.parse(JSON.stringify(item))"></ProdutorExpand>
-              </div>
-            </td>
-          </tr>
-        </template> -->
-        <template v-slot:[`item.total`]="{ item }">
-          <span>{{ formatPrice(item.total) }}</span>
-        </template>
-        <template v-slot:[`item.notaFiscal`]="{ item }">
-          <v-tooltip location="top">
-            <template #activator="{ props }">
-              <v-btn class="elevation-0" @click="triggerFileInput(item.id)" v-bind="props">
-                <v-icon color="primary" v-if="file.get(item.id) || item.notaFiscal" inner-icon> mdi-file </v-icon>
-                <v-icon v-else inner-icon> mdi-file-outline </v-icon>
-              </v-btn>
-              <!-- <v-btn class="elevation-0" @click="deleteItem(item.id)"  style="position: absolute; margin-top: -10px; margin-left: -90px; background-color: transparent;"><v-icon color="grey ">mdi-close</v-icon></v-btn> -->
-              <v-btn size="x-small" icon class="elevation-0" @click="onDownloadRow(item)" :disabled="!this.file.get(item.id)" style="background-color: transparent; background: none;"><v-icon :color="this.file.get(item.id) ? 'green' : 'grey'">mdi-check-bold</v-icon></v-btn>
-              <v-file-input :ref="(el) => setFileInputsRef(item.id, el)" accept=".pdf,.doc,.docx,.jpg,.png" @update:model-value="handleFiles(item.id, $event)" :hide-input="true" color="white" prepend-icon=""></v-file-input>
-            </template>
-            <span>{{ file.get(item.id)?.name || item.notaFiscal || "Sem arquivo associado" }}</span>
-          </v-tooltip>
-        </template>
-        <template v-slot:[`item.download`]="{ item }">
-          <v-btn icon class="elevation-0" @click="onDownload(item)">
-            <v-icon color="primary"> mdi-download </v-icon>
-          </v-btn>
-        </template>
-        <template v-slot:[`item.data`]="{ item }">
-          <span>{{ formatData(item.data) }}</span>
-        </template>
-        <template v-slot:[`item.status`]="{ index, item }">
-          <v-tooltip location="top">
-            <template #activator="{ props }">
-              <v-select
-                v-bind="props"
-                style="margin-bottom: -8px; margin-top: 13px; margin-right: -80px; margin-left: 30px"
-                :persistent-placeholder="true"
-                v-model="this.payments[index].status"
-                :width="200"
-                :items="options"
-                :bg-color="getStatusColor(item.status)"
-                item-title="title"
-                item-value="value"
-                density="compact"
-                rounded
-                variant="outlined"
-                class="elevation-0"
-                item-color="green"
-                @update:model-value="handleSelectionChange(index, $event)"
-              >
-              </v-select>
-            </template>
-            <span>{{ getTooltipText(item.status) }}</span>
-          </v-tooltip>
-        </template>
+          <template v-slot:[`item.delete`]="{ item }">
+            <v-tooltip location="top">
+              <template #activator="{ props }">
+                <ConfirmButton icon v-bind="props" :onConfirm="() => onDeleteRow(item)" class="elevation-0">
+                  <v-icon color="red">mdi-delete</v-icon>
+                </ConfirmButton>
+              </template>
+              <span>Clique para deletar um Produtor</span>
+            </v-tooltip>
+          </template>
+          <template v-slot:expanded-row="{ item }">
+            <tr>
+              <td :colspan="12" style="background-color: #37622a; padding: 0">
+                <div style="max-height: 400px; /* Ajuste conforme necessário */ overflow-y: auto; background-color: #37622a; padding: 16px" class="text-white expand">
+                  <PagamentoExpand :produtorData="JSON.parse(JSON.stringify(item))"></PagamentoExpand>
+                </div>
+              </td>
+            </tr>
+          </template>
+          <template v-slot:[`item.total`]="{ item }">
+            <span>{{ formatPrice(item.total) }}</span>
+          </template>
+          <template v-slot:[`item.notaFiscal`]="{ item }">
+            <v-tooltip location="top">
+              <template #activator="{ props }">
+                <v-row justify="start" class="">
+                  <v-col cols="12" sm="6" md="6" lg="2">
+                    <v-btn class="elevation-0" @click="triggerFileInput(item.id)" v-bind="props">
+                      <v-icon color="#deb13e" v-if="file.get(item.id) || item.notaFiscal" inner-icon> mdi-file </v-icon>
+                      <v-icon v-else inner-icon> mdi-file-outline </v-icon>
+                    </v-btn>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4" lg="">
+                    <v-btn size="x-small" icon class="elevation-0" @click="onDownloadRow(item)" :disabled="!this.file.get(item.id)" style="background-color: transparent; background: none"><v-icon :color="this.file.get(item.id) ? 'green' : 'grey'">mdi-check-bold</v-icon></v-btn>
+                  </v-col>
+                </v-row>
 
-        <template v-slot:[`item.save`]="{ item, index }">
-          <v-tooltip location="top">
-            <template #activator="{ props }">
-              <v-btn icon size="x-small" :color="selectedRowIndex === index ? 'green' : 'grey'" v-bind="props" style="align-items: center" @click="onSelectRow(item)" :disabled="selectedRowIndex !== index">
-                <v-icon>mdi-check-bold</v-icon>
-              </v-btn>
-            </template>
-            <span>Clique para salvar a alteração</span>
-          </v-tooltip>
-        </template>
-      </v-data-table>
-      <v-dialog v-model="dialog.create">
-        <v-card class="card-form">
-          <v-card-title class="sticky-title title-border">
-            Cadastro de Produtor
-            <v-spacer></v-spacer>
-            <v-btn icon class="btn-close elevation-0" @click="dialog.create = false">
-              <v-icon prepend> mdi-close </v-icon>
+                <!-- <v-btn class="elevation-0" @click="deleteItem(item.id)"  style="position: absolute; margin-top: -10px; margin-left: -90px; background-color: transparent;"><v-icon color="grey ">mdi-close</v-icon></v-btn> -->
+                <v-file-input :ref="(el) => setFileInputsRef(item.id, el)" accept=".pdf,.doc,.docx,.jpg,.png" @update:model-value="handleFiles(item.id, $event)" :hide-input="true" color="white" prepend-icon=""></v-file-input>
+              </template>
+              <span>{{ file.get(item.id)?.name || item.notaFiscal?.fileName || "Sem arquivo associado" }}</span>
+            </v-tooltip>
+          </template>
+          <template v-slot:[`item.download`]="{ item }">
+            <v-btn icon class="elevation-0" @click="onDownload(item)">
+              <v-icon color="primary"> mdi-download </v-icon>
             </v-btn>
-          </v-card-title>
-          <!-- <NovoProdutor
+          </template>
+          <template v-slot:[`item.data`]="{ item }">
+            <span>{{ formatData(item.data) }}</span>
+          </template>
+          <template v-slot:[`item.status`]="{ index, item }">
+            <v-tooltip location="top">
+              <template #activator="{ props }">
+                <v-select
+                  v-bind="props"
+                  style="margin-bottom: -8px; margin-top: 13px; margin-right: -80px; margin-left: 0px"
+                  :persistent-placeholder="true"
+                  v-model="this.payments[index].status"
+                  :width="200"
+                  :items="options"
+                  :bg-color="getStatusColor(item.status)"
+                  item-title="title"
+                  item-value="value"
+                  density="compact"
+                  rounded
+                  variant="outlined"
+                  class="elevation-0"
+                  item-color="green"
+                  @update:model-value="handleSelectionChange(index, $event)"
+                >
+                </v-select>
+              </template>
+              <span>{{ getTooltipText(item.status) }}</span>
+            </v-tooltip>
+          </template>
+
+          <template v-slot:[`item.save`]="{ item, index }">
+            <v-tooltip location="top">
+              <template #activator="{ props }">
+                <v-btn icon size="x-small" :color="this.payments[index].selected ? 'green' : 'grey'" v-bind="props" style="align-items: center" @click="onSelectRow(item)" :disabled="!this.payments[index].selected">
+                  <v-icon>mdi-check-bold</v-icon>
+                </v-btn>
+              </template>
+              <span>Clique para salvar a alteração</span>
+            </v-tooltip>
+          </template>
+        </v-data-table>
+        <v-dialog v-model="dialog.create">
+          <v-card class="card-form">
+            <v-card-title class="sticky-title title-border">
+              Cadastro de Produtor
+              <v-spacer></v-spacer>
+              <v-btn icon class="btn-close elevation-0" @click="dialog.create = false">
+                <v-icon prepend> mdi-close </v-icon>
+              </v-btn>
+            </v-card-title>
+            <!-- <NovoProdutor
             :currentItem="newItem"
             :onSubmit="createProductor"
             :files="files"
             :dialogAtivo="dialog.create"
           ></NovoProdutor> -->
-        </v-card>
-      </v-dialog>
-      <v-dialog v-model="dialog.update">
-        <v-card class="card-form">
-          <v-card-title class="sticky-title title-border">
-            Editar Produtor: {{ selectedRow.id }}
-            <v-spacer></v-spacer>
-            <v-btn icon class="btn-close elevation-0" @click="dialog.update = !dialog.update">
-              <v-icon prepend> mdi-close </v-icon>
-            </v-btn>
-          </v-card-title>
-          <!-- <EditProdutor
+          </v-card>
+        </v-dialog>
+        <v-dialog v-model="dialog.update">
+          <v-card class="card-form">
+            <v-card-title class="sticky-title title-border">
+              Editar Produtor: {{ selectedRow.id }}
+              <v-spacer></v-spacer>
+              <v-btn icon class="btn-close elevation-0" @click="dialog.update = !dialog.update">
+                <v-icon prepend> mdi-close </v-icon>
+              </v-btn>
+            </v-card-title>
+            <!-- <EditProdutor
             :currentItem="selectedRow"
             :onSubmit="updateProductor"
             :files="files"
           ></EditProdutor> -->
-        </v-card>
-      </v-dialog>
-    </v-col>
-  </v-row>
+          </v-card>
+        </v-dialog>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -281,14 +255,15 @@ import { useToast } from "vue-toastification";
 import BtnComeBack from "../../template/BtnComeBack.vue";
 import ConfirmButton from "../../template/ConfirmButton.vue";
 import UtilsService from "../../../services/utilsService";
+import PagamentoExpand from "./PagamentoExpand.vue";
 
 export default {
   name: "Pagamento",
   components: {
     NavBar,
-
     BtnComeBack,
     ConfirmButton,
+    PagamentoExpand,
   },
   data: () => ({
     file: new Map(),
@@ -307,21 +282,22 @@ export default {
     paymentsCopy: [],
     payments: [],
     headers: [
-      { text: "Remover", align: "center", value: "delete", width: "50px" },
+      { text: "Remover", align: "center", value: "delete", minWidth: "30px" },
       {
         title: "Nome do Produtor",
         align: "center",
         sortable: true,
         value: "produtor.nome",
+        minWidth: "200px",
       },
       { title: "Conta", align: "center", sortable: true, value: "produtor.conta" },
       { title: "Agência", align: "center", sortable: true, value: "produtor.agencia" },
       { title: "Total", align: "center", sortable: true, value: "total" },
-      { title: "Comprovante De Entrega", align: "center", sortable: true, value: "download" },
-      { title: "NF", align: "center", sortable: true, value: "notaFiscal" },
+      { title: "Comprovante De Entrega", align: "center", sortable: true, value: "download", minWidth: "10px" },
+      { title: "NF", align: "center", sortable: true, value: "notaFiscal", minWidth: "200px" },
       { title: "Data", align: "center", sortable: true, value: "data" },
-      { title: "Status Do Pagamento", align: "center", sortable: true, value: "status", cellClass: "text-right" },
-      { text: "Salvar", align: "center", value: "save", width: "50px" },
+      { title: "Status Do Pagamento", align: "center", sortable: true, value: "status", minWidth: "250px" },
+      { text: "Salvar", align: "end", value: "save", minWidth: "50px" },
     ],
     options: [
       { title: "NF A EMITIR", value: "AGUARDANDO_NF" },
@@ -370,41 +346,21 @@ export default {
           return "grey"; // Cinza para desconhecidos
       }
     },
-    // filterActive: false,
-    // filters: {
-    //   estado: { value: null, compareType: "equal", prop: "estado" },
-    //   municipio: { value: null, compareType: "equal", prop: "municipio" },
-    //   sexo: { value: null, compareType: "equal", prop: "sexo" },
-    //   cpf: { value: null, compareType: "equal", prop: "cpf" },
-    //   cep: { value: null, compareType: "equal", prop: "cep" },
-    //   estado_civil: { value: null, compareType: "equal", prop: "estadoCivil" },
-    // },
+    filters: {
+      status: { value: null, compareType: "equal", prop: "status" },
+    },
   }),
   computed: {
     filteredUsers() {
-      return this.payments.map((payment) => ({
-        ...payment,
-        selected: false,
-      }));
+      return this.payments
+        .map((payment) => ({
+          ...payment,
+          selected: false,
+        }))
+        .filter((item) => {
+          return this.filters.status.value ? item.status === this.filters.status.value : true;
+        })
     },
-    // filteredProductors() {
-    //   return this.productors
-    //     .filter((item) => {
-    //       return this.filters.estado.value
-    //         ? item.estado === this.filters.estado.value
-    //         : true;
-    //     })
-    //     .filter((item) => {
-    //       return this.filters.municipio.value
-    //         ? item.municipio === this.filters.municipio.value
-    //         : true;
-    //     })
-    //     .filter((item) => {
-    //       return this.filters.sexo.value
-    //         ? item.sexo === this.filters.sexo.value
-    //         : true;
-    //     });
-    // },
   },
   watch: {
     payments: function () {
@@ -413,7 +369,7 @@ export default {
   },
   methods: {
     deleteItem(id) {
-      this.file.delete(id)
+      this.file.delete(id);
     },
 
     setFileInputsRef(id, el) {
@@ -493,7 +449,6 @@ export default {
         this.filters[key].value = null;
       });
       this.filterActive = false;
-      this.filtered = [];
     },
 
     async getPayments() {
@@ -501,9 +456,8 @@ export default {
         const { data } = await axios.get("/public/pagamentos");
         console.log(data);
 
-        this.payments = data;
+        this.payments = data.sort((a, b) => a.produtor.nome.localeCompare(b.produtor.nome));
         this.paymentsCopy = JSON.parse(JSON.stringify(this.payments));
-        // this.productors.sort((a, b) => a.nome.localeCompare(b.nome))
       } catch (error) {
         console.log("Error: ", error);
         this.payments = [];
@@ -527,12 +481,13 @@ export default {
         console.error("Erro: ", error);
         toast.error("Erro ao atualizar pagamento: ", error);
       } finally {
+        this.selectedRow.selected = false;
         this.getPayments();
       }
     },
 
     async updatePaymentAndUploadFile(fields) {
-      console.log(fields)
+      console.log(fields);
 
       const toast = useToast();
       delete fields.selected;
@@ -542,37 +497,29 @@ export default {
         formData.append("file", this.file.get(fields.id));
         formData.append("pagamento", JSON.stringify(fields));
 
-        console.log(formData.get("pagamento"))
+        console.log(formData.get("pagamento"));
 
         const response = await axios.put(`public/pagamentos/pagamento/upload/${fields.id}`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         });
+        console.log(response.status);
+        if (response.status !== 200) {
+          throw new Error("Erro na requisição");
+        }
 
-      } catch (error) {}
-
-      console.log(requestFields);
-
-      // try {
-      //   const response = await axios.put(`/public/pagamentos/pagamento/${fields.id}`, fields);
-
-      //   console.log(response.data);
-
-      //   if (response.status !== 200) {
-      //     throw new Error(`Erro: ${response.status}`);
-      //   }
-      //   toast.success("Pagamento atualizado com sucesso!");
-      // } catch (error) {
-      //   console.error("Erro: ", error);
-      //   toast.error("Erro ao atualizar pagamento: ", error);
-      // } finally {
-      //   this.getPayments();
-      // }
+        toast.success("Pagamento atualizado com sucesso");
+      } catch (error) {
+        toast.error("Erro ao atualizar pagamento");
+        console.error(error);
+      } finally {
+        this.getPayments();
+      }
     },
 
     async deleteProductor(fields) {
-      console.log(fields)
+      console.log(fields);
       const toast = useToast();
       try {
         const response = await axios.delete(`/public/produtores/produtor/${fields.id}`, fields);
@@ -607,7 +554,6 @@ export default {
       this.selectedRow = JSON.parse(JSON.stringify({ ...row }));
       this.downloadComprovante(this.selectedRow);
     },
-
 
     downloadComprovante(item) {
       const url = `https://siaeserver.com/public/pagamentos/relatorio/generate/${item.id}`;
@@ -744,5 +690,9 @@ td {
   align-items: center !important;
   text-align: center !important;
   white-space: normal !important;
+}
+
+.custom-table {
+  overflow-x: auto;
 }
 </style>
