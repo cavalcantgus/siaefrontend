@@ -22,48 +22,27 @@
               </v-col>
 
               <v-col cols="12">
-              <v-expand-transition>
-                <v-card v-show="showFilters" variant="outlined" height="150px">
-                  <h4 class="ml-4 mt-4" align="start">Filtrar por</h4>
-                  <v-row dense class="py-2 px-4">
-                    <v-col :cols="2">
-                      <v-autocomplete
-                        density="compact"
-                        variant="outlined"
-                        :items="options"
-                        label="Status de Pagamento"
-                        item-title="title"
-                        item-value="value"
-                        v-model="filters.status.value"
-                        outlined
-                        dense
-                        clearable
-                      ></v-autocomplete>
-                    </v-col>
-                  </v-row>
-                  <v-card-actions>
-                    <v-row dense>
-                      <v-col class="text-end" height="200">
-                        <v-btn
-                          align="start"
-                          justify="center"
-                          class="pb-8"
-                          color="error"
-                          text
-                          elevation="0"
-                          @click="clearFilters"
-                        >
-                          Limpar filtros
-                        </v-btn>
+                <v-expand-transition>
+                  <v-card v-show="showFilters" variant="outlined" height="150px">
+                    <h4 class="ml-4 mt-4" align="start">Filtrar por</h4>
+                    <v-row dense class="py-2 px-4">
+                      <v-col :cols="2">
+                        <v-autocomplete density="compact" variant="outlined" :items="options" label="Status de Pagamento" item-title="title" item-value="value" v-model="filters.status.value" outlined dense clearable></v-autocomplete>
                       </v-col>
                     </v-row>
-                  </v-card-actions>
-                </v-card>
-              </v-expand-transition>
-            </v-col>
+                    <v-card-actions>
+                      <v-row dense>
+                        <v-col class="text-end" height="200">
+                          <v-btn align="start" justify="center" class="pb-8" color="error" text elevation="0" @click="clearFilters"> Limpar filtros </v-btn>
+                        </v-col>
+                      </v-row>
+                    </v-card-actions>
+                  </v-card>
+                </v-expand-transition>
+              </v-col>
             </v-row>
             <v-row class="mb-5 pl-1 ml-4">
-              <v-col cols="auto" class="pa-0 mr-4">
+              <v-col cols="12" sm="6" md="4" lg="2" class="pa-0 mr-4">
                 <span class="status-text">Pagamentos</span>
                 <div class="d-flex align-center">
                   <v-icon small color="primary" left>mdi-account-check</v-icon>
@@ -75,7 +54,7 @@
                   </div>
                 </div>
               </v-col>
-              <v-col cols="auto" class="pa-0 mr-4" v-if="aguardando_nf > 0 || nf_emitida > 0 || env_empenho > 0 || efetuado > 0">
+              <v-col cols="12" sm="6" md="4" lg="auto" class="pa-0 mr-4" v-if="aguardando_nf > 0 || nf_emitida > 0 || env_empenho > 0 || efetuado > 0">
                 <span class="status-text">Status</span>
                 <div class="d-flex align-start">
                   <v-icon small color="primary" left>mdi-information-variant-circle-outline</v-icon>
@@ -99,17 +78,30 @@
                   </div>
                 </div>
               </v-col>
-              <!-- <v-col
-              cols="auto"
-              class="pa-0 mr-4"
-            >
-              <div class="d-flex align-center">
-                <v-btn icon class="elevation-0" @click="downloadRelatorio">
-                  <v-icon color="primary" left>mdi-file-download-outline</v-icon>
-                </v-btn>
-              </div>
-            </v-col> -->
+              <v-col cols="12" sm="6" md="4" lg="1" class="pa-0" align="center">
+                <v-icon class="pr-2">mdi-calendar-range</v-icon>
+                <span class="status-text">Mês</span>
+                  <div class="d-flex flex-column status-text align-center ga-3">
+                  <span class="text-xs font-weight-medium">Março</span>
+                </div>
+              </v-col>
+
+              <v-col cols="12" sm="6" md="4" lg="1" class="pa-0 mr-4" align="center">
+                <v-icon class="pr-2">mdi-calendar-range</v-icon>
+                <span class="status-text">Ano</span>    
+                  <div class="d-flex flex-column status-text align-center ga-3">
+                  <span class="text-xs font-weight-medium">2025</span>
+                </div>
+                
+              </v-col>
             </v-row>
+            <v-row class="mb-5 pl-1 ml-4">
+              <v-col cols="12" sm="6" md="4" lg="2" class="pa-0" align="center">
+                <span class="status-text">Mês</span>
+                   <v-select variant="flat" density="compact" class="elevation-2 rounded-xl"  :hide-details="true" >
+                   </v-select>
+              </v-col>
+              </v-row>
           </template>
           <template v-slot:[`item.edit`]="{ item }">
             <v-tooltip location="top">
@@ -173,25 +165,23 @@
             <span>{{ formatData(item.data) }}</span>
           </template>
           <template v-slot:[`item.status`]="{ index, item }">
-          
-                <v-select
-                  v-bind="props"
-                  style="margin-bottom: -8px; margin-top: 13px; margin-right: -80px; margin-left: 0px"
-                  :persistent-placeholder="true"
-                  v-model="this.payments[index].status"
-                  :width="200"
-                  :items="options"
-                  :bg-color="getStatusColor(item.status)"
-                  item-title="title"
-                  item-value="value"
-                  density="compact"
-                  rounded
-                  variant="outlined"
-                  class="elevation-0"
-                  item-color="green"
-                  @update:model-value="handleSelectionChange(index, $event, item)"
-                >
-                </v-select>
+            <v-select
+              style="margin-bottom: -8px; margin-top: 13px; margin-right: -80px; margin-left: 0px"
+              :persistent-placeholder="true"
+              v-model="this.payments[index].status"
+              :width="200"
+              :items="options"
+              :bg-color="getStatusColor(item.status)"
+              item-title="title"
+              item-value="value"
+              density="compact"
+              rounded
+              variant="outlined"
+              class="elevation-0"
+              item-color="green"
+              @update:model-value="handleSelectionChange(index, $event, item)"
+            >
+            </v-select>
           </template>
 
           <!-- <template v-slot:[`item.save`]="{ item, index }">
@@ -352,7 +342,7 @@ export default {
         }))
         .filter((item) => {
           return this.filters.status.value ? item.status === this.filters.status.value : true;
-        })
+        });
     },
   },
   watch: {
@@ -386,7 +376,7 @@ export default {
 
     handleSelectionChange(index, value, row) {
       this.selectedRow = JSON.parse(JSON.stringify({ ...row }));
-      this.selectedValue = value
+      this.selectedValue = value;
       this.updatePaymentAndUploadFile(this.selectedRow);
     },
     formatData(item) {
@@ -438,7 +428,7 @@ export default {
     },
 
     downloadFile(item) {
-      console.log(item)
+      console.log(item);
       const url = `https://siaeserver.com/notas/download/${item?.notaFiscal?.fileName}`;
       const link = document.createElement("a");
       link.href = url;
@@ -487,23 +477,29 @@ export default {
 
     async updatePaymentAndUploadFile(fields) {
       console.log(fields);
-      const toast = useToast()
+      const toast = useToast();
       try {
         const formData = new FormData();
-        if(this.selectedValue !== null) {
-          fields.status = this.selectedValue
+        if (this.selectedValue !== null) {
+          fields.status = this.selectedValue;
         }
-        formData.append("file", this.file.get(fields.id));
+        let file = null;
+
+        if(this.file.get(fields.id) !== null || this.file.get(fields.id) !== undefined) {
+          file = this.file.get(fields.id)
+        }
+
+        formData.append("file", file);
         formData.append("pagamento", JSON.stringify(fields));
 
         console.log(formData.get("pagamento"));
-        console.log(formData.get("file"))
+        console.log(formData.get("file"));
         const response = await axios.put(`public/pagamentos/pagamento/upload/${fields.id}`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         });
-        console.log(response.status);
+        console.log(response);
         if (response.status !== 200) {
           throw new Error("Erro na requisição");
         }
@@ -511,7 +507,6 @@ export default {
       } catch (error) {
         console.error(error);
         toast.error("Erro ao atualizar pagamento: ", error);
-
       } finally {
         this.getPayments();
       }
