@@ -138,7 +138,7 @@ export default {
           break;
 
         case "/pagamento":
-          if (this.role.toLowerCase() === "admin" || this.role.toLowerCase() === "central") {
+          if (this.role.toLowerCase() === "admin" || this.role.toLowerCase() === "pagamento") {
             this.$router.push("/pagamento");
           } else {
             toast.error("Você precisa de permissão de Administrador para acessar essa página.");
