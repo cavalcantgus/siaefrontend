@@ -67,7 +67,12 @@ export default {
        async aggregatingNotifications() {
             if(this.menu.admin && this.role.toLowerCase() === 'admin') {
                 this.menu.admin.notifications = await services.getPendingUsers()
-            } else {
+            } else if(this.menu.central && this.role.toLowerCase() === 'central') {
+                this.menu.central.notifications = await services.getNotificationsByUser()
+            }
+            
+
+            else {
                 this.menu.pendente.notifications = []
             }
         }

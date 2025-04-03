@@ -1,17 +1,17 @@
 <template>
   <NavBar></NavBar>
   <BtnComeBack></BtnComeBack>
-  <h1 style="color: #57a340; margin-top: 10px; padding: 30px; font-size: 3rem">Pagamentos</h1>
+  <h1 style="color: #57a340; margin-top: 10px; padding: 30px; font-size: 38px">Pagamentos</h1>
   <v-container fluid>
     <v-row justify="center">
       <v-col cols="12">
-        <v-data-table class="custom-table" :items="filteredUsers" :headers="headers" :search="search" show-expand :single-expand="true" v-model:expanded="expanded" :fixed-header="true" height="700px" @update:expanded="onExpand">
+        <v-data-table class="custom-table" :items="filteredPayments" :headers="headers" :search="search" v-model:expanded="expanded" :fixed-header="true" height="700px" @update:expanded="onExpand">
           <template v-slot:top>
-            <v-row class="mt-2 mb-8 mx-3">
-              <v-col cols="5">
-                <v-text-field class="border rounded" dense outlined hide-details v-model="search" label="Pesquisar" :append-inner-icon="'mdi-magnify'" clearable />
+            <v-row class="mt-2 mb-8" align="center" justify="center">
+              <v-col cols="12" sm="8" md="6" lg="5">
+                <v-text-field class="custom-search elevation-2" variant="flat" density="comfortable" :hide-details="true" dense outlined v-model="search" label="Pesquisar" :append-inner-icon="'mdi-magnify'" clearable />
               </v-col>
-              <v-col class="text-end" cols="2">
+              <v-col class="text-end" cols="12" sm="8" md="6" lg="1">
                 <v-badge location="top start" bordered overlap>
                   <v-btn class="elevation-0" @click="showFilters = !showFilters">
                     <v-icon v-if="!showFilters" size="25px" left>mdi-filter</v-icon>
@@ -41,7 +41,8 @@
                 </v-expand-transition>
               </v-col>
             </v-row>
-            <v-row class="mb-5 pl-1 ml-4">
+            <v-row class="mb-12 pl-1 mt-3 ml-4 d-flex align-center justify-space-between">
+              <!-- Coluna Pagamentos -->
               <v-col cols="12" sm="6" md="4" lg="2" class="pa-0 mr-4">
                 <span class="status-text">Pagamentos</span>
                 <div class="d-flex align-center">
@@ -54,6 +55,8 @@
                   </div>
                 </div>
               </v-col>
+
+              <!-- Coluna Status -->
               <v-col cols="12" sm="6" md="4" lg="auto" class="pa-0 mr-4" v-if="aguardando_nf > 0 || nf_emitida > 0 || env_empenho > 0 || efetuado > 0">
                 <span class="status-text">Status</span>
                 <div class="d-flex align-start">
@@ -78,30 +81,19 @@
                   </div>
                 </div>
               </v-col>
-              <v-col cols="12" sm="6" md="4" lg="1" class="pa-0" align="center">
-                <v-icon class="pr-2">mdi-calendar-range</v-icon>
-                <span class="status-text">Mês</span>
-                  <div class="d-flex flex-column status-text align-center ga-3">
-                  <span class="text-xs font-weight-medium">Março</span>
-                </div>
-              </v-col>
 
-              <v-col cols="12" sm="6" md="4" lg="1" class="pa-0 mr-4" align="center">
-                <v-icon class="pr-2">mdi-calendar-range</v-icon>
-                <span class="status-text">Ano</span>    
-                  <div class="d-flex flex-column status-text align-center ga-3">
-                  <span class="text-xs font-weight-medium">2025</span>
-                </div>
-                
+              <v-spacer></v-spacer>
+              <v-icon class="mr-1">mdi-calendar-range</v-icon>
+              <span class="mr-2 status-text">Mês:</span>
+              <v-col cols="12" sm="6" md="4" lg="1" class="pa-0 mr-4 ml-4">
+                <v-select v-model="filters.mes.value" :items="months" variant="flat" density="" item-title="title" item-value="value" width="110px" class="custom-select-date elevation-2 rounded-lg" :hide-details="true"></v-select>
+              </v-col>
+              <v-icon class="mr-1">mdi-calendar-range</v-icon>
+              <span class="mr-2 status-text">Ano:</span>
+              <v-col cols="12" sm="6" md="4" lg="2" class="pa-0">
+                <v-select v-model="filters.ano.value" :items="gerarAnos" variant="flat" density="" width="110px" class="custom-select-date elevation-2 rounded-lg" :hide-details="true"></v-select>
               </v-col>
             </v-row>
-            <v-row class="mb-5 pl-1 ml-4">
-              <v-col cols="12" sm="6" md="4" lg="2" class="pa-0" align="center">
-                <span class="status-text">Mês</span>
-                   <v-select variant="flat" density="compact" class="elevation-2 rounded-xl"  :hide-details="true" >
-                   </v-select>
-              </v-col>
-              </v-row>
           </template>
           <template v-slot:[`item.edit`]="{ item }">
             <v-tooltip location="top">
@@ -117,14 +109,14 @@
           <template v-slot:[`item.delete`]="{ item }">
             <v-tooltip location="top">
               <template #activator="{ props }">
-                <ConfirmButton icon v-bind="props" :onConfirm="() => onDeleteRow(item)" class="elevation-0">
+                <ConfirmButton icon v-bind="props" :onConfirm="() => onDeleteRow(item)" class="elevation-0" disabled>
                   <v-icon color="red">mdi-delete</v-icon>
                 </ConfirmButton>
               </template>
               <span>Clique para deletar um Produtor</span>
             </v-tooltip>
           </template>
-          <template v-slot:expanded-row="{ item }">
+          <!-- <template v-slot:expanded-row="{ item }">
             <tr>
               <td :colspan="12" style="background-color: #37622a; padding: 0">
                 <div style="max-height: 400px; /* Ajuste conforme necessário */ overflow-y: auto; background-color: #37622a; padding: 16px" class="text-white expand">
@@ -132,7 +124,7 @@
                 </div>
               </td>
             </tr>
-          </template>
+          </template> -->
           <template v-slot:[`item.total`]="{ item }">
             <span>{{ formatPrice(item.total) }}</span>
           </template>
@@ -278,8 +270,8 @@ export default {
       { title: "Conta", align: "center", sortable: true, value: "produtor.conta" },
       { title: "Agência", align: "center", sortable: true, value: "produtor.agencia" },
       { title: "Total", align: "center", sortable: true, value: "total" },
-      { title: "Comprovante De Entrega", align: "center", sortable: true, value: "download", minWidth: "10px" },
-      { title: "NF", align: "center", sortable: true, value: "notaFiscal", minWidth: "200px" },
+      { title: "Comprovante De Entrega", align: "center", sortable: true, value: "download" },
+      { title: "NF", align: "center", sortable: true, value: "notaFiscal", minWidth: "100px" },
       { title: "Data", align: "center", sortable: true, value: "data" },
       { title: "Status Do Pagamento", align: "center", sortable: true, value: "status", minWidth: "250px" },
     ],
@@ -288,6 +280,20 @@ export default {
       { title: "EMITIDA NF", value: "EMITIDO_NF" },
       { title: "ENV. PARA EMPENHO", value: "ENVIADO_EMPENHO" },
       { title: "EFETUADO", value: "EFETUADO" },
+    ],
+    months: [
+      { title: "Janeiro", value: 1 },
+      { title: "Fevereiro", value: 2 },
+      { title: "Março", value: 3 },
+      { title: "Abril", value: 4 },
+      { title: "Maio", value: 5 },
+      { title: "Junho", value: 6 },
+      { title: "Julho", value: 7 },
+      { title: "Agosto", value: 8 },
+      { title: "Setembro", value: 9 },
+      { title: "Outubro", value: 10 },
+      { title: "Novembro", value: 11 },
+      { title: "Dezembro", value: 12 },
     ],
     statusLabels: {
       AGUARDANDO_NF: "NF A EMITIR",
@@ -332,16 +338,40 @@ export default {
     },
     filters: {
       status: { value: null, compareType: "equal", prop: "status" },
+      mes: { value: null, compareType: "equal" },
+      ano: { value: null, compareType: "equal" },
     },
   }),
   computed: {
-    filteredUsers() {
+    gerarAnos() {
+      const anoAtual = new Date().getFullYear();
+      const anoInicio = 1900; // Define o ano inicial
+      return Array.from({ length: anoAtual - anoInicio + 1 }, (_, i) => anoAtual - i);
+    },
+
+    filteredPayments() {
       return this.payments
-        .map((payment) => ({
-          ...payment,
-        }))
+        .map((payment) => ({ ...payment }))
         .filter((item) => {
-          return this.filters.status.value ? item.status === this.filters.status.value : true;
+          const mes = Number(this.filters.mes.value); // Converter para número
+          const ano = Number(this.filters.ano.value);
+
+          // Garantindo que a string de data está no formato correto
+          console.log("Data recebida do backend: ", item.data);
+
+          // Criando um objeto Date corretamente
+          const data = new Date(`${item.data}T00:00:00`); // Garante que não há problemas com fuso horário
+
+          const mesData = data.getMonth() + 1; // getMonth() retorna 0-11, então somamos 1
+          const anoData = data.getFullYear();
+
+          // Aplicando o filtro corretamente
+          const filtroMesAno = mes && ano ? mesData === mes && anoData === ano : true;
+          const filtroStatus = this.filters.status.value ? item.status === this.filters.status.value : true;
+
+          console.log("Filtro Mes Ano: ", filtroMesAno);
+
+          return filtroMesAno && filtroStatus;
         });
     },
   },
@@ -485,8 +515,8 @@ export default {
         }
         let file = null;
 
-        if(this.file.get(fields.id) !== null || this.file.get(fields.id) !== undefined) {
-          file = this.file.get(fields.id)
+        if (this.file.get(fields.id) !== null || this.file.get(fields.id) !== undefined) {
+          file = this.file.get(fields.id);
         }
 
         formData.append("file", file);
@@ -556,11 +586,21 @@ export default {
   },
   mounted() {
     this.getPayments();
+    this.filters.ano.value = new Date().getFullYear();
+    this.filters.mes.value = new Date().getMonth() + 1
   },
 };
 </script>
 
 <style scoped>
+.custom-select-date {
+  background-color: rgb(226, 226, 226);
+}
+
+.custom-search {
+  background-color: rgb(226, 226, 226) !important;
+  border-radius: 20px;
+}
 .alert-status {
   font-size: 0.8rem;
   align-content: flex-start;
@@ -672,6 +712,7 @@ td {
 
 ::v-deep(.v-field__input) {
   font-size: 12px !important;
+  padding: 5px !important;
   justify-content: center !important;
   align-items: center !important;
   text-align: center !important;
@@ -684,9 +725,5 @@ td {
   align-items: center !important;
   text-align: center !important;
   white-space: normal !important;
-}
-
-.custom-table {
-  overflow-x: auto;
 }
 </style>

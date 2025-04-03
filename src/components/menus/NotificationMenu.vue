@@ -13,7 +13,9 @@
                 </v-card-actions>
             <v-list :lines="false" density="compact" nav v-if="notifications && notifications.length > 0">
                 <v-list-item v-for="(notification, index ) in notifications" :key="index" density="compact" class="custom-notification" append-icon="mdi-alert-circle-outline">
-                        <v-list-item-title>{{ notification.username }} está aguardando aprovação </v-list-item-title>
+                        <v-list-item-title>{{ notification.titulo }}
+                          <v-list-item-subtitle>{{ notification.mensagem }}</v-list-item-subtitle>
+                        </v-list-item-title>
                 </v-list-item>
             </v-list>
             <v-list :lines="false" density="compact" nav v-else>
