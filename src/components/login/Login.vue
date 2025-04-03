@@ -94,6 +94,7 @@
 <script>
 import axios from "@/services/axios.js";
 import { useToast } from "vue-toastification";
+import utilsFunc from "../../services/utilsFunc";
 
 export default {
   name: "TwoCardsExample",
@@ -121,6 +122,7 @@ export default {
         const token = fulltoken.split(" ")[1];
 
         localStorage.setItem("token", token);
+        localStorage.setItem('user', JSON.stringify(response.data))
         this.$router.push("/menu");
       } catch (error) {
         if(error.response) {
@@ -135,7 +137,7 @@ export default {
     },
   },
   mounted() {
-    console.log("TESTANDO")
+    console.log("TESTANDO");
   }
 };
 </script>

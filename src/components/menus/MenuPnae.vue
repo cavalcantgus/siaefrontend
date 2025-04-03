@@ -150,6 +150,9 @@ export default {
       }
     },
   },
+  async mounted() {
+    console.log("Notificacoes: ", await services.getNotificationsByUser())
+  }
 };
 </script>
 
