@@ -58,6 +58,14 @@ export default {
                     { title: "Meu Perfil", icon: "mdi-account-outline", to: "/profile" },
                     { title: "Sair", icon: "mdi-logout", action: "logout" },
                 ],
+            },
+
+            pagamento: {
+                notifications: [],
+                profileItems: [
+                    { title: "Meu Perfil", icon: "mdi-account-outline", to: "/profile" },
+                    { title: "Sair", icon: "mdi-logout", action: "logout" },
+                ],
             }
         },
 
@@ -67,8 +75,8 @@ export default {
        async aggregatingNotifications() {
             if(this.menu.admin && this.role.toLowerCase() === 'admin') {
                 this.menu.admin.notifications = await services.getPendingUsers()
-            } else if(this.menu.central && this.role.toLowerCase() === 'central') {
-                this.menu.central.notifications = await services.getNotificationsByUser()
+            } else if(this.menu.pagamento && this.role.toLowerCase() === 'pagamento') {
+                this.menu.pagamento.notifications = await services.getNotificationsByUser()
             }
             
 
