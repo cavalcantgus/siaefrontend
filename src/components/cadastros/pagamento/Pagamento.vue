@@ -109,7 +109,7 @@
           <template v-slot:[`item.delete`]="{ item }">
             <v-tooltip location="top">
               <template #activator="{ props }">
-                <ConfirmButton icon v-bind="props" :onConfirm="() => onDeleteRow(item)" class="elevation-0" disabled>
+                <ConfirmButton icon v-bind="props" :onConfirm="() => onDeleteRow(item)" class="elevation-0" :disabled="!isAllowed">
                   <v-icon color="red">mdi-delete</v-icon>
                 </ConfirmButton>
               </template>
@@ -233,6 +233,7 @@ import BtnComeBack from "../../template/BtnComeBack.vue";
 import ConfirmButton from "../../template/ConfirmButton.vue";
 import UtilsService from "../../../services/utilsService";
 import PagamentoExpand from "./PagamentoExpand.vue";
+import services from "@/services/utilsFunc.js";
 
 export default {
   name: "Pagamento",
@@ -243,6 +244,8 @@ export default {
     PagamentoExpand,
   },
   data: () => ({
+    role: services.getRoleFromToken(),
+    isAllowed: false,
     file: new Map(),
     fileInputs: new Map(),
     aguardando_nf: null,
@@ -542,20 +545,20 @@ export default {
       }
     },
 
-    async deleteProductor(fields) {
+    async deletePayment(fields) {
       console.log(fields);
       const toast = useToast();
       try {
-        const response = await axios.delete(`/public/produtores/produtor/${fields.id}`, fields);
+        const response = await axios.delete(`/public/pagamentos/pagamento/${fields.id}`, fields);
         if (response.status !== 204) {
           throw new Error(`Erro: `, response.status);
         }
-        toast.success("Produtor removido com sucesso!");
+        toast.success("Pagamento removido com sucesso!");
       } catch (error) {
-        toast.error("Erro ao deletar pesquisa: ", error);
+        toast.error("Erro ao deletar pagamento: ", error);
         console.error("Erro: ", error);
       } finally {
-        this.getProductors();
+        this.getPayments();
       }
     },
 
@@ -566,7 +569,7 @@ export default {
 
     onDeleteRow(row) {
       this.selectedRow = { ...row };
-      this.deleteProductor(this.selectedRow);
+      this.deletePayment(this.selectedRow);
     },
 
     onDownloadRow(row) {
@@ -588,6 +591,14 @@ export default {
     this.getPayments();
     this.filters.ano.value = new Date().getFullYear();
     this.filters.mes.value = new Date().getMonth() + 1
+
+    try {
+      if (this.role.toLowerCase() === "admin") {
+        this.isAllowed = true;
+      }
+    } catch (error) {
+      console.error(error);
+    }
   },
 };
 </script>
