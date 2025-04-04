@@ -1,4 +1,5 @@
 import axios from 'axios';
+import router from '../router/routes';
 
 // Configurações globais
 const api = axios.create({
@@ -17,4 +18,19 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+
+api.interceptors.response.use(
+    response => response,
+    error => {
+      if (error.response && error.response.status === 401) {
+        console.log(error.response)
+        localStorage.removeItem('token');
+  
+        if (router.currentRoute.value.path !== '/login') {
+          router.push('/login');
+        }
+      }
+      return Promise.reject(error);
+    }
+  );
 export default api;

@@ -1,28 +1,37 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
-    { path: '/login', name: 'Login', component: () => import("@/components/login/Login.vue")},
-    { path: '/admin', name: 'Admin', component: () => import("@/components/admin/DashboardAdmin.vue")},
-    { path: '/menu', name: 'Menu', component: () => import("@/components/Menu.vue")},
-    { path: '/register', name: 'Register', component: () => import("@/components/cadastros/Register.vue")},
-    { path: '/menu-pnae', name: 'Pnae', component: () => import("@/components/menus/MenuPnae.vue")},
-    { path: '/cadastro-produtor', name: 'Produtor', component: () => import("@/components/cadastros/produtor/Produtor.vue")},
-    { path: '/cadastro-produto', name: 'Produto', component: () => import("@/components/cadastros/produto/Produto.vue")},
-    { path: '/pesquisa-de-preco', name: 'PesquisaDePreco', component: () => import("@/components/cadastros/pesquisaDePreco/PesquisaDePreco.vue")},
-    { path: '/pauta-da-chamada', name: 'PautaDaChamada', component: () => import("@/components/cadastros/pautaDaChamada/PautaDaChamada.vue")},
-    { path: '/projeto-de-venda', name: 'ProjetoDeVenda', component: () => import("@/components/cadastros/projetoDeVenda/ProjetoDeVenda.vue")},
-    { path: '/comprovante', name: 'Entrega', component: () => import("@/components/cadastros/entrega/Entrega.vue")},
-    { path: '/contrato', name: 'Contrato', component: () => import("@/components/cadastros/contratos/RelacoesContratuais.vue")},
-    { path: '/relatorio', name: 'Relatorio', component: () => import("@/components/cadastros/relatorios/Relatorios.vue")},
-    { path: '/ata', name: 'Ata', component: () => import("@/components/cadastros/ata/Ata.vue")},
-    { path: '/pagamento', name: 'Pagamento', component: () => import("@/components/cadastros/pagamento/Pagamento.vue")},
-    { path: '/', redirect: '/login'},
+    { path: '/login', name: 'Login', component: () => import("@/components/login/Login.vue") },
+    { path: '/admin', name: 'Admin', component: () => import("@/components/admin/DashboardAdmin.vue"), meta: { requiresAuth: true }},
+    { path: '/menu', name: 'Menu', component: () => import("@/components/Menu.vue"), meta: { requiresAuth: true }},
+    { path: '/register', name: 'Register', component: () => import("@/components/cadastros/Register.vue"), meta: { requiresAuth: true }},
+    { path: '/menu-pnae', name: 'Pnae', component: () => import("@/components/menus/MenuPnae.vue"), meta: { requiresAuth: true }},
+    { path: '/cadastro-produtor', name: 'Produtor', component: () => import("@/components/cadastros/produtor/Produtor.vue"), meta: { requiresAuth: true }},
+    { path: '/cadastro-produto', name: 'Produto', component: () => import("@/components/cadastros/produto/Produto.vue"), meta: { requiresAuth: true }},
+    { path: '/pesquisa-de-preco', name: 'PesquisaDePreco', component: () => import("@/components/cadastros/pesquisaDePreco/PesquisaDePreco.vue"), meta: { requiresAuth: true }},
+    { path: '/pauta-da-chamada', name: 'PautaDaChamada', component: () => import("@/components/cadastros/pautaDaChamada/PautaDaChamada.vue"), meta: { requiresAuth: true }},
+    { path: '/projeto-de-venda', name: 'ProjetoDeVenda', component: () => import("@/components/cadastros/projetoDeVenda/ProjetoDeVenda.vue"), meta: { requiresAuth: true }},
+    { path: '/comprovante', name: 'Entrega', component: () => import("@/components/cadastros/entrega/Entrega.vue"), meta: { requiresAuth: true }},
+    { path: '/contrato', name: 'Contrato', component: () => import("@/components/cadastros/contratos/RelacoesContratuais.vue"), meta: { requiresAuth: true }},
+    { path: '/relatorio', name: 'Relatorio', component: () => import("@/components/cadastros/relatorios/Relatorios.vue"), meta: { requiresAuth: true }},
+    { path: '/ata', name: 'Ata', component: () => import("@/components/cadastros/ata/Ata.vue"), meta: { requiresAuth: true }},
+    { path: '/pagamento', name: 'Pagamento', component: () => import("@/components/cadastros/pagamento/Pagamento.vue"), meta: { requiresAuth: true }},
+    { path: '/', redirect: '/login' },
 ];
 
 const router = createRouter({
-    // Use o base correto para o GitHub Pages
-    history: createWebHistory('/siaefrontend/'),  // Aqui você coloca o caminho base
+    history: createWebHistory('/siaefrontend/'),  // Ajuste do caminho base
     routes,
+});
+
+router.beforeEach((to, from, next) => {
+    const token = localStorage.getItem('token'); // Verifica se o usuário tem um token válido
+
+    if (to.meta.requiresAuth && !token) {
+        next('/login'); // Redireciona para login se tentar acessar uma página protegida sem token
+    } else {
+        next(); // Permite a navegação normal
+    }
 });
 
 export default router;
