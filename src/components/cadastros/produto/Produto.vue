@@ -32,28 +32,19 @@
             </v-col>
           </v-row>
           <v-row class="mb-5 pl-1 ml-4">
-            <v-col
-              cols="auto"
-              class="pa-0 mr-4"
-            >
+            <v-col cols="auto" class="pa-0 mr-4">
               <span class="status-text">Produtos</span>
               <div class="d-flex align-center">
                 <v-icon small color="primary" left>mdi-account-check</v-icon>
                 <div class="d-flex flex-column ml-3 status-text align-start">
-                  <span
-                    
-                    class="text-xs font-weight-medium"
-                  >
+                  <span class="text-xs font-weight-medium">
                     {{ this.products.length }}
                     {{ this.products.length === 1 ? "Produto" : "Produtos" }} cadastrado(s)
                   </span>
                 </div>
               </div>
             </v-col>
-            <v-col
-              cols="auto"
-              class="pa-0 mr-4"
-            >
+            <v-col cols="auto" class="pa-0 mr-4">
               <div class="d-flex align-center">
                 <v-btn icon class="elevation-0" @click="downloadRelatorio">
                   <v-icon color="primary" left>mdi-file-download-outline</v-icon>
@@ -187,7 +178,7 @@ export default {
 
         if (Array.isArray(response.data)) {
           this.products = response.data;
-          this.products.sort((a, b) => a.descricao.localeCompare(b.descricao))
+          this.products.sort((a, b) => a.descricao.localeCompare(b.descricao));
         } else {
           console.log("A resposta da API não é um Array");
           this.products = [];
@@ -267,8 +258,46 @@ export default {
 
     downloadRelatorio() {
       const url = `https://siaeserver.com/public/produtos/relatorio/generate`;
-      window.location.href = url; // Redireciona o navegador e força o downlo
-    }
+      axios({
+        url: url,
+        method: "GET",
+        responseType: "blob",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+        .then((response) => {
+          console.log("Content-Disposition:", response);
+          const contentDisposition = response.headers["content-disposition"];
+          let fileName = "arquivo.pdf";
+
+          if (contentDisposition) {
+            let fileNameMatch = contentDisposition.match(/filename\*=UTF-8''(.+)/);
+            if (!fileNameMatch) {
+              fileNameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+            }
+
+            if (fileNameMatch?.[1]) {
+              console.log("Nome do arquivo bruto:", fileNameMatch[1]);
+              fileName = decodeURIComponent(fileNameMatch[1]);
+              console.log("Nome decodificado:", fileName);
+            }
+          }
+
+          const blob = new Blob([response.data], { type: "application/pdf" });
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = downloadUrl;
+          link.download = fileName;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(downloadUrl);
+        })
+        .catch((error) => {
+          console.error("Erro ao baixar o contrato:", error);
+        });
+    },
   },
   mounted() {
     this.getProducts();

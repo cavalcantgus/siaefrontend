@@ -10,7 +10,7 @@
             <v-col cols="5">
               <v-text-field class="border rounded" dense outlined hide-details v-model="search" label="Pesquisar" :append-inner-icon="'mdi-magnify'" clearable />
             </v-col>
-            <v-col class="text-end" >
+            <v-col class="text-end">
               <v-badge location="top start" bordered overlap>
                 <v-btn class="elevation-0" @click="showFilters = !showFilters">
                   <v-icon v-if="!showFilters" size="25px" left>mdi-filter</v-icon>
@@ -19,7 +19,7 @@
                 </v-btn>
               </v-badge>
             </v-col>
-            <v-col  class="button-group mr-4" align="end">
+            <v-col class="button-group mr-4" align="end">
               <v-tooltip location="top">
                 <template #activator="{ props }">
                   <v-btn color="success" class="elevation-3 compact-btn ml-3" min-width="25%" @click="dialog.create = true" v-bind="props">
@@ -31,7 +31,7 @@
               </v-tooltip>
             </v-col>
           </v-row>
-          <v-row justify="start" class="ml-0 mb-1 " style="margin-top: -20px">
+          <v-row justify="start" class="ml-0 mb-1" style="margin-top: -20px">
             <v-col class="" align="start" cols="12" sm="6" md="4" lg="auto">
               <v-tooltip location="top">
                 <template #activator="{ props }">
@@ -46,7 +46,7 @@
             <v-col class="" align="start" cols="12" sm="6" md="4" lg="auto">
               <v-tooltip location="top">
                 <template #activator="{ props }">
-                  <v-btn color="#4A90E2" class="elevation-3 compact-btn "  @click="dialog.converter = true" v-bind="props">
+                  <v-btn color="#4A90E2" class="elevation-3 compact-btn" @click="dialog.converter = true" v-bind="props">
                     <v-icon small class="compact-icon" left>mdi-swap-horizontal</v-icon>
                     <div class="d-flex flex-column compact-btn-text" style="font-size: 0.6rem"><span>Calculadora</span></div>
                   </v-btn>
@@ -57,7 +57,7 @@
             <v-col class="" align="start" cols="12" sm="6" md="4" lg="auto">
               <v-tooltip location="top">
                 <template #activator="{ props }">
-                  <v-btn color="#FABC4A" class="elevation-3 compact-btn text-grey-lighten-5" @click="dialog.payment = true" v-bind="props" >
+                  <v-btn color="#FABC4A" class="elevation-3 compact-btn text-grey-lighten-5" @click="dialog.payment = true" v-bind="props">
                     <v-icon small class="compact-icon" left>mdi-plus</v-icon>
                     <div class="d-flex flex-column compact-btn-text" style="font-size: 0.6rem"><span>Enviar P/</span><span>Pagamento</span></div>
                   </v-btn>
@@ -263,33 +263,107 @@ export default {
     },
 
     downloadRelatorio(item) {
-      console.log("Método chamado");
       const url = `https://siaeserver.com/public/comprovantes/relatorio/generate/${item.id}`;
-      window.location.href = url; // Redireciona o navegador e força o download
+      axios({
+        url: url,
+        method: "GET",
+        responseType: "blob",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+        .then((response) => {
+          console.log("Content-Disposition:", response);
+          const contentDisposition = response.headers["content-disposition"];
+          let fileName = "arquivo.pdf";
+
+          if (contentDisposition) {
+            let fileNameMatch = contentDisposition.match(/filename\*=UTF-8''(.+)/);
+            if (!fileNameMatch) {
+              fileNameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+            }
+
+            if (fileNameMatch?.[1]) {
+              console.log("Nome do arquivo bruto:", fileNameMatch[1]);
+              fileName = decodeURIComponent(fileNameMatch[1]);
+              console.log("Nome decodificado:", fileName);
+            }
+          }
+
+          const blob = new Blob([response.data], { type: "application/pdf" });
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = downloadUrl;
+          link.download = fileName;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(downloadUrl);
+        })
+        .catch((error) => {
+          console.error("Erro ao baixar o contrato:", error);
+        });
     },
 
     downloadRelatorioMensal(fields) {
-      console.log(fields);
       const { mes, ano } = fields;
       const url = `https://siaeserver.com/public/comprovantes/relatorio/mensal/generate/${mes}/${ano}`;
-      window.location.href = url; // Redireciona o navegador e força o download
+      axios({
+        url: url,
+        method: "GET",
+        responseType: "blob",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+        .then((response) => {
+          console.log("Content-Disposition:", response);
+          const contentDisposition = response.headers["content-disposition"];
+          let fileName = "arquivo.pdf";
+
+          if (contentDisposition) {
+            let fileNameMatch = contentDisposition.match(/filename\*=UTF-8''(.+)/);
+            if (!fileNameMatch) {
+              fileNameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+            }
+
+            if (fileNameMatch?.[1]) {
+              console.log("Nome do arquivo bruto:", fileNameMatch[1]);
+              fileName = decodeURIComponent(fileNameMatch[1]);
+              console.log("Nome decodificado:", fileName);
+            }
+          }
+
+          const blob = new Blob([response.data], { type: "application/pdf" });
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = downloadUrl;
+          link.download = fileName;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(downloadUrl);
+        })
+        .catch((error) => {
+          console.error("Erro ao baixar o contrato:", error);
+        });
     },
 
     async sendToPayment(fields) {
       const toast = useToast();
       try {
-        const response = await axios.post("/public/pagamentos/pagamento", fields)
+        const response = await axios.post("/public/pagamentos/pagamento", fields);
 
-        if(response.status !== 200) {
-          throw new Error("Erro com a requisição")
+        if (response.status !== 200) {
+          throw new Error("Erro com a requisição");
         }
-        toast.success("Entregas enviadas para o pagamento com sucesso")
-        console.log(response)
+        toast.success("Entregas enviadas para o pagamento com sucesso");
+        console.log(response);
       } catch (error) {
-        toast.error("Ocorreu um erro ao enviar as entregas para o pagamento com sucesso")
-        console.error(error)
+        toast.error("Ocorreu um erro ao enviar as entregas para o pagamento com sucesso");
+        console.error(error);
       } finally {
-        this.dialog.payment = false
+        this.dialog.payment = false;
       }
     },
 

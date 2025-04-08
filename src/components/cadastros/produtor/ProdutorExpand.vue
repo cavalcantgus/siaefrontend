@@ -122,9 +122,7 @@
         </template>
     </v-data-table-virtual>
    </v-row> -->
-  <h4 align="start" class="pa-2">
-    Documentos do produtor
-  </h4>
+  <h4 align="start" class="pa-2">Documentos do produtor</h4>
   <v-row dense class="border-md pa-2">
     <v-col v-for="(documento, index) in produtorData.documentos" :key="index" cols="12" sm="6" md="3" lg="2">
       <v-card class="pa-3" outlined style="height: 200px; overflow: hidden; display: flex; flex-direction: column">
@@ -136,7 +134,7 @@
               <v-col class="text-center" height="200">
                 <v-tooltip location="top">
                   <template #activator="{ props }">
-                    <v-btn  icon v-bind="props" @click="downloadFile(item)" class="elevation-0" color="#f4f1e4">
+                    <v-btn icon v-bind="props" @click="downloadFile(documento)" class="elevation-0" color="#f4f1e4">
                       <v-icon size="50" color="primary">mdi-download-box</v-icon>
                     </v-btn>
                   </template>
@@ -195,12 +193,28 @@ export default {
 
     downloadFile(item) {
       const url = `https://siaeserver.com/document/download/${item?.fileName}`;
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = item.fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      axios({
+        url: url,
+        method: "GET",
+        responseType: "blob",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Substitua pela forma como você armazena seu token
+        },
+      })
+        .then((response) => {
+          const blob = new Blob([response.data]);
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = downloadUrl;
+          link.download = item?.fileName || "arquivo";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(downloadUrl);
+        })
+        .catch((error) => {
+          console.error("Erro ao fazer download do arquivo:", error);
+        });
     },
 
     async deleteFile(item) {

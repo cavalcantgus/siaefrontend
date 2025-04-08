@@ -224,9 +224,46 @@ export default {
     },
 
     downloadRelatorio(item) {
-      console.log("Método chamado");
       const url = `https://siaeserver.com/public/projetos/relatorio/generate/${item.id}`;
-      window.location.href = url; // Redireciona o navegador e força o download
+      axios({
+        url: url,
+        method: "GET",
+        responseType: "blob",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+        .then((response) => {
+          console.log("Content-Disposition:", response);
+          const contentDisposition = response.headers["content-disposition"];
+          let fileName = "arquivo.pdf";
+
+          if (contentDisposition) {
+            let fileNameMatch = contentDisposition.match(/filename\*=UTF-8''(.+)/);
+            if (!fileNameMatch) {
+              fileNameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+            }
+
+            if (fileNameMatch?.[1]) {
+              console.log("Nome do arquivo bruto:", fileNameMatch[1]);
+              fileName = decodeURIComponent(fileNameMatch[1]);
+              console.log("Nome decodificado:", fileName);
+            }
+          }
+
+          const blob = new Blob([response.data], { type: "application/pdf" });
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = downloadUrl;
+          link.download = fileName;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(downloadUrl);
+        })
+        .catch((error) => {
+          console.error("Erro ao baixar o contrato:", error);
+        });
     },
 
     async getProducts() {

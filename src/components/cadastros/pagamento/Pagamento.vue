@@ -139,7 +139,7 @@
                     </v-btn>
                   </v-col>
                   <v-col cols="12" sm="6" md="4" lg="">
-                    <v-btn icon class="elevation-0" @click="downloadFile(item)" style="background-color: transparent; background: none"><v-icon color="primary">mdi-download</v-icon></v-btn>
+                    <v-btn icon class="elevation-0" @click="downloadFile(item.notaFiscal)" style="background-color: transparent; background: none"><v-icon color="primary">mdi-download</v-icon></v-btn>
                   </v-col>
                 </v-row>
 
@@ -156,11 +156,11 @@
           <template v-slot:[`item.data`]="{ item }">
             <span>{{ formatData(item.data) }}</span>
           </template>
-          <template v-slot:[`item.status`]="{ index, item }">
+          <template v-slot:[`item.status`]="{ item }">
             <v-select
               style="margin-bottom: -8px; margin-top: 13px; margin-right: -80px; margin-left: 0px"
               :persistent-placeholder="true"
-              v-model="this.payments[index].status"
+              v-model="item.status"
               :width="200"
               :items="options"
               :bg-color="getStatusColor(item.status)"
@@ -171,7 +171,7 @@
               variant="outlined"
               class="elevation-0"
               item-color="green"
-              @update:model-value="handleSelectionChange(index, $event, item)"
+              @update:model-value="handleSelectionChange($event, item)"
             >
             </v-select>
           </template>
@@ -407,7 +407,8 @@ export default {
       this.file.set(id, value);
     },
 
-    handleSelectionChange(index, value, row) {
+    handleSelectionChange(value, row) {
+      console.log("ROW: ", row);
       this.selectedRow = JSON.parse(JSON.stringify({ ...row }));
       this.selectedValue = value;
       this.updatePaymentAndUploadFile(this.selectedRow);
@@ -461,14 +462,30 @@ export default {
     },
 
     downloadFile(item) {
+      const url = `https://siaeserver.com/notas/download/${item?.fileName}`;
       console.log(item);
-      const url = `https://siaeserver.com/notas/download/${item?.notaFiscal?.fileName}`;
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = item?.fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      axios({
+        url: url,
+        method: "GET",
+        responseType: "blob",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Substitua pela forma como você armazena seu token
+        },
+      })
+        .then((response) => {
+          const blob = new Blob([response.data]);
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = downloadUrl;
+          link.download = item?.fileName || "arquivo";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(downloadUrl);
+        })
+        .catch((error) => {
+          console.error("Erro ao fazer download do arquivo:", error);
+        });
     },
 
     async getPayments() {
@@ -584,13 +601,51 @@ export default {
 
     downloadComprovante(item) {
       const url = `https://siaeserver.com/public/pagamentos/relatorio/generate/${item.id}`;
-      window.location.href = url; // Redireciona o navegador e força o downlo
+      axios({
+        url: url,
+        method: "GET",
+        responseType: "blob",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+        .then((response) => {
+          console.log("Content-Disposition:", response);
+          const contentDisposition = response.headers["content-disposition"];
+          let fileName = "arquivo.pdf";
+
+          if (contentDisposition) {
+            let fileNameMatch = contentDisposition.match(/filename\*=UTF-8''(.+)/);
+            if (!fileNameMatch) {
+              fileNameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+            }
+
+            if (fileNameMatch?.[1]) {
+              console.log("Nome do arquivo bruto:", fileNameMatch[1]);
+              fileName = decodeURIComponent(fileNameMatch[1]);
+              console.log("Nome decodificado:", fileName);
+            }
+          }
+
+          const blob = new Blob([response.data], { type: "application/pdf" });
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = downloadUrl;
+          link.download = fileName;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(downloadUrl);
+        })
+        .catch((error) => {
+          console.error("Erro ao baixar o contrato:", error);
+        });
     },
   },
   mounted() {
     this.getPayments();
     this.filters.ano.value = new Date().getFullYear();
-    this.filters.mes.value = new Date().getMonth() + 1
+    this.filters.mes.value = new Date().getMonth() + 1;
 
     try {
       if (this.role.toLowerCase() === "admin") {

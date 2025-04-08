@@ -20,19 +20,19 @@
   </h4>
   <v-row dense style="height: 200px" class="border-md pa-2">
     <v-col v-for="(projeto, index) in projetoData.projetoProdutos" :key="index" cols="2" class="d-flex flex-wrap flex-column mr-16 h-50">
-      <div class="d-flex flex-wrap flex-column mr-16" style="height: 175px; border: 2px solid white; width:390px" align="start">
-        <p class="pl-3 pt-2" style="margin-right: -100px; font-weight: bold; width: 150px;;">Produto {{ index + 1 }}</p>
+      <div class="d-flex flex-wrap flex-column mr-16" style="height: 175px; border: 2px solid white; width: 390px" align="start">
+        <p class="pl-3 pt-2" style="margin-right: -100px; font-weight: bold; width: 150px">Produto {{ index + 1 }}</p>
 
         <div class="d-flex container mt-2" align="start" style="width: 100%; height: 100%">
           <v-col cols="12" class="mt-6 pt-2 container" align="start" style="margin-left: -50px">
-            <span style="font-weight: bold;">Descrição:</span>
+            <span style="font-weight: bold">Descrição:</span>
             <p>{{ projeto.produto.descricao }}</p>
             <br />
             <span>Unidade:</span>
             <p>{{ projeto.produto.unidade }}</p>
           </v-col>
-          <v-col cols="9" align="start" class="mt-5 container" style="margin-left: -130px; ">
-            <span style="font-weight: bold;">Preço Médio:</span>
+          <v-col cols="9" align="start" class="mt-5 container" style="margin-left: -130px">
+            <span style="font-weight: bold">Preço Médio:</span>
             <p>{{ formatPrice(projeto.produto.precoMedio) }}</p>
             <br />
             <span>Quantidade:</span>
@@ -154,7 +154,7 @@ export default {
   }),
   methods: {
     age(item) {
-      console.log('Método chamado')
+      console.log("Método chamado");
       const today = new Date();
       const birthDate = new Date(item);
       let age = today.getFullYear() - birthDate.getFullYear();
@@ -163,7 +163,7 @@ export default {
       if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
         age--;
       }
-      console.log(age)
+      console.log(age);
       return age;
     },
 
@@ -237,7 +237,6 @@ export default {
 </script>
 
 <style scoped>
-
 .container {
   display: grid;
   grid-gap: 3px;
