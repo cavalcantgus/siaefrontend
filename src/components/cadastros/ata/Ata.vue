@@ -259,22 +259,39 @@ export default {
         method: "GET",
         responseType: "blob",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Substitua pela forma como você armazena seu token
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       })
         .then((response) => {
-          const blob = new Blob([response.data]);
+          console.log("Content-Disposition:", response);
+          const contentDisposition = response.headers["content-disposition"];
+          let fileName = "arquivo.pdf";
+
+          if (contentDisposition) {
+            let fileNameMatch = contentDisposition.match(/filename\*=UTF-8''(.+)/);
+            if (!fileNameMatch) {
+              fileNameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+            }
+
+            if (fileNameMatch?.[1]) {
+              console.log("Nome do arquivo bruto:", fileNameMatch[1]);
+              fileName = decodeURIComponent(fileNameMatch[1]);
+              console.log("Nome decodificado:", fileName);
+            }
+          }
+
+          const blob = new Blob([response.data], { type: "application/pdf" });
           const downloadUrl = window.URL.createObjectURL(blob);
           const link = document.createElement("a");
           link.href = downloadUrl;
-          link.download = "ata";
+          link.download = fileName;
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
           window.URL.revokeObjectURL(downloadUrl);
         })
         .catch((error) => {
-          console.error("Erro ao fazer download do arquivo:", error);
+          console.error("Erro ao baixar o contrato:", error);
         });
     },
 
