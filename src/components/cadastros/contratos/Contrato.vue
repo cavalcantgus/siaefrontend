@@ -1,5 +1,4 @@
 <template>
- 
   <BtnComeBack></BtnComeBack>
   <h1 style="color: #57a340; margin-top: 10px; padding: 30px; font-size: 3rem">Contratos</h1>
   <v-row justify="center" class="pr-2">
@@ -32,18 +31,12 @@
             </v-col>
           </v-row>
           <v-row class="mb-5 pl-1 ml-4">
-            <v-col
-              cols="auto"
-              class="pa-0 mr-4"
-            >
+            <v-col cols="auto" class="pa-0 mr-4">
               <span class="status-text">Contratos</span>
               <div class="d-flex align-center">
                 <v-icon small color="primary" left>mdi-account-check</v-icon>
                 <div class="d-flex flex-column ml-3 status-text align-start">
-                  <span
-                    
-                    class="text-xs font-weight-medium"
-                  >
+                  <span class="text-xs font-weight-medium">
                     {{ this.contracts.length }}
                     {{ this.contracts.length === 1 ? "Contrato" : "Contratos" }} cadastrado(s)
                   </span>
@@ -172,7 +165,7 @@ export default {
   },
   methods: {
     formatData(val) {
-      return UtilsService.formatData(val)
+      return UtilsService.formatData(val);
     },
 
     async getContracts() {
@@ -182,7 +175,7 @@ export default {
 
         if (Array.isArray(response.data)) {
           this.contracts = response.data;
-          this.contracts.sort((a, b) => a.produtor.nome.localeCompare(b.produtor.nome))
+          this.contracts.sort((a, b) => a.produtor.nome.localeCompare(b.produtor.nome));
         } else {
           console.log("A resposta da API não é um Array");
           this.contracts = [];
@@ -203,13 +196,13 @@ export default {
           throw new Error(`Erro: ${response.status}`);
         }
         toast.success("Contrato cadastrado com sucesso!");
-        this.downloadContrato(response.data.id)
+        this.downloadContrato(response.data.id);
       } catch (error) {
         console.error("Erro: ", error);
         toast.error("Erro ao cadastrar contrato: ", error);
       } finally {
         this.dialog.create = false;
-        this.getContracts();      
+        this.getContracts();
       }
     },
 
@@ -252,7 +245,46 @@ export default {
 
     downloadContrato(produtorId) {
       const url = `https://siaeserver.com/public/contratos/contrato/generate/${produtorId}`;
-      window.location.href = url; // Redireciona o navegador e força o download
+
+      axios({
+        url: url,
+        method: "GET",
+        responseType: "blob",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+        .then((response) => {
+          console.log("Content-Disposition:", response);
+          const contentDisposition = response.headers["content-disposition"];
+          let fileName = "contrato.pdf";
+
+          if (contentDisposition) {
+            let fileNameMatch = contentDisposition.match(/filename\*=UTF-8''(.+)/);
+            if (!fileNameMatch) {
+              fileNameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+            }
+
+            if (fileNameMatch?.[1]) {
+              console.log("Nome do arquivo bruto:", fileNameMatch[1]);
+              fileName = decodeURIComponent(fileNameMatch[1]);
+              console.log("Nome decodificado:", fileName);
+            }
+          }
+
+          const blob = new Blob([response.data], { type: "application/pdf" });
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = downloadUrl;
+          link.download = fileName;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(downloadUrl);
+        })
+        .catch((error) => {
+          console.error("Erro ao baixar o contrato:", error);
+        });
     },
 
     onSelectRow(row, dialog) {
@@ -282,7 +314,7 @@ export default {
 .sticky-icon {
   display: flex;
   font-weight: bold !important;
-  top: 0 !important; 
+  top: 0 !important;
   color: #57a340;
   justify-content: flex-end;
   align-items: flex-end;

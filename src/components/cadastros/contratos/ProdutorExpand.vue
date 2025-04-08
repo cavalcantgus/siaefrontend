@@ -52,40 +52,38 @@
       <p>{{ produtorData.cep }}</p>
     </v-col>
   </v-row>
-  <v-row dense style="height: 50vh; width: 452px; margin-top: 34px; border-top: 2px solid #CCCCCC;" class=" float-end">
-    <v-data-table-virtual :items="produtorData.documentos" :headers="headers"  class="h-75 " align="start" :items-per-page="3" :fixed-header="true">
+  <v-row dense style="height: 50vh; width: 452px; margin-top: 34px; border-top: 2px solid #cccccc" class="float-end">
+    <v-data-table-virtual :items="produtorData.documentos" :headers="headers" class="h-75" align="start" :items-per-page="3" :fixed-header="true">
       <template v-slot:top>
-        <h4 align="center" class="pa-2">
-          Documentos do produtor
-        </h4>
+        <h4 align="center" class="pa-2">Documentos do produtor</h4>
       </template>
-        <template v-slot:[`item.download`]="{ item }">
-          <v-tooltip location="top">
-            <template #activator="{ props }">
-              <v-btn icon v-bind="props" @click="downloadFile(item)" class="elevation-0">
-                <v-icon color="primary">mdi-download-box</v-icon>
-              </v-btn>
-            </template>
-            <span>Clique para baixar um arquivo</span>
-          </v-tooltip>
-        </template>
-        <template v-slot:[`item.remove`]="{ item }">
-          <v-tooltip location="top">
-            <template #activator="{ props }">
-              <v-btn icon v-bind="props" @click="deleteFile(item)" class="elevation-0">
-                <v-icon color="red">mdi-delete</v-icon>
-              </v-btn>
-            </template>
-            <span>Clique para remover um arquivo</span>
-          </v-tooltip>
-        </template>
+      <template v-slot:[`item.download`]="{ item }">
+        <v-tooltip location="top">
+          <template #activator="{ props }">
+            <v-btn icon v-bind="props" @click="downloadFile(item)" class="elevation-0">
+              <v-icon color="primary">mdi-download-box</v-icon>
+            </v-btn>
+          </template>
+          <span>Clique para baixar um arquivo</span>
+        </v-tooltip>
+      </template>
+      <template v-slot:[`item.remove`]="{ item }">
+        <v-tooltip location="top">
+          <template #activator="{ props }">
+            <v-btn icon v-bind="props" @click="deleteFile(item)" class="elevation-0">
+              <v-icon color="red">mdi-delete</v-icon>
+            </v-btn>
+          </template>
+          <span>Clique para remover um arquivo</span>
+        </v-tooltip>
+      </template>
     </v-data-table-virtual>
-   </v-row>
+  </v-row>
   <h4 align="start" class="pa-2">
     Dados Bancários
     <v-icon>mdi-bank</v-icon>
   </h4>
-  <v-row dense style="height: 100px; width: 50vw;" class="border-md pa-2">
+  <v-row dense style="height: 100px; width: 50vw" class="border-md pa-2">
     <v-col cols="3" align="start" class="h-75">
       <h4>Banco:</h4>
       <p>{{ produtorData.banco }}</p>
@@ -107,7 +105,7 @@
     Dados da CAF
     <v-icon>mdi-text-box-multiple-outline</v-icon>
   </h4>
-  <v-row dense style="height: 120px; width: 50vw;" class="border-md pa-2">
+  <v-row dense style="height: 120px; width: 50vw" class="border-md pa-2">
     <v-col cols="3" align="start" class="h-75">
       <h4>CAF:</h4>
       <p>{{ produtorData.caf }}</p>
@@ -148,30 +146,30 @@ export default {
       if (m < 0 || (m === 0 && date.getDate() < bornDate.getDate())) {
         age--;
       }
-      this.produtorData.dataNascimento = age
+      this.produtorData.dataNascimento = age;
     },
 
     downloadFile(item) {
-        const url = `https://siaeserver.com/document/download/${item?.fileName}`
-        const link = document.createElement('a')
-        link.href = url
-        link.download = item.fileName
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
+      const url = `https://siaeserver.com/document/download/${item?.fileName}`;
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = item.fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     },
 
     async deleteFile(item) {
-      const toast = useToast()
-      console.log("Id do arquivo: ", item.id)
+      const toast = useToast();
+      console.log("Id do arquivo: ", item.id);
       try {
-        const response = await axios.delete(`/document/delete/${item.id}/${this.produtorData.id}`)
-        if(response.status !== 204) {
-          throw new Error("Erro: ", response.status)
+        const response = await axios.delete(`/document/delete/${item.id}/${this.produtorData.id}`);
+        if (response.status !== 204) {
+          throw new Error("Erro: ", response.status);
         }
-        toast.success("Arquivo removido com sucesso!")
+        toast.success("Arquivo removido com sucesso!");
       } catch (error) {
-        toast.error("Erro ao remover arquivo: ", error)
+        toast.error("Erro ao remover arquivo: ", error);
       }
     },
 
@@ -193,8 +191,7 @@ export default {
     },
   },
   mounted() {
-    this.getAge(),
-    console.log(this.produtorData?.documentos)
+    this.getAge(), console.log(this.produtorData?.documentos);
   },
 };
 </script>

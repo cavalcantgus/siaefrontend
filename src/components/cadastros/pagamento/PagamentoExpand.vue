@@ -35,9 +35,7 @@
     </v-col>
   </v-row>
 
-  <h4 align="start" class="pa-2" v-if="produtorData.notaFiscal">
-    Documentos
-  </h4>
+  <h4 align="start" class="pa-2" v-if="produtorData.notaFiscal">Documentos</h4>
   <v-row dense class="border-md pa-2" v-if="produtorData.notaFiscal">
     <v-col cols="12" sm="6" md="3" lg="2">
       <v-card class="pa-3" outlined style="height: 200px; overflow: hidden; display: flex; flex-direction: column">
@@ -49,7 +47,7 @@
               <v-col class="text-center" height="200">
                 <v-tooltip location="top">
                   <template #activator="{ props }">
-                    <v-btn  icon v-bind="props" @click="downloadFile(produtorData.notaFiscal)" class="elevation-0" color="#f4f1e4">
+                    <v-btn icon v-bind="props" @click="downloadFile(produtorData.notaFiscal)" class="elevation-0" color="#f4f1e4">
                       <v-icon size="30" color="primary">mdi-download-box</v-icon>
                     </v-btn>
                   </template>
@@ -102,16 +100,16 @@ export default {
       val = UtilsService.formatReal(val);
       return val;
     },
-   
-    downloadFile(item) {
-      const url = `https://siaeserver.com/notas/download/${item?.fileName}`;
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = item?.fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    },
+
+    // downloadFile(item) {
+    //   const url = `https://siaeserver.com/notas/download/${item?.fileName}`;
+    //   const link = document.createElement("a");
+    //   link.href = url;
+    //   link.download = item?.fileName;
+    //   document.body.appendChild(link);
+    //   link.click();
+    //   document.body.removeChild(link);
+    // },
 
     async deleteFile(item) {
       const toast = useToast();

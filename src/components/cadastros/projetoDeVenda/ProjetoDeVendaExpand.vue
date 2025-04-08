@@ -19,8 +19,7 @@
     <v-icon>mdi-file-account</v-icon>
   </h4>
   <v-row dense class="border-md pa-2">
-    <v-col v-for="(projeto, index) in projetoData.projetoProdutos" :key="index" 
-    cols="12" sm="6" md="3" lg="3">
+    <v-col v-for="(projeto, index) in projetoData.projetoProdutos" :key="index" cols="12" sm="6" md="3" lg="3">
       <v-card class="pa-3" outlined style="height: 200px; overflow: hidden; display: flex; flex-direction: column">
         <v-card-title class="text-h6" style="flex-shrink: 0">Produto {{ index + 1 }}</v-card-title>
         <v-card-text align="start" style="font-size: 0.8rem; overflow-y: auto; flex-grow: 1">
@@ -177,16 +176,6 @@ export default {
         age--;
       }
       this.projetoData.dataNascimento = age;
-    },
-
-    downloadFile(item) {
-      const url = `https://siaeserver.com/document/download/${item?.fileName}`;
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = item.fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
     },
 
     async deleteFile(item) {

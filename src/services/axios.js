@@ -24,6 +24,7 @@ api.interceptors.response.use(
     error => {
       if (error.response && error.response.status === 401) {
         console.log(error.response)
+        console.log(error.response.data)
         localStorage.removeItem('token');
   
         if (router.currentRoute.value.path !== '/login') {

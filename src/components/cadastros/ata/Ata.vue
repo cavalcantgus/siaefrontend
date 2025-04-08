@@ -134,12 +134,11 @@
 import NavBar from "../../NavBar.vue";
 import BtnComeBack from "../../template/BtnComeBack.vue";
 import axios from "@/services/axios.js";
-import AtaDaChamada from './AtaDaChamada.vue';
+import AtaDaChamada from "./AtaDaChamada.vue";
 import EditAta from "./EditAta.vue";
 import { useToast } from "vue-toastification";
 import ConfirmButton from "../../template/ConfirmButton.vue";
 import UtilsService from "../../../services/utilsService";
-
 
 export default {
   name: "Ata",
@@ -147,8 +146,8 @@ export default {
     NavBar,
     BtnComeBack,
     AtaDaChamada,
-    EditAta, 
-    ConfirmButton
+    EditAta,
+    ConfirmButton,
   },
   data: () => ({
     atas: [],
@@ -177,9 +176,9 @@ export default {
     },
   }),
   computed: {
-      filteredAtas() {
-        return this.atas
-      },
+    filteredAtas() {
+      return this.atas;
+    },
   },
   methods: {
     formatDate(val) {
@@ -187,19 +186,19 @@ export default {
     },
 
     async getAtas() {
-        try {
-            const { data } = await axios.get("public/atas")
-            this.atas = data
-            console.log(this.atas)
-        } catch (error) {
-            console.error(error)
-        }
+      try {
+        const { data } = await axios.get("public/atas");
+        this.atas = data;
+        console.log(this.atas);
+      } catch (error) {
+        console.error(error);
+      }
     },
 
     async createAta(fields) {
-      const toast = useToast()
+      const toast = useToast();
       try {
-        const response = await axios.post("public/atas/ata", fields)
+        const response = await axios.post("public/atas/ata", fields);
 
         console.log(response.data);
 
@@ -212,14 +211,14 @@ export default {
         toast.error("Erro ao cadastrar entrega: ", error);
       } finally {
         this.dialog.create = false;
-        this.getAtas()
+        this.getAtas();
       }
     },
 
     async updateAta(fields) {
-      const toast = useToast()
+      const toast = useToast();
       try {
-        const response = await axios.put(`public/atas/ata/${fields.id}`, fields)
+        const response = await axios.put(`public/atas/ata/${fields.id}`, fields);
 
         console.log(response.data);
 
@@ -232,7 +231,7 @@ export default {
         toast.error("Erro ao atualizar ata: ", error);
       } finally {
         this.dialog.update = false;
-        this.getAtas()
+        this.getAtas();
       }
     },
 
@@ -253,9 +252,30 @@ export default {
     },
 
     downloadAta(item) {
-      console.log("Método chamado");
       const url = `https://siaeserver.com/public/atas/ata/generate/${item.id}`;
-      window.location.href = url; // Redireciona o navegador e força o download
+
+      axios({
+        url: url,
+        method: "GET",
+        responseType: "blob",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Substitua pela forma como você armazena seu token
+        },
+      })
+        .then((response) => {
+          const blob = new Blob([response.data]);
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = downloadUrl;
+          link.download = "ata";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(downloadUrl);
+        })
+        .catch((error) => {
+          console.error("Erro ao fazer download do arquivo:", error);
+        });
     },
 
     onSelectRow(row, dialog) {
@@ -275,7 +295,7 @@ export default {
     },
   },
   mounted() {
-    this.getAtas()
+    this.getAtas();
   },
 };
 </script>
