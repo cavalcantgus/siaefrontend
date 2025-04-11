@@ -117,7 +117,6 @@ export default {
       try {
         console.log("Teste de requisição");
         const response = await axios.post("/login/auth", fields);
-        console.log(response.status);
         const fulltoken = response.data.token;
         const token = fulltoken.split(" ")[1];
 
@@ -126,8 +125,13 @@ export default {
         this.$router.push("/menu");
       } catch (error) {
         if(error.response) {
-          toast.error("Erro ao fazer o login. " + error.response.data.message)
-          console.log(error.response.data.message)
+          console.log(error.response)
+          if(error.response.data.message === "Seu login ainda não foi habilitado. Confirme o e-mail.") {
+            toast.warning(error.response.data.message)
+          }
+          else {
+            toast.error("Erro ao fazer o login. " + error.response.data.message)
+          }
         } else {
           console.error("Erro de conexão: ", error)
         }

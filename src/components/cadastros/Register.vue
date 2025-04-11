@@ -39,55 +39,33 @@
                     <p>Esqueci a senha</p>
                   </router-link>
                 </div>
-                <v-text-field
-                  v-model="username"
-                  rounded
-                  variant="outlined"
-                  placeholder="Usuário"
-                  dense
-                  hide-details
-                />
+                <v-text-field v-model="username" rounded variant="outlined" placeholder="Usuário" dense hide-details />
               </v-col>
             </v-row>
             <v-row dense>
               <v-col>
-                <v-text-field
-                  v-model="email"
-                  rounded
-                  variant="outlined"
-                  placeholder="Email"
-                  dense
-                  hide-details
-                />
+                <v-text-field v-model="email" rounded variant="outlined" placeholder="Email" dense hide-details />
               </v-col>
             </v-row>
             <v-row dense>
               <v-col>
-                <v-text-field
-                  v-model="password"
-                  rounded
-                  variant="outlined"
-                  placeholder="Senha"
-                  :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                  :type="showPassword ? 'text' : 'password'"
-                  @click:append-inner="showPassword = !showPassword"
-                  dense
-                  hide-details
-                  class="custom-text-field"
-                />
+                <v-text-field v-model="password" rounded variant="outlined" placeholder="Senha" :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" :type="showPassword ? 'text' : 'password'" @click:append-inner="showPassword = !showPassword" dense hide-details class="custom-text-field" />
               </v-col>
             </v-row>
           </v-card-text>
           <v-card-actions>
             <v-container>
-              <v-btn type="submit" class="btn-login"> Cadastrar </v-btn>
+              <v-btn :loading="loading" type="submit" class="btn-login">
+                Cadastrar
+                <template v-slot:loader>
+                  <v-progress-circular indeterminate color="white"></v-progress-circular>
+                </template>
+              </v-btn>
             </v-container>
           </v-card-actions>
           <v-row dense justify="end">
             <v-col class="text-end forgot-password-container">
-              <router-link class="forgot_password" to="/change-password"
-                >Esqueci minha senha</router-link
-              >
+              <router-link class="forgot_password" to="/change-password">Esqueci minha senha</router-link>
             </v-col>
           </v-row>
         </v-form>
@@ -98,11 +76,13 @@
 
 <script>
 import axios from "@/services/axios.js";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "TwoCardsExample",
 
   data: () => ({
+    loading: false,
     username: null,
     email: null,
     password: null,
@@ -110,6 +90,8 @@ export default {
   }),
   methods: {
     async register() {
+      const toast = useToast();
+      this.loading = true;
       const fields = {
         username: this.username,
         email: this.email,
@@ -119,14 +101,19 @@ export default {
       try {
         console.log("Teste de requisição");
         const response = await axios.post("/public/users/register", fields);
+        if (response.status === 409) {
+          throw new Error("Um erro ocorreu:");
+        }
         console.log(response);
-        const fulltoken = response.data.token;
-        const token = fulltoken.split(" ")[1];
-
-        localStorage.setItem("token", token);
-        this.$router.push("/menu");
+        localStorage.setItem("canAccessEmailVerification", "true");
+        this.$router.push({
+          name: "MailVerification",
+          query: { email: this.email },
+        });
       } catch (error) {
-        console.log("Erro no login", error);
+        const errorMessage = error.response?.data?.error || "Erro inesperado.";
+        toast.error(errorMessage);
+        this.loading = false;
       }
     },
   },

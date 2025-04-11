@@ -94,3 +94,17 @@ h6 {
   word-break: break-all;
 }
 
+#nprogress .bar {
+  background: #57a340 !important; /* verde SIAE */
+  height: 4px !important;         /* espessura da barra */
+}
+
+/* Remove o spinner (bolinha girando no canto) */
+#nprogress .spinner {
+  display: none !important;
+}
+
+/* Personaliza a sombra da barra */
+#nprogress .bar {
+  box-shadow: 0 0 10px #57a340, 0 0 5px #57a340;
+}
