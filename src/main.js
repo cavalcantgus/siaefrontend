@@ -11,8 +11,32 @@ import VuetifyMoney from 'vuetify-money-3'
 import App from './App.vue'
 import VueTheMask from 'vue-the-mask'
 
+import axios from 'axios';
+
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
+
+import nProgress from 'nprogress';
+import 'nprogress/nprogress.css'
+
+nProgress.configure({
+  showSpinner: false,
+  trickle: true,           // habilita o "ping"
+  trickleSpeed: 200,       // frequência dos passos
+  minimum: 0.1,            // início visível
+  easing: 'ease',          // suavidade
+  speed: 500               // velocidade da transição
+})
+
+router.beforeEach((to, from, next) => {
+  nProgress.start()
+  next()
+})
+
+router.afterEach(() => {
+  nProgress.done()
+})
+
 
 const app = createApp(App)
 const vuetify = createVuetify({
