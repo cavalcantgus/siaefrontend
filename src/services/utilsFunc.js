@@ -1,6 +1,17 @@
 import axios from "@/services/axios.js";
 const pendingUsers = [];
 
+function getUser() {
+  const data = JSON.parse(localStorage.getItem('user'))
+
+  if (!data || !data.user || !data.user.id) {
+    console.error("Usuário não encontrado no localStorage");
+    return [];
+  }
+
+  return data
+}
+
 async function getNotificationsByUser() {
   const data = JSON.parse(localStorage.getItem("user"));
   
@@ -73,4 +84,5 @@ export default {
   getRoleFromToken,
   getUsers,
   getPendingUsers,
+  getUser,
 };

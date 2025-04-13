@@ -31,6 +31,7 @@ const routes = [
       }
     },
   },
+  { path: "/profile-prod", name: "ProfileProdutor", component: () => import("@/components/profiles/ProfileProdutor.vue"), meta: { requiresAuth: false } },
   { path: "/", redirect: "/login" },
 ];
 

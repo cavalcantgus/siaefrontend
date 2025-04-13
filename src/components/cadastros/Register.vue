@@ -108,6 +108,7 @@ export default {
     username: null,
     email: null,
     password: null,
+    cpf: null,
     showPassword: false,
   }),
 
@@ -119,6 +120,7 @@ export default {
         username: this.username,
         email: this.email,
         password: this.password,
+        cpf: this.cpf
       };
 
       try {
