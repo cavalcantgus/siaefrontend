@@ -39,50 +39,28 @@
                     <p>Esqueci a senha</p>
                   </router-link>
                 </div>
-                <v-text-field
-                  v-model="username"
-                  rounded
-                  variant="outlined"
-                  placeholder="Usuário"
-                  dense
-                  hide-details
-                />
+                <v-text-field v-model="username" rounded variant="outlined" placeholder="Usuário" dense hide-details />
               </v-col>
             </v-row>
             <v-row dense>
               <v-col>
-                <v-text-field
-                  v-model="password"
-                  rounded
-                  variant="outlined"
-                  placeholder="Senha"
-                  :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                  :type="showPassword ? 'text' : 'password'"
-                  @click:append-inner="showPassword = !showPassword"
-                  dense
-                  hide-details
-                  class="custom-text-field"
-                />
+                <v-text-field v-model="password" rounded variant="outlined" placeholder="Senha" :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" :type="showPassword ? 'text' : 'password'" @click:append-inner="showPassword = !showPassword" dense hide-details class="custom-text-field" />
               </v-col>
             </v-row>
           </v-card-text>
           <v-card-actions>
             <v-container>
               <v-btn :loading="loading" type="submit" class="btn-login">
-                <template v-slot:default>
-                  Entrar
-                </template>
+                <template v-slot:default> Entrar </template>
                 <template v-slot:loader>
-                  <v-progress-circular indeterminate color="white" ></v-progress-circular>
+                  <v-progress-circular indeterminate color="white"></v-progress-circular>
                 </template>
               </v-btn>
             </v-container>
           </v-card-actions>
           <v-row dense justify="end">
             <v-col class="text-end forgot-password-container">
-              <router-link class="forgot_password" to="/change-password"
-                >Esqueci minha senha</router-link
-              >
+              <router-link class="forgot_password" to="/change-password">Esqueci minha senha</router-link>
             </v-col>
           </v-row>
         </v-form>
@@ -107,42 +85,52 @@ export default {
   }),
   methods: {
     async login() {
-      this.loading = true
-      const toast = useToast()
-      const fields = {
-        username: this.username,
-        password: this.password,
-      };
+      this.loading = true;
+      const toast = useToast();
+      const { username, password } = this;
 
       try {
         console.log("Teste de requisição");
-        const response = await axios.post("/login/auth", fields);
-        const fulltoken = response.data.token;
-        const token = fulltoken.split(" ")[1];
+
+        const response = await axios.post("/login/auth", { username, password });
+        const [_, token] = response.data.token.split(" ");
 
         localStorage.setItem("token", token);
-        localStorage.setItem('user', JSON.stringify(response.data))
-        this.$router.push("/menu");
-      } catch (error) {
-        if(error.response) {
-          console.log(error.response)
-          if(error.response.data.message === "Seu login ainda não foi habilitado. Confirme o e-mail.") {
-            toast.warning(error.response.data.message)
-          }
-          else {
-            toast.error("Erro ao fazer o login. " + error.response.data.message)
-          }
-        } else {
-          console.error("Erro de conexão: ", error)
+        localStorage.setItem("user", JSON.stringify(response.data));
+
+        const role = utilsFunc.getRoleFromToken();
+        console.log("ROLE", typeof role);
+
+        if (role === "PRODUTOR") {
+          console.log("Caiu na condição");
+          return this.$router.push("/profile-prod");
         }
+
+        return this.$router.push("/menu");
+      } catch (error) {
+        this.handleLoginError(error, toast);
       } finally {
-        this.loading = false; 
+        this.loading = false;
+      }
+    },
+
+    handleLoginError(error, toast) {
+      if (error.response) {
+        const { message } = error.response.data;
+
+        if (message === "Seu login ainda não foi habilitado. Confirme o e-mail.") {
+          toast.warning(message);
+        } else {
+          toast.error("Erro ao fazer o login. " + message);
+        }
+      } else {
+        console.error("Erro de conexão: ", error);
       }
     },
   },
   mounted() {
     console.log("TESTANDO");
-  }
+  },
 };
 </script>
 

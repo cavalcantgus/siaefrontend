@@ -1,76 +1,98 @@
 <template>
   <v-main>
-    <div class="container">
-      <!-- Primeiro card (verde) -->
-      <v-card class="card-first" color="#57a340">
-        <div class="green-card-container">
-          <h3 class="welcome">BEM-VINDO</h3>
-          <div class="logo-name-container">
-            <h3 class="logo-name">SIAE</h3>
-          </div>
-        </div>
-        <p class="slogan">
-          O sistema que garante alimentação<br />
-          de qualidade para os nossos alunos
-        </p>
-      </v-card>
-
-      <!-- Segundo card (branco) -->
-      <v-card class="card-second" color="#ffffff">
-        <v-row>
-          <v-col class="text-center">
-            <div class="logo-circle">
-              <v-img class="logo-img" src=".\img\logo (1).svg"></v-img>
+    <v-container class="d-flex container">
+      <v-row dense align="center" justify="center" class="">
+        <!-- Primeiro card (verde) -->
+        <v-col cols="12" sm="6" md="4" class="d-flex">
+          <v-card class="flex-grow-1 align-center rounded-xl elevation-4 card-1" color="#57a340" height="550px">
+            <div class="green-card-container">
+              <h3 class="welcome">BEM-VINDO</h3>
+              <div class="logo-name-container">
+                <h3 class="logo-name">SIAE</h3>
+              </div>
             </div>
-          </v-col>
-        </v-row>
-        <v-form class="form-container" v-on:submit.prevent="register">
-          <v-card-text>
-            <v-row dense>
-              <v-col dense>
-                <div class="options-bar">
-                  <router-link class="arch-left" to="/register">
-                    <p>Cadastrar</p>
-                  </router-link>
-                  <router-link class="rectangle" to="/login">
-                    <p>Login</p>
-                  </router-link>
-                  <router-link class="arch-right" to="/change-password">
-                    <p>Esqueci a senha</p>
-                  </router-link>
+            <p class="slogan">
+              O sistema que garante alimentação<br />
+              de qualidade para os nossos alunos
+            </p>
+          </v-card>
+        </v-col>
+
+        <!-- Segundo card (branco) -->
+        <v-col cols="12" sm="6" md="5" class="d-flex justify-center card-2">
+          <v-card class="flex-grow-1 rounded-xl elevation-4" color="#ffffff" height="550px">
+            <v-row>
+              <v-col class="text-center">
+                <div class="logo-circle">
+                  <v-img class="logo-img" src=".\img\logo (1).svg"></v-img>
                 </div>
-                <v-text-field v-model="username" rounded variant="outlined" placeholder="Usuário" dense hide-details />
               </v-col>
             </v-row>
-            <v-row dense>
-              <v-col>
-                <v-text-field v-model="email" rounded variant="outlined" placeholder="Email" dense hide-details />
-              </v-col>
-            </v-row>
-            <v-row dense>
-              <v-col>
-                <v-text-field v-model="password" rounded variant="outlined" placeholder="Senha" :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" :type="showPassword ? 'text' : 'password'" @click:append-inner="showPassword = !showPassword" dense hide-details class="custom-text-field" />
-              </v-col>
-            </v-row>
-          </v-card-text>
-          <v-card-actions>
-            <v-container>
-              <v-btn :loading="loading" type="submit" class="btn-login">
-                Cadastrar
-                <template v-slot:loader>
-                  <v-progress-circular indeterminate color="white"></v-progress-circular>
-                </template>
-              </v-btn>
-            </v-container>
-          </v-card-actions>
-          <v-row dense justify="end">
-            <v-col class="text-end forgot-password-container">
-              <router-link class="forgot_password" to="/change-password">Esqueci minha senha</router-link>
-            </v-col>
-          </v-row>
-        </v-form>
-      </v-card>
-    </div>
+            <v-form class="form-container" v-on:submit.prevent="register">
+              <v-card-text>
+                <v-row dense>
+                  <v-col dense>
+                    <div class="options-bar">
+                      <router-link class="arch-left" to="/register">
+                        <p>Cadastrar</p>
+                      </router-link>
+                      <router-link class="rectangle" to="/login">
+                        <p>Login</p>
+                      </router-link>
+                      <router-link class="arch-right" to="/change-password">
+                        <p>Esqueci a senha</p>
+                      </router-link>
+                    </div>
+                  </v-col>
+                </v-row>
+                <v-row dense class="mt-5">
+                  <v-col cols="12" sm="6" md="4" lg="6">
+                    <v-text-field v-model="username" rounded variant="outlined" density="compact" placeholder="Usuário" dense hide-details />
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4" lg="6">
+                    <v-text-field v-model="cpf" rounded variant="outlined" density="compact" placeholder="CPF" dense hide-details />
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4" lg="6">
+                    <v-text-field v-model="email" rounded variant="outlined" density="compact" placeholder="Email" dense hide-details />
+                  </v-col>
+
+                  <v-col cols="12" sm="6" md="4" lg="6">
+                    <v-text-field
+                      v-model="password"
+                      rounded
+                      variant="outlined"
+                      placeholder="Senha"
+                      :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                      :type="showPassword ? 'text' : 'password'"
+                      @click:append-inner="showPassword = !showPassword"
+                      dense
+                      hide-details
+                      class="custom-text-field"
+                      density="compact"
+                    />
+                  </v-col>
+                </v-row>
+              </v-card-text>
+              <v-card-actions class="mt-7">
+                <v-container>
+                  <v-btn :loading="loading" type="submit" class="btn-login">
+                    Cadastrar
+                    <template v-slot:loader>
+                      <v-progress-circular indeterminate color="white"></v-progress-circular>
+                    </template>
+                  </v-btn>
+                </v-container>
+              </v-card-actions>
+              <v-row dense justify="end">
+                <v-col class="text-end forgot-password-container">
+                  <router-link class="forgot_password" to="/change-password">Esqueci minha senha</router-link>
+                </v-col>
+              </v-row>
+            </v-form>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
   </v-main>
 </template>
 
@@ -86,8 +108,10 @@ export default {
     username: null,
     email: null,
     password: null,
+    cpf: null,
     showPassword: false,
   }),
+
   methods: {
     async register() {
       const toast = useToast();
@@ -96,6 +120,7 @@ export default {
         username: this.username,
         email: this.email,
         password: this.password,
+        cpf: this.cpf
       };
 
       try {
@@ -124,29 +149,20 @@ export default {
 .container {
   display: flex;
   justify-content: center; /* Centraliza horizontalmente */
+  flex-wrap: wrap;
   align-items: center; /* Centraliza verticalmente */
-  height: 100vh; /* Ocupa a altura total da tela */
+  min-height: 100vh; /* Garante que ocupe ao menos 100% da altura da tela */
   position: relative;
+  overflow-y: hidden; /* Impede o scroll */
 }
 
-.card-first {
-  position: absolute;
-  border-radius: 20px;
+.card-1 {
   z-index: 1;
-  width: 550px;
-  height: 550px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-  transform: translate(-180px);
 }
 
-.card-second {
-  position: absolute;
-  border-radius: 20px;
+.card-2 {
   z-index: 2;
-  width: 430px;
-  height: 550px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-  transform: translate(220px);
+  
 }
 
 .form-container {
@@ -164,7 +180,7 @@ export default {
 
 .green-card-container {
   display: grid;
-  justify-content: center; /* Centraliza horizontalmente */
+  justify-items: center; /* Centraliza horizontalmente */
   align-items: center; /* Centraliza verticalmente */
   position: relative;
 }
@@ -172,12 +188,11 @@ export default {
 .welcome {
   font-size: 1.6rem;
   margin-top: 100px;
-  margin-right: 90px;
+ 
 }
 
 .logo-name {
   margin-top: 110px;
-  margin-right: 110px;
 }
 
 .logo-name-container {
@@ -186,7 +201,6 @@ export default {
   height: 35px;
   width: 120px;
   margin-top: 110px;
-  margin-left: 15px !important;
   transform: skew(20deg); /* Inclinação do paralelogramo */
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.4); /* Sombra */
 }
@@ -204,7 +218,6 @@ export default {
 .slogan {
   font-size: 1.1rem;
   margin-top: 100px;
-  margin-right: 90px;
 }
 
 .btn-login {
@@ -298,4 +311,14 @@ export default {
   background-color: #57a340;
   transform: scale(0.9);
 }
+
+::v-deep(.v-field__input) {
+  font-size: 12px !important;
+  padding: 5px 20px !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: justify !important;
+  white-space: normal !important;
+}
+
 </style>
