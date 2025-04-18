@@ -119,7 +119,7 @@ export default {
         console.log(response.data);
 
         if (Array.isArray(response.data)) {
-          this.proofs = response.data.filter(proof => proof.enviadoParaPagamento === false);
+          this.proofs = response.data.filter(proof => proof.enviadoParaPagamento !== true);
         } else {
           console.log("A resposta da API não é um Array");
           this.proofs = [];

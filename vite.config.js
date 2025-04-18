@@ -7,7 +7,11 @@ export default defineConfig({
   server: {
     host: true,
     base: '/siaefrontend/',
-    allowedHosts: ['www.siaeserver.com']
+    allowedHosts: ['www.siaeserver.com'],
+    watch: {
+      usePolling: true, // força Vite a "escutar" mudanças mesmo em Windows ou VSCode
+      interval: 100
+    }
   },
   plugins: [
     vue(),
