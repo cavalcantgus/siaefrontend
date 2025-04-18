@@ -14,7 +14,7 @@ function getUser() {
 
 async function getNotificationsByUser() {
   const data = JSON.parse(localStorage.getItem("user"));
-  
+  console.log("DATA: ", data)
   if (!data || !data.user || !data.user.id) {
     console.error("Usuário não encontrado no localStorage");
     return [];

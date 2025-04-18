@@ -13,6 +13,7 @@
   overflow-y: auto;
 }
 
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -20,14 +21,6 @@ a {
 }
 a:hover {
   color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 100vw;
-  min-height: 100vh;
 }
 
 h1 {
@@ -59,6 +52,18 @@ button:hover {
   margin: 0 auto;
   text-align: center;
 }
+
+
+@media (min-width: 768px) {
+  html, body .app{
+    margin: 0;
+    padding: 0;
+    width: 100vw;  /* Usa 100% da largura da janela */
+    height: 100vh; /* Usa 100% da altura da janela */
+    overflow: hidden; /* Impede qualquer tipo de scroll */
+  }
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

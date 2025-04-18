@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import utilsFunc from "../services/utilsFunc";
 
 const routes = [
   { path: "/login", name: "Login", component: () => import("@/components/login/Login.vue") },
@@ -6,7 +7,7 @@ const routes = [
   { path: "/menu", name: "Menu", component: () => import("@/components/Menu.vue"), meta: { requiresAuth: true } },
   { path: "/register", name: "Register", component: () => import("@/components/cadastros/Register.vue"), meta: { requiresAuth: false } },
   { path: "/menu-pnae", name: "Pnae", component: () => import("@/components/menus/MenuPnae.vue"), meta: { requiresAuth: true } },
-  { path: "/cadastro-produtor", name: "Produtor", component: () => import("@/components/cadastros/produtor/Produtor.vue"), meta: { requiresAuth: true } },
+  { path: "/cadastro-produtor", name: "Produtor", component: () => import("@/components/cadastros/produtor/Produtor.vue"), meta: { requiresAuth: true, roles: ['admin'] } },
   { path: "/cadastro-produto", name: "Produto", component: () => import("@/components/cadastros/produto/Produto.vue"), meta: { requiresAuth: true } },
   { path: "/pesquisa-de-preco", name: "PesquisaDePreco", component: () => import("@/components/cadastros/pesquisaDePreco/PesquisaDePreco.vue"), meta: { requiresAuth: true } },
   { path: "/pauta-da-chamada", name: "PautaDaChamada", component: () => import("@/components/cadastros/pautaDaChamada/PautaDaChamada.vue"), meta: { requiresAuth: true } },
@@ -42,9 +43,16 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem("token"); // Verifica se o usuário tem um token válido
+  const userRole = utilsFunc.getRoleFromToken()
 
-  if (to.meta.requiresAuth && !token) {
-    next("/login"); // Redireciona para login se tentar acessar uma página protegida sem token
+  if (to.meta.requiresAuth) {
+    if(!token) {
+      next("/login");
+    } else if(to.meta.roles && !to.meta.roles.includes(userRole.toLowerCase())) {
+      next('/login');
+    } else {
+      next();
+    }
   } else {
     next(); // Permite a navegação normal
   }

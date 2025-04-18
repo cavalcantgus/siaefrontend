@@ -1,9 +1,9 @@
 <template>
     <v-menu offset="12">
         <template #activator="{ props }">
-            <v-btn icon v-bind="props" class="notifications" @click="document.activeElement.blur()">
+            <v-btn icon v-bind="props" class="notifications elevation-0 mx-0" @click="document.activeElement.blur()">
                 <v-badge :content="notifications.length" color="red" overlap>
-                    <v-icon>mdi-bell</v-icon>
+                    <v-icon color="white">mdi-bell</v-icon>
                 </v-badge>
             </v-btn>
         </template>
