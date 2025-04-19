@@ -73,7 +73,7 @@
             </v-col>
 
             <v-col cols="12" md="5" class="mb-md-8 text-center text-md-left mr-md-12 mb-9">
-              <h1 class="font-weight-regular username" style="text-shadow: 0px 4px 5px rgba(0, 0, 0, 0.6)">Olá, {{ user.user.username }}</h1>
+              <h1 class="font-weight-regular username" style="text-shadow: 0px 4px 5px rgba(0, 0, 0, 0.6)">Olá, {{ user?.user?.username || "Não informado" }}</h1>
               <p class="text-h6 font-weight-regular welcome" style="text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7)">Bem-vindo ao seu perfil</p>
             </v-col>
           </v-row>
@@ -83,19 +83,19 @@
           <v-row class="d-flex justify-md-end justify-start" align="center">
             <v-col v-if="!isMobile" cols="12" md="2" class="mb-md-n16 d-flex">
               <div class="flex-column text-md-start mb-md-n16 mt-4">
-                <h1 class="font-weight-bold mb-1" style="font-size: 18px">Marcelo Cavalcanti</h1>
-                <span class="text-subtitle-2 text-grey">{{ user.user.role }}</span>
+                <h1 class="font-weight-bold mb-1" style="font-size: 18px">{{ user?.user?.username || "Não informado" }}</h1>
+                <span class="text-subtitle-2 text-grey">{{ user?.user?.role || "Sem cargo"}}</span>
               </div>
             </v-col>
             <v-row v-if="isMobile" class="justify-space-between align-end">
               <v-col cols="12" md="5" class="mb-md-8 text-center text-md-left mr-md-12 mb-9 mt-n3">
-                <h1 style="font-size: 25px; color: #57a340;">Olá, {{ user.user.username }}</h1>
+                <h1 style="font-size: 25px; color: #57a340;">Olá, {{ user?.user?.username || "Não informado"}}</h1>
                 <p style="font-size: 16px; color: #57a340; font-weight: 300px;">Bem-vindo ao seu perfil</p>
               </v-col>
               <v-col cols="auto" class="d-flex align-end ">
                 <div class="text-md-start mt-4">
                   <v-icon color="#57a340" class="mr-2 ml-n2">mdi-leaf-circle</v-icon>
-                  <span class="text-subtitle-2 text-grey">{{ user.user.role }}</span>
+                  <span class="text-subtitle-2 text-grey">{{ user?.user?.role || "Sem cargo"}}</span>
                 </div>
               </v-col>
 
@@ -112,25 +112,25 @@
                 <!-- Nome -->
                 <v-col v-if="isMobile" cols="12" md="4" class="mb-n5">
                   <v-icon color="#57a340" class="" left>mdi-account</v-icon>
-                  <span class="ml-2" style="margin-left: 30px; font-size: 13px">{{ user.user.username }}</span>
+                  <span class="ml-2" style="margin-left: 30px; font-size: 13px">{{ user?.user?.completeName || "Não informado" }}</span>
                 </v-col>
 
                 <v-col v-if="!isMobile" cols="12" md="4" class="">
                   <v-icon color="#57a340" class="mr-2" left>mdi-account</v-icon>
                   <strong class="mr-3">Nome:</strong><br />
-                  <span style="margin-left: 30px">{{ user.user.username }}</span>
+                  <span style="margin-left: 30px">{{ user?.user?.completeName || "Não informado" }}</span>
                 </v-col>
 
                 <!-- Email -->
                 <v-col v-if="isMobile" cols="12" md="4" class="mb-n11">
                   <v-icon color="#57a340" class="" left>mdi-email</v-icon>
-                  <span class="ml-2" style="margin-left: 30px; font-size: 13px">{{ user.user.email || "Não informado" }}</span>
+                  <span class="ml-2" style="margin-left: 30px; font-size: 13px">{{ user?.user?.email || "Não informado" }}</span>
                 </v-col>
 
                 <v-col v-if="!isMobile" cols="12" md="4" class="">
                   <v-icon color="#57a340" class="mr-2" left>mdi-email</v-icon>
                   <strong>Email:</strong><br />
-                  <span style="margin-left: 30px">{{ user.user.email || "Não informado" }}</span>
+                  <span style="margin-left: 30px">{{ user?.user?.email || "Não informado" }}</span>
                 </v-col>
 
                 <!-- Card de Cadastrado Desde -->
@@ -147,25 +147,25 @@
                 <!-- Contato -->
                 <v-col v-if="isMobile" cols="12" md="4" class="mb-n5">
                   <v-icon color="#57a340" class="" left>mdi-phone</v-icon>
-                  <span class="ml-2" style="margin-left: 30px; font-size: 13px">{{ produtor.contato || "Sem número" }}</span>
+                  <span class="ml-2" style="margin-left: 30px; font-size: 13px">{{ produtor?.contato || "Sem número" }}</span>
                 </v-col>
 
                 <v-col v-if="!isMobile" cols="12" md="4" class="">
                   <v-icon color="#57a340" class="mr-2" left>mdi-phone</v-icon>
                   <strong>Telefone:</strong><br />
-                  <span  style="margin-left: 30px">{{ produtor.contato || "Sem número" }}</span>
+                  <span  style="margin-left: 30px">{{ produtor?.contato || "Sem número" }}</span>
                 </v-col>
 
                 <!-- Email -->
                 <v-col v-if="isMobile" cols="12" md="4">
                   <v-icon color="#57a340" class="" left>mdi-map-marker</v-icon>
-                  <span class="ml-2" style="margin-left: 30px; font-size: 13px">{{ produtor.municipio + " - " + produtor.estado || "Não informado" }}</span>
+                  <span class="ml-2" style="margin-left: 30px; font-size: 13px">{{ produtor?.municipio + " - " + produtor?.estado || "Não informado" }}</span>
                 </v-col>
 
                 <v-col v-if="!isMobile" cols="12" md="4" class="">
                   <v-icon color="#57a340" class="mr-2" left>mdi-map-marker</v-icon>
                   <strong>Localização:</strong><br />
-                  <span style="margin-left: 30px">{{ produtor.municipio + " - " + produtor.estado || "Não informado" }}</span>
+                  <span style="margin-left: 30px">{{ produtor?.municipio + " - " + produtor?.estado || "Não informado" }}</span>
                 </v-col>
 
                 <v-col v-if="!isMobile" cols="12" md="4" class="pb-0">
@@ -548,8 +548,8 @@ export default {
         const response = await axios.get("public/produtores");
         console.log(response.data);
         console.log(this.user);
-        this.produtor = response.data.find((p) => p.cpf === this.user.user.cpf);
-        console.log(this.produtor.id);
+        this.produtor = response.data.find((p) => p.cpf === this.user?.user?.cpf);
+        console.log(this.produtor?.id);
       } catch (error) {
         console.error(error);
       }
@@ -621,7 +621,7 @@ export default {
 
     async getProjetoPerProductor() {
       try {
-        const { data } = await axios.get(`public/projetos/projeto/${this.produtor.id}`);
+        const { data } = await axios.get(`public/projetos/projeto/${this.produtor?.id}`);
         this.projects.push(data);
         this.sections[0].items = this.projects;
         console.log("projetos", this.projects);
@@ -632,7 +632,7 @@ export default {
 
     async getEntregasPerProductor() {
       try {
-        const { data } = await axios.get(`public/comprovantes/comprovante/${this.produtor.id}`);
+        const { data } = await axios.get(`public/comprovantes/comprovante/${this.produtor?.id}`);
         this.entregas = data;
         this.sections[1].items = this.entregas;
         console.log("entregas", this.entregas);
@@ -643,7 +643,7 @@ export default {
 
     async getPagamentosPerProductor() {
       try {
-        const { data } = await axios.get(`public/pagamentos/pagamento/${this.produtor.id}`);
+        const { data } = await axios.get(`public/pagamentos/pagamento/${this.produtor?.id}`);
         this.pagamentos = data;
         this.sections[2].items = this.pagamentos;
         console.log("pagamentos", this.pagamentos);

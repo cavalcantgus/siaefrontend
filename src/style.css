@@ -51,18 +51,10 @@ button:hover {
   width: 100vw;
   margin: 0 auto;
   text-align: center;
+  height: 100%;
 }
 
 
-@media (min-width: 768px) {
-  html, body .app{
-    margin: 0;
-    padding: 0;
-    width: 100vw;  /* Usa 100% da largura da janela */
-    height: 100vh; /* Usa 100% da altura da janela */
-    overflow: hidden; /* Impede qualquer tipo de scroll */
-  }
-}
 
 @media (prefers-color-scheme: light) {
   :root {
@@ -93,6 +85,11 @@ h6 {
   justify-self: center;
 }
 
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
 
 .text-justify {
   text-align: justify-all !important;
