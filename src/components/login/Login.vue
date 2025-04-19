@@ -37,7 +37,7 @@
           </v-col>
         </v-row>
         <v-row v-if="isMobile" justify="center" align="center" class="d-flex justify-center w-100" >
-          <v-form >
+          <v-form v-on:submit.prevent="login">
             <v-row no-gutters>
               <v-col cols="12" class="">
                 <v-text-field v-model="username" bg-color="#f5f4f4" rounded variant="" placeholder="Usuário" density="comfortable" :rules="nomeRules"/>
