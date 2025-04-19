@@ -25,7 +25,7 @@
           </v-col>
         </v-row>
         <v-row v-if="isMobile" justify="center" align="center" class="d-flex justify-center w-100" >
-          <v-form >
+          <v-form v-on:submit.prevent="register">
             <v-row no-gutters>
               <v-col cols="12" class="">
                 <v-text-field class="required" v-model="completeName"  placeholder="Nome Completo " bg-color="#f5f4f4" rounded variant=""  density="compact" :rules="nomeRules"/>
